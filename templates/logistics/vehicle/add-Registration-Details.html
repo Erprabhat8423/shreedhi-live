@@ -1,0 +1,508 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 550%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-500" />
+                    <h4 class="modalColHead">Registration Details</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addRegistrationDetails" method="POST" autocomplete="off"  action="" aria-label="Product">
+                    {% csrf_token %}
+                    <input type="hidden" name="vehicle_id" value="{{vehicle.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Registration Details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveRegistrationDetails()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"}
+                            onclick="RegistrationList('{{ vehicle.id }}')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Owner Name*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Owner Name*" name="owner_name" id="owner_name" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration Number*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Registration Number*" name="registration_number"  id="registration_number1" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registered Address*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Registered Address*" name="registered_address" id="registered_address" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>RTO*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="RTO*" name="rto" id="rto" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration Fees Amount*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Registration Fees Amount*" name="registration_fees_amount" id="registration_fees_amount" onkeypress="return validateFloatKeyPress(this,event);" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration Date*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Registration Date*" name="registration_date" id="registration_date" readonly maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration Valid Till*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Registration Validity*" readonly name="registration_valid_till" id="registration_valid_till" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration Copy</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input type="file" class="inputField" type="text" placeholder="Registration Copy*" name="registration_copy" id="registration_copy" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <div id="newRow">
+                    
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    
+    function saveRegistrationDetails() {
+        if(validateZoneForm()){
+            hideLoader();
+            return false;
+        }else{
+            var vehicle_id="{{vehicle.id}}";
+            $form = $(this)
+            var formData = new FormData(document.getElementById("addRegistrationDetails"));
+            $.ajax({
+                url:'{% url 'src:add-RegistrationDetails' '1' %}',
+                url:url.replace('1',vehicle_id),
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    
+                    if(data.flag){
+                        RegistrationList('{{ vehicle.id }}')
+                    }
+                    else{
+                        openToaster('success',data.message)
+                        window.location= ""
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    function validateZoneForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        var a = document.getElementById("owner_name").value;
+        
+        if(a.length > 50){
+            $('#owner_name').parent().find('.error_msg').text('Length should be less than 50');
+            $('#owner_name').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        var length = $.trim($("#owner_name").val()).length;
+        if(length == 0){
+            $('#owner_name').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#owner_name').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        
+
+        if($('#owner_name').val() == ""){
+            $('#owner_name').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#owner_name').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+         
+        
+        
+            
+        
+        if($('#registered_address').val() == ""){
+            $('#registered_address').parent().find('.error_msg').text('Please Give Registered Address');
+            $('#registered_address').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("registered_address").value;
+        
+        if(a.length > 50){
+            $('#registered_address').parent().find('.error_msg').text('Length should be less than 50');
+            $('#registered_address').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#registered_address").val()).length;
+        if(length == 0){
+            $('#registered_address').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#registered_address').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+        
+        
+        
+        if($('#rto').val() == ""){
+            $('#rto').parent().find('.error_msg').text('Please Give Rto Details');
+            $('#rto').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("rto").value;
+        
+        if(a.length > 50){
+            $('#rto').parent().find('.error_msg').text('Length should be less than 50');
+            $('#rto').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#rto").val()).length;
+        if(length == 0){
+            $('#rto').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#rto').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        
+        
+        
+        
+        if($('#registration_valid_till').val() == ""){
+            $('#registration_valid_till').parent().find('.error_msg').text('Please Give Registration Validity');
+            $('#registration_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        var a = document.getElementById("registration_valid_till").value;
+        
+        if(a.length > 50){
+            $('#registration_valid_till').parent().find('.error_msg').text('Length should be less than 50');
+            $('#registration_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#registration_valid_till").val()).length;
+        if(length == 0){
+            $('#registration_valid_till').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#registration_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        
+        
+        
+        
+        
+        if($('#registration_date').val() == ""){
+            $('#registration_date').parent().find('.error_msg').text('Please Give Registration Date');
+            $('#registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("registration_date").value;
+        
+        if(a.length > 50){
+            $('#registration_date').parent().find('.error_msg').text('Length should be less than 50');
+            $('#registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#registration_date").val()).length;
+        if(length == 0){
+            $('#registration_date').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        
+        
+        
+        if($('#registration_number1').val() == ""){
+            $('#registration_number1').parent().find('.error_msg').text('Please Give Registration No.');
+            $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        var a = document.getElementById("registration_number1").value;
+        
+        if(a.length > 50){
+            $('#registration_number1').parent().find('.error_msg').text('Length should be less than 50');
+            $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#registration_number1").val()).length;
+        if(length == 0){
+            $('#registration_number1').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+        
+        
+        
+        
+        if($('#registration_fees_amount').val() == ""){
+            $('#registration_fees_amount').parent().find('.error_msg').text('Please Give Registration Fees Amt.');
+            $('#registration_fees_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        var a = document.getElementById("registration_fees_amount").value;
+        
+        if(a.length > 50){
+            $('#registration_fees_amount').parent().find('.error_msg').text('Length should be less than 50');
+            $('#registration_fees_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#registration_fees_amount").val()).length;
+        if(length == 0){
+            $('#registration_fees_amount').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#registration_fees_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        if($('#registration_copy').val() != ""){
+            var ext = $('#registration_copy').val().split('.').pop().toLowerCase();
+            var oFile = document.getElementById("registration_copy").files[0]; 
+            if($.inArray(ext, ['png','jpg','jpeg']) == -1 ) {
+                $('#registration_copy').parent().find('.error_msg').text('Only PNG and JPEG are allowed.');
+                $('#registration_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            if (oFile.size > 5242880) 
+            {
+                $('#registration_copy').parent().find('.error_msg').text(' Image file should not be more than 5 MB ');
+                $('#registration_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            
+        }
+
+
+  
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+
+    function validateDateRange(){
+        if($("#registration_valid_till").val() != "" && $("#registration_date").val() != ""){
+                registration_date = new Date(getDateFormat($("#registration_date").val()));
+                registration_valid_till = new Date(getDateFormat($("#registration_valid_till").val()));
+                $('.error_msg').text('');
+                $('[name="registration_date"]').css("border", "");
+                $('[name="registration_valid_till"]').css("border", "");
+    
+                if(registration_date > registration_valid_till){
+                    $('[name="registration_valid_till"]').parent().find('.error_msg').text('Date Should Be More Than Registration Date');
+                    $('[name="registration_valid_till"]').css("border", "1px solid #db8305");
+                    $("#registration_valid_till").val('')
+                    return false;
+                }
+                }
+    }
+
+
+    function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+    
+    
+    
+    
+    $("#registration_date").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+    });
+    
+    $("#registration_valid_till").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+        
+    });
+
+
+
+    
+    
+    
+</script>

@@ -1,0 +1,989 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+    .table td, .table th{
+        padding:0.65rem!important;
+    }
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+    
+    #user_wise_order {
+        width: 100%;
+        height: 200px;
+        border-top:1px solid rgb(223, 223, 223);
+        border-left:1px solid rgb(223, 223, 223);
+        border-bottom:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    
+    #product_wise_order {
+        width: 100%;
+        height: 200px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    #weekly {
+        width: 100%;
+        height: 280px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{
+        text-align:left!important;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                    <div class="col-md-12 p-md-0 text-left" style="margin-top:50px;" >
+                        <span id="order_count">Order Count: {{orders|length}}/<a href="javascript:void(0)" onclick="getDefaulterUserList('{{user_id}}')">{{total_user_count}}</a></span>
+                        
+                    </div>
+                </div>
+                <div class="col-md-8 p-md-0">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-4 p-md-0">
+                            <div class="col-md-3 p-md-2" style="float: left;">
+                                {% if role_id == 0 %}
+                                <select class="inputField selectField" style="width: 100% !important; padding: 0.3rem;" name="order_status" id="order_status" onchange="getOrderRecord()">
+                                    <option value="">All Status</option>
+                                    <option value="1" {% if order_status == 1 %} selected {% endif %}>Initiated</option>
+                                    <option value="2" {% if order_status == 2 %} selected {% endif %}>Forwarded</option>
+                                    <option value="3" {% if order_status == 3 %} selected {% endif %}>Approved</option>
+                                    <option value="4" {% if order_status == 4 %} selected {% endif %}>Delivered</option>
+                                </select>
+                                {% else %}
+                                <input type="hidden" name="order_status" id="order_status" />
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 p-md-2" style="float: left;">
+                                <select class="inputField selectField" style="width: 100% !important; padding: 0.3rem;" name="town_id" id="town_id" onchange="getOrderRecord()">
+                                    <option value="">All Town</option>
+                                    {% for town in towns%}
+                                    <option value="{{ town.id }}">{{ town.town }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 p-md-2" style="float: left;">
+                                <select class="inputField selectField" style="width: 100% !important; padding: 0.3rem;" name="route_id" id="route_id" onchange="getOrderRecord()">
+                                    <option value="">All Route</option>
+                                    {% for route in routes%}
+                                    <option value="{{ route.id }}">{{ route.route }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 p-md-2" style="float: right;">
+                                <button type="button" class="btn btn-primary"  onclick="addOrder()">Add Order</button>
+    
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <!-- <input class="searchTable" style="width: 30%;" placeholder="SAP ID-Dist./SS. Name" type="search" name="search" id="user_sap_id" data-column="all" maxlength="20" onkeyup="getOrderRecord()"> -->
+                            <select class="inputField selectField" style="width: 30% !important; margin-right: 5px; padding: 0.3rem; text-align: left;" name="user_sap_id" id="user_sap_id" onchange="getOrderRecord()">
+                                <option value="">Select SAP ID</option>
+                                {% for user in user_list %}
+                                <option value="{{ user.emp_sap_id }}">{{ user.store_name }}({{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}/{{user.emp_sap_id}})</option>
+                                {% endfor %}
+                            </select>
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 25%; padding: 0.3rem;" onchange="getOrderRecord()" readonly>
+                            {% if role_id == 0%}
+                            <button type="button" class="btn iconBox iconForward" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconApproved" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+                            {% else %}
+                            {% if level_id == 2 %}
+                            <button type="button" class="btn iconBox iconForward" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+                            {% else %}
+                            <button type="button" class="btn iconBox iconApproved" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+                            {% endif %}
+                            {% endif %}
+                            <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                    </div>
+                                </div>
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="order_id" id="order_id" data-id="1"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="order_id">Order ID</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="distributor_ss" id="distributor_ss" data-id="2"
+                                        onclick="showHideColumns(this.id, 2)"
+                                        />
+                                        <label class="mb-0" for="distributor_ss">Store(Dist./SS)</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="shift" id="shift" data-id="3"
+                                        onclick="showHideColumns(this.id, 3)"
+                                        />
+                                        <label class="mb-0" for="shift">Shift</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="route" id="route" data-id="4"
+                                        onclick="showHideColumns(this.id, 4)"
+                                        />
+                                        <label class="mb-0" for="route">Route</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="amount" id="amount" data-id="4"
+                                        onclick="showHideColumns(this.id, 5)"
+                                        />
+                                        <label class="mb-0" for="amount">Amount </label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="status" id="status" data-id="4"
+                                        onclick="showHideColumns(this.id, 6)"
+                                        />
+                                        <label class="mb-0" for="status">Status</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="order_date" id="order_date" data-id="4"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="order_date">Order Date</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="order_id" id="lock_order_id" data-id="1"
+                                    onclick="toggleFreeze(this.id,'order_id',1)" />
+                                    <label class="mb-0" for="lock_order_id">Order ID</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="distributor_ss"
+                                    id="lock_distributor_ss" data-id="2" 
+                                    onclick="toggleFreeze(this.id,'distributor_ss',2)" />
+                                    <label class="mb-0" for="lock_distributor_ss">Store(Dist./SS)</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="shift"
+                                    id="lock_shift" data-id="3"  
+                                    onclick="toggleFreeze(this.id,'shift',3)" />
+                                    <label class="mb-0" for="lock_shift">Shift</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="route" id="lock_route" data-id="4"
+                                    onclick="toggleFreeze(this.id,'route',4)" />
+                                    <label class="mb-0" for="lock_route">Route</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="amount" id="lock_amount" data-id="4"
+                                    onclick="toggleFreeze(this.id,'amount',5)" />
+                                    <label class="mb-0" for="lock_amount">Amount</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="status" id="lock_status" data-id="4"
+                                    onclick="toggleFreeze(this.id,'status',6)" />
+                                    <label class="mb-0" for="lock_status">Status</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="order_date" id="lock_order_date" data-id="4"
+                                    onclick="toggleFreeze(this.id,'order_date',7)" />
+                                    <label class="mb-0" for="lock_order_date">Order Date</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="sorter-false all_checkbox_class" style="border-right:none!important; width:32px!important; min-width: 32px!important;"><input type="checkbox" class="checked_all" id="new_module_1"> </th>
+                        <th class="order_id" id="order_id">
+                            Order ID
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="distributor_ss" id="distributor_ss">Store(Dist./SS)<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="shift" id="shift">Shift<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="route" id="route">Route<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="amount" id="amount">Amount<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="status" id="status">Status<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="order_date" id="order_date">Order Date<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if orders %}
+                    {% for order in orders %}
+                    <tr class="odd">
+                        <td class="sorter-false checked_class" >{% if role_id == 0 and order.order_status != 3 and order.order_status != 4 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% else %} {% if order.status == 0 %}{% if order.order_status == 1 and order.level_id == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% elif order.order_status == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% elif order.order_status == 3 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% else %}  {% endif %} {% else %} <input type="checkbox" disabled checked> {% endif %}{% endif %}</td>
+                        <td class="order_id" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_code }}</td>
+                        <td class="distributor_ss" onclick="getOrderDetails('{{ order.id }}')">{{ order.store_name }}({{ order.user_name }}/{{order.user_sap_id}})</td>
+                        <td class="shift" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_shift_name }}</td>
+                        <td class="route" onclick="getOrderDetails('{{ order.id }}')">{% if order.route_name %} {{ order.route_name }} {% else %} - {% endif %}</td>
+                        <td class="amount" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_total_amount }}</td>
+                        <td class="status" ><a href="javascript:void()" onclick="getOrderStatus('{{ order.id }}')">{% if role_id == 0 %} {% if order.order_status == 1 %} Initiated {% elif order.order_status == 2 %} Forwarded {% elif order.order_status == 3 %} Approved {% elif order.order_status == 4 %} Delivered  {% endif %} {% else %} 
+                            {% if order.order_status == 4 %} Delivered {% elif order.order_status == 3 %}Approved {% elif order.status == 0 %}{% if order.order_status == 1 and order.level_id == 2 %} Initiated {% elif order.order_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}</a></td>
+                            <td class="order_date" onclick="getOrderDetails('{{ order.id }}')">{% if order.order_date %} {{ order.order_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %}</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        {% if order.order_status == 1 %}
+                                        <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" onclick="editOrder('{{ order.id }}')"/>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </div> 
+                                    <div class="col-md-3">
+                                        {% if  order.order_status == 1 or order.order_status == 2 or order.order_status == 3 or order.order_status == 4  %}
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" name="is_active"
+                                            id="is_order_active_{{ order.id }}"
+                                            {% if order.block_unblock == 1 %} checked="" {% else %}
+                                            {% endif %}
+                                            onclick="updateUserOrderStatus('{{ order.id }}')">
+                                            <span class="slider round"></span>
+                                        </label> 
+                                        {% else %}
+                                        {% endif %} 
+
+                                    </div> 
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="loading" style="display: none;">
+                            <td class="text-center" colspan="9"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        <div class="col-12 p-0 col-md-12 p-md-0">
+            <h6><b>Total Order Stats </b></h6>
+            <div class="col-6 p-0 col-md-6" style="float: left;">
+                <div id="user_wise_order"></div>
+            </div>
+            
+            <div class="col-6 p-0 col-md-6" style="float: right;">
+                <div id="product_wise_order"></div>
+            </div>
+            <br clear="all"><br clear="all">
+            <!--<div class="col-12 p-0 m-10">-->
+                <!--    <h6><b>Last Week Order's Count</b></h6>-->
+                <!--    <div id="weekly"></div>-->
+                <!--</div>-->
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<!-- Resources -->
+<script src="{% static 'js/amchart/core.js' %}"></script>
+<script src="{% static 'js/amchart/charts.js' %}"></script>
+<script src="{% static 'js/amchart/frozen.js' %}"></script>
+<script src="{% static 'js/amchart/animated.js' %}"></script>
+
+<script src="{% static 'js/amchart/amcharts.js' %}"></script>
+<script src="{% static 'js/amchart/serial.js' %}"></script>
+<script src="{% static 'js/amchart/light.js' %}"></script>
+<!-- Chart code -->
+<script>
+    function updateUserOrderStatus(id,is_active) {
+
+        if ($('#is_order_active_'+id).prop("checked") == true) {
+            console.log(id)
+            is_active = 1;
+            status = 'Yes';
+        } else {
+            is_active = 0;  
+            status = 'No';
+        }
+        
+        //showLoader();
+        $.ajax({
+            url: "{% url 'src:update-user-order-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.error == false) {
+
+                    hideLoader();
+                    openToaster("success", data.message);
+                    setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                    
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }   
+    
+
+
+
+
+    function getOrderStatus(order_id){
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:order-status-details' %}",
+            method: 'GET',
+            data: { order_id:order_id },
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    function bouncer(arr) {
+        return arr.filter(Boolean);
+        }
+    function updateOrderStatus(level_id){
+        var orderID = [];
+        $("input:checkbox[class=checkbox]:checked").each(function(){
+            var id = parseInt($(this).val());
+            orderID.push(id);
+
+        });
+        orderID=bouncer(orderID)
+        {% if role_id == 0 %}
+        level_id = parseInt($('#order_status').val())+1;
+        {% else %}
+        level_id = level_id
+        {% endif %}
+        if(orderID.length > 0){
+            showLoader();
+            $.ajax({
+                url: "{% url 'src:update-order-status' %}",
+                method: 'POST',
+                data: { level_id:level_id, order_id: orderID, csrfmiddlewaretoken: '{{ csrf_token }}' },
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        hideLoader();
+                        openToaster("danger", data.message);
+                    }else{
+                        if (data.error == false) {
+                            console.log(data.message)
+                            hideLoader();
+                            openToaster("success", data.message);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    };
+    
+    
+    function addOrder(){
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-order' %}",
+            method: 'GET',
+          
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    hideLoader();
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(data);
+                    var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                    $("#addUserModalBody").height(mch);
+                    $(".selectField").select2();
+                }
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    function editOrder(id){
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:edit-order' %}",
+            method: 'GET',
+            data: { id:id },
+            success: function (data) {
+                if(data.error == true){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    hideLoader();
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(data);
+                    var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                    $("#addUserModalBody").height(mch);
+                    $(".selectField").select2();
+                }
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function exports(type){
+        var columns     = $('#show_columns').val();
+        var town_id     = $('#town_id').val();
+        if(town_id){ town_id = town_id; }else{ town_id = '0' }
+        var route_id    = $('#route_id').val();
+        if(route_id){ route_id = route_id; }else{ route_id = '0' }
+        var user_sap_id      = $('#user_sap_id').val();
+        if(user_sap_id){ user_sap_id = user_sap_id; }else{ user_sap_id = '0' }
+        var order_dates  = $('#order_datepicker').val();
+        if(order_dates){ 
+            order_dates = order_dates.split('/');
+            order_dates = order_dates[2]+'-'+order_dates[1]+'-'+order_dates[0]
+        }else{ order_dates = '0' }
+        
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-order-to-xlsx' 'columns' 1 1 'user_sap_id' 'order_dates' %}";
+                url = url.replace('columns',columns).replace('1',town_id).replace('1',route_id).replace('user_sap_id',user_sap_id).replace('order_dates',order_dates);
+                console.log(url);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-order-to-pdf' 'columns' 1 1 'user_sap_id' 'order_dates' %}";  
+                url = url.replace('columns',columns).replace('1',town_id).replace('1',route_id).replace('user_sap_id',user_sap_id).replace('order_dates',order_dates);
+                window.location.href = url;
+            }
+        }
+        
+    }
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["30px","14.5%", "13.5%", "10.5%", "11.5%", "13.5%", "12%", "16%", "13%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        $(".deptRow").click(function () {
+            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+        });
+        
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        $(".mobileCode").mask("+00");
+        $(".phoneCode").mask("000");
+        $(".landLineNo").mask("00000000");
+        $(".mobileNo").mask("0000000000");
+        $(".pincode").mask("000000");
+        
+        $("#order_datepicker").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0"
+            ,maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        {% if orders %}
+        $(".checked_all").attr("disabled", false);
+        {% else %}    
+        $(".checked_all").attr("disabled", true);
+        {% endif %}
+        
+        {% if role_id == 0 %}
+        $(".all_checkbox_class").css("display", "none");
+        $(".checked_class").css("display", "none");
+        {% endif %}
+        
+    });
+    
+    $(document).ready(function () {
+        getOrderDetails('{{first_order_id}}');
+        {% if order_status %}
+        getOrderRecord();
+        {% endif %}
+        var checkbox_val = ["order_id","distributor_ss","shift","route","amount","status","order_date"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+        
+        $('.checked_all').on('change', function() {     
+            $('.checkbox').prop('checked', $(this).prop("checked")); 
+            if($('.checkbox:checked').length > 0){
+                $('#forward').show();
+            }else{
+                $('#forward').hide();
+            }             
+        });
+        
+        $('.checkbox').change(function(){ 
+            if($('.checkbox:checked').length == $('.checkbox').length){
+                $('.checked_all').prop('checked',true);
+            }else{
+                $('.checked_all').prop('checked',false);
+            }
+            if($('.checkbox:checked').length > 0){
+                $('#forward').show();
+            }else{
+                $('#forward').hide();
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    
+    function getOrderDetails(id) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            if(id!='0'){
+                 $.ajax({
+                    url: "{% url 'src:get-order-details' %}",
+                    method: 'GET',
+                    data: { id: id },
+                    success: function (data) {
+                        //hideLoader();
+                        $('#detailsBox').html(data);
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }else{
+                $('#detailsBox').html('<div style="margin-top:40px; text-align:center; color:red; text-decoration:underline;">No Record Found...</div>');
+            }
+           
+        }
+        
+        function getOrderRecord(){
+            var order_status    = $('#order_status').val();
+            var town_id         = $('#town_id').val();
+            var route_id        = $('#route_id').val();
+            var user_sap_id          = $('#user_sap_id').val();
+            var order_date      = $('#order_datepicker').val();
+            
+            $('#tablebody').html('<tr><td colspan="8"><div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div></td></tr>');
+                $.ajax({
+                    url: "{% url 'src:ajax-orders-lists' %}",
+                    method: 'GET',
+                    data: { order_status:order_status, town_id:town_id, route_id:route_id, user_sap_id:user_sap_id, order_date:order_date },
+                    success: function (data) {
+                        if(typeof data.flag !== "undefined" && !data.flag){
+                            hideLoader();
+                            openToaster("danger", data.message);
+                        }else{
+                            $('#tablebody').html(data);
+                            $('#addOrgTable').trigger('update');
+                        }
+                    },
+                    error: function (err) {
+                        // alert(err.message);
+                        // window.location.reload();
+                    }
+                });
+            }
+
+            function getDefaulterUserList(user_id){
+                showLoader();
+                var url = "{% url 'src:get-defaulter-user-list' %}";
+                $.ajax({
+                    url: url,
+                    data: {user_id:user_id},
+                    method: 'GET',
+                    success: function (data) {
+                        if(typeof data.flag !== "undefined" && !data.flag){
+                            hideLoader();
+                            openToaster("danger", data.message);
+                        }else{
+                            hideLoader();
+                            $("#addUserModal").show();
+                            $('#addUserModal').html(data);
+                        }
+                        
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                });
+            }
+        </script>
+        <script>
+            am4core.ready(function() {
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+                // Create chart instance
+                var chart = am4core.create("user_wise_order", am4charts.PieChart);
+                // Add data
+                chart.data = [{
+                    "user_order": "Distributors",
+                    "quantity": "{{distributor_order_count}}"
+                }, {
+                    "user_order": "Super Stockist",
+                    "quantity": "{{super_stockist_order_count}}"
+                }];
+                
+                // Add and configure Series
+                var pieSeries = chart.series.push(new am4charts.PieSeries());
+                var colorSet = new am4core.ColorSet();
+                colorSet.list = ["#388E3C", "#FBC02D"].map(function(color) {
+                    return new am4core.color(color);
+                });
+                pieSeries.colors = colorSet;
+                
+                pieSeries.dataFields.value = "quantity";
+                pieSeries.dataFields.category = "user_order";
+                pieSeries.innerRadius = am4core.percent(50);
+                pieSeries.ticks.template.disabled = true;
+                pieSeries.labels.template.disabled = true;
+                
+                var rgm = new am4core.RadialGradientModifier();
+                rgm.brightnesses.push(-0.4, -0.4, -0.1, 0, - 0.1);
+                pieSeries.slices.template.fillModifier = rgm;
+                pieSeries.slices.template.strokeModifier = rgm;
+                pieSeries.slices.template.strokeOpacity = 0.1;
+                pieSeries.slices.template.strokeWidth = 0;
+                
+                chart.legend = new am4charts.Legend();
+                chart.legend.position = "bottom";
+                chart.legend.fontSize = 11;
+                var markerTemplate = chart.legend.markers.template;
+                markerTemplate.width = 10;
+                markerTemplate.height = 10;
+                
+                var title = chart.titles.create();
+                title.text = "{{total_orders}} Total No. of Orders";
+                title.fontSize = 11;
+                title.marginTop = 5;
+                title.marginBottom = 0;
+            }); 
+            
+            am4core.ready(function() {
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+                // Create chart instance
+                var chart = am4core.create("product_wise_order", am4charts.PieChart);
+                // Add data
+                chart.data = [
+                {% for products in products_list %}    
+                {
+                    "product_order": "{{products.class_name}}",
+                    "product_quantity": {{products.quantity}}
+                },
+                {% endfor %}
+                ];
+                
+                // Add and configure Series
+                var pieSeries = chart.series.push(new am4charts.PieSeries());
+                var colorSet = new am4core.ColorSet();
+                colorSet.list = ["#388E3C", "#FBC02D", "#d6d6d6"].map(function(color) {
+                    return new am4core.color(color);
+                });
+                pieSeries.colors = colorSet;
+                
+                
+                pieSeries.dataFields.value = "product_quantity";
+                pieSeries.dataFields.category = "product_order";
+                pieSeries.innerRadius = am4core.percent(50);
+                pieSeries.ticks.template.disabled = true;
+                pieSeries.labels.template.disabled = true;
+                
+                var rgm = new am4core.RadialGradientModifier();
+                rgm.brightnesses.push(-0.4, -0.4, -0.1, 0, - 0.1);
+                pieSeries.slices.template.fillModifier = rgm;
+                pieSeries.slices.template.strokeModifier = rgm;
+                pieSeries.slices.template.strokeOpacity = 0.1;
+                pieSeries.slices.template.strokeWidth = 0;
+                
+                
+                chart.legend = new am4charts.Legend();
+                chart.legend.position = "bottom";
+                chart.legend.contentAlign = "left";
+                chart.legend.fontSize = 11;
+                chart.legend.width = 250;
+                chart.legend.truncate = false;
+                chart.legend.wrap = true;
+                chart.legend.scrollable = true;
+                chart.legend.verticalCenter = "top";
+                chart.legend.horizontalCenter = "left";
+                
+                var markerTemplate = chart.legend.markers.template;
+                markerTemplate.width = 10;
+                markerTemplate.height = 10;
+                
+                var title = chart.titles.create();
+                title.text = "{{total_order_quantity}} Total No. of Crates/Matki Quantity";
+                title.fontSize = 11;
+                title.marginTop = 5;
+                title.marginBottom = 0;
+                
+            });
+            
+            AmCharts.makeChart("weekly",
+            {
+                "type": "serial",
+                "categoryField": "category",
+                "startDuration": 1,
+                "theme": "light",
+                "categoryAxis": {
+                    "gridPosition": "start"
+                },
+                "trendLines": [],
+                "graphs": [
+                {
+                    "balloonText": "[[category]]:[[value]]",
+                    "bullet": "round",
+                    "id": "AmGraph-1",
+                    "valueField": "column-1"
+                }
+                ],
+                "guides": [],
+                "valueAxes": [
+                {
+                    // "id": "ValueAxis-1",
+                    // "title": "Axis title"
+                }
+                ],
+                "allLabels": [],
+                "balloon": {},
+                "titles": [
+                {
+                    "id": "Title-1",
+                    "size": 11,
+                    "text": "Weekly({{week_start_date}} TO {{week_end_date}})"
+                }
+                ],
+                "dataProvider": [
+                {% for order_count in order_counts %}
+                {
+                    "category": "{{ order_count.day }}",
+                    "column-1": {{ order_count.count }},
+                    "title": "title"
+                },
+                {% endfor %}
+                ]
+            }
+            );
+        </script>
+        {% endblock %}        
+        
+        

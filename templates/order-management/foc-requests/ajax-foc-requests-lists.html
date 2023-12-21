@@ -1,0 +1,98 @@
+{% load static %}
+{% if foc_requests %}
+
+{% for foc_request in foc_requests %}
+
+
+<tr {% if forloop.first %} class="odd selected" {% endif %} role="row" data-userId="{{foc_request.id}}">
+    <td class="sorter-false checked_class" >{% if role_id == 0 and foc_request.foc_status != 3 and foc_request.foc_status != 4 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ foc_request.id }}"> {% else %} {% if foc_request.status == 0 %}{% if foc_request.foc_status == 1 and foc_request.level_id == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ foc_request.id }}"> {% elif foc_request.foc_status == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ foc_request.id }}"> {% elif foc_request.foc_status == 3 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ foc_request.id }}"> {% else %}  {% endif %} {% else %} <input type="checkbox" disabled checked> {% endif %}{% endif %}</td>
+    <td class="roles_name"  onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.request_by_name}}</td>
+    <td class="org_name" onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.user_name}}</td>
+    <td class="org_status" ><a href="javascript:void()" onclick="getOrderStatus('{{ foc_request.id }}')">{% if role_id == 0 %} {% if foc_request.foc_status	 == 1 %} Initiated {% elif foc_request.foc_status == 2 %} Forwarded {% elif foc_request.foc_status == 3 %} Approved {% elif foc_request.foc_status == 4 %} Delivered {% else %} {{foc_request.foc_status}}   {% endif %} {% else %} 
+        {% if foc_request.foc_status == 4 %} Delivered {% elif foc_request.foc_status == 3 %}Approved {% elif foc_request.status == 0 %}{% if foc_request.foc_status == 1 and foc_request.level_id == 2 %} Initiated {% elif foc_request.foc_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}</a></td>
+    <td class="department"  onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.created_at|date:'d/m/Y H:i'}}</td>
+    <td class="delivery_date_check"  onclick="focRequestDetails('{{foc_request.id}}')">
+        {{foc_request.foc_delivery_date|date:'d/m/Y'}}</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td colspan="9" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+
+
+
+<script>
+    $('#forward').hide();
+    $('.iconApproved').hide();
+    $('.iconForward').hide();
+    $(".checked_all").attr("checked", false);
+
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked")); 
+        checked_all();           
+    });
+
+    function checked_all(){
+        $('.iconForward').hide();
+        $('.iconApproved').hide();
+        $('#forward').hide();
+        if($('.checkbox:checked').length == $('.checkbox').length){
+            $('.checked_all').prop('checked',true);
+        }else{
+            $('.checked_all').prop('checked',false);
+        }
+        if($('.checkbox:checked').length > 0){
+            {% if role_id == 0 %}
+            {% if foc_status == '1' %}
+            $('.iconForward').show();
+            {% else %} 
+            $('.iconApproved').show();
+            {% endif %}
+            {% else %}
+            $('#forward').show();
+            {% endif %}
+    
+        }else{
+            $('.iconForward').hide();
+            $('.iconApproved').hide();
+            $('#forward').hide();
+        }
+    }
+    
+    $('.checkbox').change(function(){ 
+        checked_all();
+    });
+    
+    
+    {% if role_id == 0 %}
+    {% if foc_status != '' %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% else %} 
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% if foc_status == '3' %}
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% else %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% endif %}
+
+    
+    {% if foc_requests %}
+    $(".checked_all").attr("disabled", false);
+    {% else %}    
+    $(".checked_all").attr("disabled", true);
+    {% endif %}
+    
+   
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    $('#order_count').html('Order Count: {{foc_requests|length}}');
+</script>

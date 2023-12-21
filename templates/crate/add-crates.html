@@ -1,0 +1,412 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+
+#subdiv {   
+    height: auto;
+    margin: 0 auto;
+    padding: 10px;
+    position: relative;
+}
+</style>
+
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<div class="row commonTableBg" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                </div>
+            </div>
+            <div class="row" >
+                <div class="col-md-12 ">
+                    <div class="col-md-12" style="margin-bottom:40px !important;">
+                        <h3 style="text-align: center;"><b style="color: #3498db;">Party Crate Dispatch & Receive<b> </h3> 
+                     </div>
+                    <table id="subdiv" class="table table-bordered" style="width: 50%; ">
+                        <thead>
+                            <tr>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <form name="crate_reg" method="POST" autocomplete="off">
+                            {% csrf_token %}
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <div class="col-md-12 p-md-0 ">
+                                        <h6 class="mt-3"> <img src="{% static 'img/svg/calendar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;<b>Current Date</b></h6>    
+                                    </div> 
+                                </td>
+                                <td colspan="2" style="text-align: center; width:50%">
+                                  <div class="col-md-12 p-md-0">
+                                        <input class="inputField" placeholder="Crate_Date" name="crate_date" id="crate_date" value="{{today_date}}" onchange="" readonly>
+                                    </div> 
+                                </td>
+                                
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <div class="col-md-12 p-md-0 ">
+                                        <h6 class="mt-3"><img src="{% static 'img/svg/user.svg' %}" class="profileIconSize" style="color:blue"/>&nbsp;&nbsp;<b>Select Party</b></h6>
+                                            
+                                    </div> 
+                                </td>
+                                <td colspan="2">
+                                    <div class="col-md-12 p-md-0">
+                                        <select class="inputField selectField " style="width: 100% !important;"
+                                        name="user_id" id="user_id" onchange="getuserdispatchcratedetail();getuserrecivecratedetail();">
+                                        <option value=""> Select User</option>
+                                        {% for user in user_list %}
+                                        <option value="{{ user.id }}">{{user.store_name}}({{ user.first_name }} {{user.last_name}}/{{user.emp_sap_id}})</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right" id="user_error"></label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
+                                <div class="col-md-12 p-md-0 ">
+                                    <h6 class="mt-3"><b>Select</b></h6>    
+                                </div> 
+                                </td>
+                                <td style="text-align: center;">
+                                    <div class="row">
+                                        <div class="col-md-12 p-md-0 ">
+                                            <h6 class="mt-3"><img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;<b>Crate Type</b></h6>    
+                                        </div>
+                                    </div>
+                                </td>
+                                <td collapse="2" style="text-align: center;">
+                                    <div class="row mt-md-3">
+                                        <div class="col-md-5 p-md-0">
+                                            <h6><b>Normal<b></h6>
+                                            
+                                        </div>
+                                        <div class="col-md-5 p-md-0 ml-5">
+                                            <h6><b>Jumbo<b></h6>
+                                            
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <tr>
+                            
+                                <td style="text-align: center;"><input type="checkbox" class="checkbox" id="dispatch_check" name="dispatch_check" onclick="showcrate();" value="0"> </td>
+                                <td style="text-align: center;">
+                                    <div class="row mt-md-3">
+                                        <div class="col-md-12 p-md-0">
+                                            <h6><b>Dispatch<b></h6>
+                                           
+                                        </div>
+                                    </div>
+                                </td>
+                                <td collapse="2" style="width:50%">
+                                    <div class="row mt-md-3" id="dispatch_id" style="display: none;">
+                                        <div class="col-md-5 p-md-0">
+                                            <input class="inputField" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="dnormal_crate" id="dnormal_crate" maxlength="5" >
+                                            <label class="error_msg float-right" id="dnormal_error"></label>
+                                        </div>
+                                        <div class="col-md-5 p-md-0 ml-5">
+                                            <input class="inputField" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="djumbo_crate" id="djumbo_crate"maxlength="5" >
+                                            <label class="error_msg float-right" id="djumbo_error"></label>
+                                        </div>
+                                         
+                                    </div>
+                                    <label class="error_msg text-center" id="user_crate_detail" name="user_crate_detail" ></label>
+                                </td>
+                                
+                                
+                            </tr>
+                            <tr>
+                            
+                                <td style="text-align: center;"><input type="checkbox" class="checkbox" id="receive_check" name="receive_check"onclick="showcrate();" value="0"></td>
+                                <td style="text-align: center;">
+                                    <div class="row mt-md-3">
+                                        <div class="col-md-12 p-md-0">
+                                            <h6><b>Receive<b></h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td collapse="2" style="width:50%">
+                                    <div class="row mt-md-3" id="receive_id" style="display: none;">
+                                        <div class="col-md-5 p-md-0">
+                                            <input class="inputField" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="rnormal_crate" id="rnormal_crate" maxlength="5" >
+                                            <label class="error_msg float-right" id="rnormal_error"></label>
+                                        </div>
+                                        <div class="col-md-5 p-md-0 ml-5">
+                                            <input class="inputField" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="rjumbo_crate" id="rjumbo_crate" maxlength="5">
+                                            <label class="error_msg float-right" id="rjumbo_error"></label>
+                                        </div>
+                                        <label class="error_msg float-right" id="rjumbo_error_back"></label>
+                                    </div>
+                                    <label class="error_msg text-center" id="user_recive_crate_detail" name="user_recive_crate_detail" ></label>
+                                    
+                                </td>
+                                
+                            </tr>
+                           <tr>
+                           <td colspan="4" style="text-align: center;">
+                           <button class="btn btn-save float-right" type="button" onclick="savecrate()">
+                                Save & New
+                            </button>
+                           </td>
+                           </tr>
+                         
+                         </form>   
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+ function showcrate(){
+     if ($('#receive_check').is(":checked"))
+        {
+         $('#receive_id').show();
+         $("#receive_check").attr("value", "1");
+        }else{ 
+            $('#receive_id').hide();
+            $('#user_crate_detail').html('')
+            $('#user_recive_crate_detail').html('')
+            $("#receive_check").attr("value", "0");
+            $("#rnormal_crate").val('');
+            $("#rjumbo_crate").val('');
+        }
+    if ($('#dispatch_check').is(":checked"))
+        {
+            $('#dispatch_id').show();
+            $("#dispatch_check").attr("value", "1");   
+        }else{
+            $('#dispatch_id').hide();
+            $("#dispatch_check").attr("value", "0");
+            $("#dnormal_crate").val('');
+            $("#djumbo_crate").val('');
+        }
+ }
+</script>
+<script>
+function savecrate(){
+    var error=0;
+    
+    var a = document.forms["crate_reg"]["user_id"].value; 
+    document.getElementById('user_error').innerHTML = '';
+    if (a.trim() == null || a.trim() == "") {
+        var error = 1;
+            document.getElementById('user_error').innerHTML = 'Please select user*';
+            $('#user_id').css("border", "1px solid #db8305");
+    }
+    var y = document.forms["crate_reg"]["receive_check"].value; 
+    var z = document.forms["crate_reg"]["dispatch_check"].value; 
+    if(y==0 && z==0){
+        error=1;
+        openToaster("danger","plese select dispatch or receive ");  
+    }
+    if ($('#receive_check').is(":checked"))
+        {
+            var b = document.forms["crate_reg"]["rnormal_crate"].value;
+            var c = document.forms["crate_reg"]["rjumbo_crate"].value;
+            document.getElementById('rnormal_error').innerHTML = '';
+            document.getElementById('rjumbo_error').innerHTML = '';
+            if (b==null && c==null || b == "" && c == "") {
+                var error = 1;
+                    document.getElementById('rjumbo_error').innerHTML = 'Please enter jumbo crate';
+                    $('#rjumbo_crate').css("border", "1px solid #db8305");
+                    document.getElementById('rnormal_error').innerHTML = 'Please enter normal crate';
+                    $('#rnormal_crate').css("border", "1px solid #db8305");
+            }
+        }
+        if ($('#dispatch_check').is(":checked"))
+        {
+            var d = document.forms["crate_reg"]["dnormal_crate"].value;
+            var e = document.forms["crate_reg"]["djumbo_crate"].value;
+            document.getElementById('dnormal_error').innerHTML = '';
+            document.getElementById('djumbo_error').innerHTML = '';
+            if (d==null && e==null || d == "" && e == "") {
+                var error = 1;
+                    document.getElementById('djumbo_error').innerHTML = 'Please enter jumbo crate';
+                    $('#djumbo_crate').css("border", "1px solid #db8305");
+                    document.getElementById('dnormal_error').innerHTML = 'Please enter normal crate';
+                    $('#dnormal_crate').css("border", "1px solid #db8305");
+            }
+        }
+        var rnormal_crate =  $('#rnormal_crate').val()
+        if(rnormal_crate){
+            rnormal_crate = rnormal_crate
+        }else{
+            rnormal_crate = 0  
+        }
+        var rjumbo_crate =  $('#rjumbo_crate').val()
+        if(rjumbo_crate){
+            rjumbo_crate = rjumbo_crate
+        }else{
+            rjumbo_crate = 0  
+        }
+        var dnormal_crate =  $('#dnormal_crate').val()
+        if(dnormal_crate){
+            dnormal_crate = dnormal_crate
+        }else{
+            dnormal_crate = 0  
+        }
+        var djumbo_crate =  $('#djumbo_crate').val()
+        if(djumbo_crate){
+            djumbo_crate = djumbo_crate
+        }else{
+            djumbo_crate = 0  
+        }
+       
+
+        if (error == 0) {
+        var question = "This data can't edited after upload. Do you want to proceed?";
+        $.confirm({
+			title: 'Confirm!',
+			content: question,
+			buttons: {
+				confirm: function () {
+					$.ajax({
+                    url: "{% url 'src:save-crate' %}",
+                    method: 'POST',
+                    data: {
+                        user_id: $('#user_id').val(),
+                        receive_check: $('#receive_check').val(),
+                        dispatch_check: $('#dispatch_check').val(),
+                        crate_date: $('#crate_date').val(),
+                        rnormal_crate:rnormal_crate,
+                        rjumbo_crate:rjumbo_crate,
+                        dnormal_crate:dnormal_crate,
+                        djumbo_crate:djumbo_crate,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function (data) {
+                        if (data.error == false) {
+                            openToaster("success", data.message);
+                            window.location.reload();
+                        } else {
+                            openToaster("danger",data.message);
+                            setTimeout(function(){// wait for 5 secs(2)
+                                window.location.reload(); // then reload the page.(3)
+                            }, 2000); 
+                        }
+                    },
+                    error: function (err) {
+                        //alert(err.message);
+                        window.location.reload();
+                    }
+                });
+					
+				},
+				cancel: function () {
+					
+				}
+			}
+		});
+            
+        }
+ }
+ function getuserdispatchcratedetail(){
+   
+    //if ($('#dispatch_check').is(":checked")){
+
+    var error=0;
+    var a = document.forms["crate_reg"]["user_id"].value;
+    document.getElementById('user_error').innerHTML = '';
+    if (a.trim() == null || a.trim() == "") {
+        var error = 1;
+            document.getElementById('user_error').innerHTML = 'Please select user*';
+            $('#user_id').css("border", "1px solid #db8305");
+            $('#user_crate_detail').html('')
+            $('#user_recive_crate_detail').html('')
+    }
+    var crate_date = document.forms["crate_reg"]["crate_date"].value;
+    if(crate_date){ 
+        crate_date = crate_date.split('/');
+        crate_date = crate_date[2]+'-'+crate_date[1]+'-'+crate_date[0]
+    }
+    if (error == 0){
+        $.ajax({
+            url: "{% url 'src:get-user-crate-detail' %}",
+            method: 'GET',
+            data: { user_id:a , crate_date: crate_date },
+            success: function (data) {
+                
+                if(data.msg!=""){
+                  $('[name="user_crate_detail"]').html(data.msg)  
+                }else{
+                    $('[name="user_crate_detail"]').html('');
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+
+    }
+    //}
+
+ }
+
+
+ function getuserrecivecratedetail(){
+    //if ($('#receive_check').is(":checked")){
+debugger;
+    var error=0;
+    var a = document.forms["crate_reg"]["user_id"].value;
+    document.getElementById('user_error').innerHTML = '';
+    if (a.trim() == null || a.trim() == "") {
+        var error = 1;
+            document.getElementById('user_error').innerHTML = 'Please select user*';
+            $('#user_id').css("border", "1px solid #db8305");
+            $('#user_crate_detail').html('')
+            $('#user_recive_crate_detail').html('')
+    }
+    var crate_date = document.forms["crate_reg"]["crate_date"].value;
+    if(crate_date){ 
+        crate_date = crate_date.split('/');
+        crate_date = crate_date[2]+'-'+crate_date[1]+'-'+crate_date[0]
+    }
+    if (error == 0){
+        $.ajax({
+            url: "{% url 'src:get-user-recive-crate-detail' %}",
+            method: 'GET',
+            data: { user_id:a , crate_date: crate_date },
+            success: function (data) {
+                
+                if(data.msg!=""){
+                  $('[name="user_recive_crate_detail"]').html(data.msg)  
+                }else{
+                    $('[name="user_recive_crate_detail"]').html('');
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+
+    }
+   // }
+
+ }
+ </script>
+
+{% endblock %}

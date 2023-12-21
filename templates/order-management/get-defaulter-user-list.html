@@ -1,0 +1,59 @@
+{% load static %}
+<style>
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+</style>
+<div class="modal-AddUser centered" style="width: 85%!important; margin-bottom: 100px;">
+    
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-8">
+                    <h5 class="mt-md-2">User Details</h5>
+                </div>
+                <div class="col-4">
+                    <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="height:550px; overflow: auto; ">
+        <div class="row">
+            <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                <div class="row">
+                    <table class="table table-bordered" style="margin-bottom: 15px;" >
+                        <thead>
+                            <tr>
+                                <th>Store Name/Username</th>
+                                <th>Contact No.</th>
+                                <th>Route</th>
+                                <th>Town</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{user.store_name}}/{{user.first_name}} {{user.middle_name}} {{user.last_name}}</td>
+                                <td>{{user.contact_no}}</td>
+                                <td>{{user.route_name}}</td>
+                                <td>{{user.town_name}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                   
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+

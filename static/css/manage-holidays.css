@@ -1,0 +1,244 @@
+.select2-container--default .select2-selection--single {
+    border: 1px solid #e7e7e7;
+    border-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 0px 9px 0px rgba(44, 44, 44, 0.14);
+  }
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    font-size: 14px;
+    font-family: "Poppins";
+    color: #000;
+    line-height: 1.2;
+    text-align: left;
+    padding: 6px 8px;
+    font-weight: 600;
+  }
+  .iconBox{
+    min-height: 30px;
+    width: 100%;
+  }
+
+  .Rectangle_6 {
+   
+   
+   
+   
+  }
+  .Rectangle_6:hover {
+  
+    border-radius: 13px;
+    
+
+  }
+ 
+  
+  .holiday-selcetion-row .table td{ padding: 0 4px;}
+  .holidays_name{
+    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .holidays_date{
+    color: rgb(93, 100, 106);
+    font-size: 10px;
+  }
+  .holidays-row{
+    
+   
+  }
+  .holidays-row{
+    background-color: rgb(247, 247, 247);
+    padding: 4px 10px;
+    border-radius: 13px;
+    font-size: 12px;
+    border: 1px solid rgb(247, 247, 247);
+    margin: 4px 0;
+  }
+  .holidays-row:hover{
+    background-color: rgb(255, 255, 255);
+    box-shadow: -1.69px 3.625px 21px 0px rgba(58, 58, 58, 0.1);
+    border: 1px solid rgb(217, 217, 217);
+  }
+  .holiday-selcetion-row .table-hover tbody tr:hover {
+    box-shadow: 0px 0px 0px 0px #ffff;
+}
+
+
+.modalHoliday {
+    background-color: #0073e0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-content: center;
+}
+.modal-heading {
+  color: #fff;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.add-details-popup{
+  padding: 25px 30px 80px 30px;
+}
+.add-contact-detail{
+  padding: 4px 0px 8px 24px;
+
+}
+
+.calender-icon-input{
+  position: absolute;
+  right: 9px;
+  top: 7px;
+}
+.modal-AddOrganisation{
+  width: 55%;
+}
+
+
+.calendar-table table{
+  width: 100%;
+  font-family: Arial, serif;
+  height: 100%;
+  margin: 10px 0;
+  }
+  .calendar-table td{
+  width: 14.28%;
+  border: 1px solid #f0f0f0;
+  font-size: 17px;
+  font-weight: 400;
+  color: #000;
+  padding: 8px;
+  padding-bottom: 4.6%;
+  margin: 0;
+  position: relative;
+  font-family: Arial, serif;
+  cursor: pointer;
+  background-color: #ffffff;
+  }
+  
+  .calendar-table td.disabled_calendar_date{
+  background-color: #f4f4f4;
+  }
+  .calendar-table td.vacation_calendar_date{
+  background-color: hsl(25deg 71% 89%) !important;
+  }
+  .calendar-table th{
+    font-size: 12px;
+    text-align: center;
+    font-weight: 500;
+    padding: 8px 0;
+    border-top: 1px solid lightGrey;
+    color: rgb(113, 117, 121);
+  
+  }
+  .calendar1{
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  }
+  
+  .calendar__input:checked + .calendar__label {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  border: 3px solid hsl(42deg 100% 50%);
+  background: #ffeec5;
+  cursor: pointer;
+  }
+  .calendar__label{
+  cursor: pointer;
+  }
+  .checked_date{
+  /*border-radius: 14px;*/
+  border: 5px solid #ffffff;
+  background: hsl(42deg 100% 89%);
+  width: 100%;
+  height: 100%;
+  }
+  
+  .calendar__input {
+    display: none;
+}
+  
+  .slider-icon-box{
+  width: 18px;
+  display: inline-block;
+  padding: 11.2px 2.5px;
+  border-radius: 6px;
+  box-shadow: 0px 0px 15px 4px rgb(135 169 224 / 30%);
+  text-align: center;
+  margin: 0 2px;
+  }
+  
+  .slider-icon-box img{
+  width: 10px;
+  }
+  .calendar-title{
+  display: inline-block;
+  width: 40%;
+  text-align: center;
+  color: #177ce0;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0px 0px 15px 4px rgb(135 169 224 / 30%);
+  padding: 7px 0px;
+  background-color: #fff;
+  }
+  .emp-sap-id{
+  color: #177ce0;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 16px;
+  }
+  .customer-name{
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  margin-left: 16px;
+  
+  }
+  
+  .customer-tab.activeTab{
+  background-color: #ffffff;
+  box-shadow: 0px 0px 15px 4px rgb(135 169 224 / 30%);
+  border-radius:6px;
+  color: #177ce0;
+  }
+  .customer-tab{
+  background-color: hsl(223deg 64% 96%);
+  padding: 0.4rem;
+  color: hsl(210deg 3% 46%);
+  position: relative;
+  font-size: 11px;
+  text-align: center;
+  width: 50%;
+  cursor: pointer;
+  font-weight: 600;
+  }
+
+
+  .yellow{
+    background-color: #fef6d0 !important;
+  }
+  .yellow span{
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    bottom: 14px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translate(-50%, 0%);
+    transform: translate(-50%, 0%);
+  }
+
+ .grey{
+   background-color: #f7f7f7  !important;
+ }
+
+

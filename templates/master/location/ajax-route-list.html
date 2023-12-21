@@ -1,0 +1,189 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Routes &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('route')"></button>
+                        
+                        <!--<div class="dropdown" style="display: inline-block;">-->
+                        <!--    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"-->
+                        <!--    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>-->
+                        <!--    <div class="dropdown-menu dropdown-menu-right logoutContainer"-->
+                        <!--    aria-labelledby="dropdownMenuButton">-->
+                            
+                        <!--    <input type="hidden" name="show_columns" id="show_columns" value="" >-->
+                        <!--    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img-->
+                        <!--        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                        <!--            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        </div>-->
+                        <!--    </div>-->
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'route_name',1)"
+                                    />
+                                    <label class="mb-0" for="">Route Name</label>
+                                </a>
+                                
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'state_name',1)"
+                                    />
+                                    <label class="mb-0" for="">State name</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="route_name" data-id="1"
+                                onclick="toggleFreeze(this.id,'route_name',1)" />
+                                <label class="mb-0" for="route_name">Route Name</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="state_name" data-id="2"
+                                onclick="toggleFreeze(this.id,'state_name',2)" />
+                                <label class="mb-0" for="state_name">State name</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="route_name">
+                        Route Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="state_name">
+                        State name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if routes %}
+                {% for route in routes %}
+                <tr>
+                    <td class="route_name">{{ route.route }} ({{ route.route_code }})<br> 
+                        <a href="javascript:;" onclick="showRouteTowns('{{ route.id }}')">view towns</a>
+                    </td>
+                    <td class="state_name">{{ route.state_name }}</td>
+                    <td >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="javascript:void(0)"
+                                onclick="editMaster('route','{{ route.id }}')" >
+                                <img
+                                src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+
+                                
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ route.id }}"
+                                    {% if route.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateRouteStatus('{{ route.id }}', '{{ route.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+     
+function updateRouteStatus(route_id,status){
+    showLoader();
+    if ($('#is_active_' + route_id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        url = "{% url 'src:update-route-status' %}";
+        url = url.replace(1,parseInt(route_id))
+        $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                route_id: route_id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        getList('route');
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+  
+</script>

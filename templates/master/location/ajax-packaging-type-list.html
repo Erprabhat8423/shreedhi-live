@@ -1,0 +1,166 @@
+{% load static %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Packaging Type &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('packaging_type')"></button>
+                        
+                        <!--<div class="dropdown" style="display: inline-block;">-->
+                        <!--    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"-->
+                        <!--    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>-->
+                        <!--    <div class="dropdown-menu dropdown-menu-right logoutContainer"-->
+                        <!--    aria-labelledby="dropdownMenuButton">-->
+                            
+                        <!--    <input type="hidden" name="show_columns" id="show_columns" value="" >-->
+                        <!--    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img-->
+                        <!--        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                        <!--            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        </div>-->
+                        <!--    </div>-->
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'packaging_type',1)"
+                                    />
+                                    <label class="mb-0" for="">Packaging Type</label>
+                                </a>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="packaging_type" data-id="1"
+                                onclick="toggleFreeze(this.id,'packaging_type',1)" />
+                                <label class="mb-0" for="packaging_type">Packaging Type</label>
+                            </a>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="packaging_type">
+                        Packaging Type
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if packaging_types %}
+                {% for packaging_type in packaging_types %}
+                <tr>
+                    <td class="packaging_type">{{ packaging_type.packaging_type }} </td>
+                    <td >
+                        <div class="row">
+                            <div class="col-md-3">
+                                
+                                <a href="javascript:void(0)"
+                                onclick="editMaster('packaging_type','{{ packaging_type.id }}')" >
+                                <img
+                                src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+
+                                
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ packaging_type.id }}"
+                                    {% if packaging_type.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updatePackagingTypeStatus('{{ packaging_type.id }}', '{{ packaging_type.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                                
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+function updatePackagingTypeStatus(id,status){
+    showLoader();
+    if ($('#is_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        url = "{% url 'src:update-packaging-type-status' %}";
+        url = url.replace(1,parseInt(id))
+        $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        getList('packaging_type');
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+
+</script>

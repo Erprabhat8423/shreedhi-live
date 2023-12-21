@@ -1,0 +1,229 @@
+{% load static %}
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales Port</title>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}" />
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css' %}" />
+  <link href="{% static 'plugins/aos/css/aos.css' %}" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'plugins/autocomplete/css/autocomplete.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/manageOrganisation.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/manageUsers.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/mediaQuery.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+  <link href="{% static 'plugins/select2/select2.min.css' %}" rel="stylesheet" />
+  {% block style %} {% endblock %}
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+  integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+  crossorigin="anonymous"></script>
+  
+  <script src="{% static 'plugins/aos/js/aos.js' %}"></script>
+  <script src="{% static 'js/script.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'plugins/jquery.css' %}">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="{% static 'plugins/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
+  <script src="{% static 'plugins/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+  
+  <script src="{% static 'js/jquery.tablesorter.js' %}"></script>
+  <script src="{% static 'js/jquery.tablesorter.widgets.js' %}"></script>
+  <script src="{% static 'plugins/toaster/toastr.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+  <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+  crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+  integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+  crossorigin="anonymous"></script>
+  <script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+  {% block script %} {% endblock %}
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse toastClass" id="toastBar">
+    <div class="container-fluid">
+      <div class="row w-100">
+        <div class="col-md-11 text-center">
+          <h6 class="m-0" id="message"></h6>
+        </div>
+        <div class="col-md-1 text-right">
+          <img src="{% static 'img/svg/close.svg' %}" onclick="closeToaster()" class="cursurorclass" />
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="comingSoon" id="bodyContainer">
+    {% include 'layout/navigation.html' %}
+    {% block content %} {% endblock %}
+    {% include 'layout/footer.html' %}
+  </div>
+  
+  <div class="loaderModal" id="loader">
+    <img src="{% static 'img/loader.gif' %}" class="centered loader">
+  </div>
+
+  <div class="overlayModal" id="changePasswordModal" style="display: none;">
+    
+  </div>
+
+</body>
+<script>
+  AOS.init();
+</script>
+{% if messages %}
+{% for message in messages %}
+<script>
+  $(document).ready(function () {
+    setHeightWidth();
+    openToaster("{{ message.tags }}", "{{ message }}");
+  });
+</script>
+{% endfor %}
+{% endif %}
+<script>
+  
+  $(window).resize(function () {
+    setHeightWidth();
+  });
+  function setHeightWidth() {
+    var containerHeight =
+    window.innerHeight -
+    ($("#header").outerHeight() + $("#footer").outerHeight()) -
+    10;
+    $("#containerHeight").height(containerHeight);
+  }
+</script>
+<script>
+  $(document).ready(function () {
+    showLoader();
+    setTimeout(() => {
+      hideLoader();
+    }, 2000);
+    setHeightWidth();
+  });
+  $(window).resize(function () {
+    setHeightWidth();
+  });
+  function setHeightWidth() {
+    var containerHeight =
+    window.innerHeight -
+    ($("#header").outerHeight() + $("#footer").outerHeight()) -
+    10;
+    $("#containerHeight").height(containerHeight);
+  }
+</script>
+<script>
+  
+ 
+  function changePassword() {
+    $('#changePasswordModal').html('');
+    showLoader();
+    $.ajax({
+      url: "{% url 'src:change-password' %}",
+      method: 'GET',
+      data: {},
+      success: function (data) {
+        hideLoader();
+        $("#changePasswordModal").show();
+        $('#changePasswordModal').html(data);
+      },
+      error: function (err) {
+        console.log(err)
+      }
+    });
+  }
+
+  function updateFavorite(element,favorite,link){
+    if(favorite == ""){
+      openToaster("warning", "favorite name is missing");
+      return false;
+    }else if(link == ""){
+      openToaster("warning", "link is missing");
+      return false;
+    }else{
+      $.ajax({
+        url: "{% url 'src:update-favorite' %}",
+        method: 'POST',
+        data: {'favorite':favorite,'link':link,'csrfmiddlewaretoken':'{{csrf_token}}'},
+        success: function (data) {
+          hideLoader();
+          if(typeof data.flag !== 'undefined' && !data.flag){
+            openToaster("danger", data.message);
+          }else{
+            $('#ajaxFavorite').html(data)
+            openToaster("success", "Favourite has been updated successfully.");
+          }
+        },
+        error: function (err) {
+          hideLoader();
+          console.log(err)
+        }
+      }).always(function() {
+        hideLoader();
+      });
+    }
+  }
+  
+  function openLink(link){
+    window.location.href = link;
+  }
+  
+  $(function () {
+    $.widget("custom.catcomplete", $.ui.autocomplete, {
+      _create: function () {
+        this._super();
+        this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
+      },
+      _renderMenu: function (ul, items) {
+        var that = this,
+        currentCategory = "";
+        $.each(items, function (index, item) {
+          var li;
+          if (item.category != currentCategory) {
+            ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
+            currentCategory = item.category;
+          }
+          li = that._renderItemData(ul, item);
+          if (item.category) {
+            li.attr("aria-label", item.category + " : " + item.label);
+          }
+        });
+      }
+    });
+    
+    var menuItems = [
+    {% for module in request.session.modules %}
+    {% for submenu in module.submenus %}
+    {
+      category: "{{module.menu}}",
+      label: "{{submenu.sub_menu}}",
+      value: "{% url submenu.link %}"
+    },
+    {% endfor %}
+    {% endfor %}
+    ];
+    
+    $("#search").catcomplete({
+      delay: 0,
+      source: menuItems,
+      select: function( event, ui ) { 
+        window.location.href = ui.item.value;
+      }
+    });
+  });
+  
+</script>
+
+</html>

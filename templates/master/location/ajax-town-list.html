@@ -1,0 +1,159 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Towns &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('town')"></button>
+                        
+                        <!--<div class="dropdown" style="display: inline-block;">-->
+                        <!--    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"-->
+                        <!--    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>-->
+                        <!--    <div class="dropdown-menu dropdown-menu-right logoutContainer"-->
+                        <!--    aria-labelledby="dropdownMenuButton">-->
+                            
+                        <!--    <input type="hidden" name="show_columns" id="show_columns" value="" >-->
+                        <!--    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img-->
+                        <!--        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                        <!--            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        </div>-->
+                        <!--    </div>-->
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'town_name',1)"
+                                    />
+                                    <label class="mb-0" for="">Town name</label>
+                                </a>
+
+
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'zone_name',2)"
+                                    />
+                                    <label class="mb-0" for="">Zone name</label>
+                                </a>
+
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'state_name',3)"
+                                    />
+                                    <label class="mb-0" for="">State name</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="town_name" data-id="1"
+                                onclick="toggleFreeze(this.id,'town_name',1)" />
+                                <label class="mb-0" for="town_name">Town name</label>
+                            </a>
+
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_zone_name" data-id="2"
+                                onclick="toggleFreeze(this.id,'zone_name',2)" />
+                                <label class="mb-0" for="lock_zone_name">Zone name</label>
+                            </a>
+                            
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_state_name" data-id="3"
+                                onclick="toggleFreeze(this.id,'state_name',3)" />
+                                <label class="mb-0" for="lock_state_name">State name</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+<div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+    <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+        
+        <input type="hidden" name="page" id="page" value="2" />
+        <input type="hidden" name="page_status" id="page_status" value="0" />
+        <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+        
+        <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="town_name">
+                    Town name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+
+                <th class="zone_name">
+                    Zone name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="state_name">
+                    State name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="tablebody">
+            {% if towns %}
+            {% for town in towns %}
+            <tr>
+                <td class="town_name">{{ town.town }}</td>
+                <td class="zone_name">{% if town.zone_name %}{{ town.zone_name }}{%else%}-{% endif %}</td>
+                <td class="state_name">{{ town.state_name }}</td>
+                <td >
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="javascript:void(0)"
+                            onclick="editMaster('town','{{ town.id }}')" >
+                            <img
+                            src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

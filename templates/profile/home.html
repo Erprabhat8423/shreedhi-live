@@ -1,0 +1,291 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+{% load humanize %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/paper-dashboard.css' %}" />
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-4 p-md-0">
+                            
+                        </div>
+                    </div>
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <div class="dropdown" style="display: inline-block;">
+                                
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="widget-cards-header ">
+            <h5 class="widget-cards-title">Today Order's Statistics</h5>
+        </div>
+        <div class="row">
+            
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="widget-cards widget-cards-stats">
+                    <div class="widget-cards-body ">
+                        <div class="row">
+                            <div class="col-5 col-md-4">
+                                <div class="icon-big text-center icon-warning">
+                                    <img src="{% static 'img/png/activity/add.png' %}" class="widget-cards-img">
+                                </div>
+                            </div>
+                            <div class="col-7 col-md-8">
+                                <div class="numbers">
+                                    <p class="widget-cards-category">Initiated</p>
+                                    <p class="widget-cards-title"><a href="{% url 'src:orders' '1' %}">{{order_intitate_count}}</a><p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="widget-cards widget-cards-stats">
+                        <div class="widget-cards-body ">
+                            <div class="row">
+                                <div class="col-5 col-md-4">
+                                    <div class="icon-big text-center icon-warning">
+                                        <img src="{% static 'img/svg/farword_b.svg' %}" class="widget-cards-img">
+                                    </div>
+                                </div>
+                                <div class="col-7 col-md-8">
+                                    <div class="numbers">
+                                        <p class="widget-cards-category">Forwarded</p>
+                                        <p class="widget-cards-title"><a href="{% url 'src:orders' '2' %}">{{order_forwarded_count}}</a><p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="widget-cards widget-cards-stats">
+                            <div class="widget-cards-body ">
+                                <div class="row">
+                                    <div class="col-5 col-md-4">
+                                        <div class="icon-big text-center icon-warning">
+                                            <img src="{% static 'img/png/Approved.png' %}" class="widget-cards-img">
+                                        </div>
+                                    </div>
+                                    <div class="col-7 col-md-8">
+                                        <div class="numbers">
+                                            <p class="widget-cards-category">Approved</p>
+                                            <p class="widget-cards-title"><a href="{% url 'src:orders' '3' %}">{{order_approved_count}}</a><p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="widget-cards widget-cards-stats">
+                                <div class="widget-cards-body ">
+                                    <div class="row">
+                                        <div class="col-5 col-md-4">
+                                            <div class="icon-big text-center icon-warning">
+                                                <img src="{% static 'img/png/activity/updateVehiclePass.png' %}">
+                                            </div>
+                                        </div>
+                                        <div class="col-7 col-md-8">
+                                            <div class="numbers">
+                                                <p class="widget-cards-category">Delivered</p>
+                                                <p class="widget-cards-title"><a href="{% url 'src:orders' '4' %}">{{order_delivered_count}}</a><p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        <div class="widget-cards-header ">
+                            <h5 class="widget-cards-title">Today User's Statistics</h5>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="widget-cards widget-cards-stats">
+                                    <div class="widget-cards-body ">
+                                        <div class="row">
+                                            <div class="col-5 col-md-4">
+                                                <div class="icon-big text-center icon-warning">
+                                                    <img src="{% static 'img/png/activity/markedAtten.png' %}" class="widget-cards-img">
+                                                </div>
+                                            </div>
+                                            <div class="col-7 col-md-8">
+                                                <div class="numbers">
+                                                    <p class="widget-cards-category">Attendance</p>
+                                                    <p class="widget-cards-title"><a href="javascript:;" onclick="viewAttendance()">{{today_attendance}}/{{total_user}}</a><p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 h-100">
+                        <div class="primaryContainerBG h-100" id="detailsBox" style="overflow: hidden;">
+                            
+                            <div class="row bootstrap snippets bootdey">
+                                <div class="col-md-12 col-xs-12 col-md-offset-6">
+                                    <div class="panel" id="daily-feed">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title"><img src="{% static 'img/png/activity.png' %}" class="tableRowIcon"> Activity Feeds
+                                                <!-- <span class="pull-right label label-round label-warning">10 Messages</span> -->
+                                            </h3>
+                                            <hr/>
+                                        </div>
+                                        <div class="panel-body infinite-scroll" style="max-height: 750px; overflow:auto">
+                                            <ul class="list-group list-group-dividered list-group-full infinite-scroll" >
+                                                {% if activity_list %}
+                                                {% for activity in activity_list %}
+                                                <li class="list-group-item">
+                                                    <div class="media">
+                                                        <div class="media-left">
+                                                            <a class="avatar" href="javascript:void(0)">
+                                                                <img src="{% static 'img/png/activity/' %}{{activity.icon}}" alt=""><i></i></a>
+                                                            </div>
+                                                            <div class="media-body">
+                                                                <h4 class="media-heading">
+                                                                    <small class="pull-right"><img src="{% static 'img/png/activity/' %}{{activity.platform_icon}}" class="activity-img" /></small>
+                                                                    <a class="name">{{ activity.heading }}</a>.
+                                                                </h4>
+                                                                <!-- <small>Today 12:00 am - 12.04.2015</small> -->
+                                                                <div class="content well">
+                                                                    {{ activity.activity }}
+                                                                    <br clear="all">
+                                                                    <small class="pull-right">{{ activity.created_at|natural_timesince }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    {% endfor %}
+                                                    {% include 'layout/paginator.html' with page=activity_list %}
+                                                    {% else %}
+                                                    <p>No Activity Found...</p>
+                                                    {% endif %}
+                                                </ul>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+                            
+                        </div>
+                        
+                        {% endblock content %}
+                        {% block script %}
+                        <script src="{% static 'js/jquery.jscroll.min.js' %}"></script>
+                        <script>
+                            $('div.pagination').hide();
+                            $(function() {
+                                $('div.pagination').hide();
+                                $('.infinite-scroll').jscroll({
+                                    autoTrigger: true,
+                                    loadingHtml: '<div style="margin-top:10px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>', 
+                                        padding: 0,
+                                        nextSelector: '.pagination span.active + span a',
+                                        contentSelector: 'ul.infinite-scroll',
+                                        data:{
+                                            id:1
+                                        },
+                                        callback: function() {
+                                            $('div.pagination').remove();
+                                        }
+                                    });
+                                })
+                                
+                                function viewAttendance(){
+                                    $('#addUserModal').html('');
+                                    showLoader();
+                                    $.ajax({
+                                        url: "{% url 'src:attendance-report' %}",
+                                        method: 'GET',
+                                        data: {},
+                                        success: function (data) {
+                                            hideLoader();
+                                            $("#addUserModal").show();
+                                            $('#addUserModal').html(data);
+                                            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                                            $("#addUserModalBody").height(mch);
+                                            
+                                            $("#attendance_date").datepicker({  
+                                                changeMonth: true,
+                                                changeYear: true,  
+                                                yearRange: "-100:+0",
+                                                maxDate: 0,
+                                                dateFormat: 'dd/mm/yy' 
+                                            });
+                                            
+                                        },
+                                        error: function (err) {
+                                            console.log(err)
+                                        }
+                                    });
+                                }
+                                
+                                function closeModal() {
+                                    $("#addUserModal").hide();
+                                }
+
+                                function filterAttendance(attendance_date){
+                                    $.ajax({
+                                        url: "{% url 'src:ajax-attendance-report' %}",
+                                        method: 'GET',
+                                        data: { attendance_date:attendance_date },
+                                        success: function (data) {
+                                            $('#ajaxDistributors').html(data);
+                                        },
+                                        error: function (err) {
+                                        }
+                                    });
+                                }
+
+
+                                
+
+                                
+                            </script>
+                            {% endblock %}

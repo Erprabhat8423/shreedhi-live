@@ -1,0 +1,208 @@
+{% load static %}
+<form name="addProductDetailsForms" id="addProductDetailsForms" method="POST" autocomplete="off" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="last_user_id" id="last_user_id" value="{{last_user_id}}" >
+    <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" onclick="perviousPage('{{last_user_id}}','2')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Product Details
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 fullWidth fulHeight" id="step1">
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-striped table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>SKU Code</th>
+                                        <th>Product Name</th>
+                                        <th>Product Variant</th>
+                                        <th>MRP</th>
+                                        <th>Sales Price</th>
+                                        <th>Container Sales Price</th>
+                                        <th width="12%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if user_variants %}
+                                    {% for user_variant in user_variants %}
+                                    <tr>
+                                        <td>{% if user_variant.item_sku_code %} {{ user_variant.item_sku_code }} {% endif %}</td>
+                                        <td>{% if user_variant.product_name %} {{ user_variant.product_name }} {% endif %}</td>
+                                        <td>{% if user_variant.variant_name %} {{ user_variant.variant_name }} {% endif %}</td>
+                                        <td>{% if user_variant.mrp %} {{ user_variant.mrp }} {% endif %}</td>
+                                        <td width="12%"><div id="sale_price_{{ user_variant.id }}"> {{ user_variant.sp_user }}</div></td>
+                                        <td id="container_price_{{ user_variant.id }}">{% if user_variant.container_sp_user %} {{ user_variant.container_sp_user }} {% endif %}</td>
+                                        <td><div id="update_{{ user_variant.id }}"><a href="javascript:void(0)" onclick="editProductVariant('{{ user_variant.id }}', '{{ user_variant.sp_user }}', '{{ user_details.is_distributor }}')"><img src="{% static 'img/svg/editcopy.svg' %}"></a></div></td> 
+                                        <td><label class="switch" title="Purchase milk from Jaipure">
+                                            <input type="checkbox" class="checkbox" name="is_active"
+                                            id="is_user_active_{{ user_variant.id }}" 
+                                            {% if user_variant.status == 1 %} checked="" {% else %}
+                                            {% endif %}
+                                            onclick="updateProductStatus('{{ user_variant.id }}')">
+                                            <span class="slider round"></span>
+                                        </label></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align: center;">No Record Found...</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-3 offset-9 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li2" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li3" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn3">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li4">
+                        <button class="btn btn-step" id="stepBtn4">
+                            &#10004;
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</form>
+
+<script>
+    function updateProductStatus(id,is_active) {
+        if ($('#is_user_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Yes';
+        } else {
+            is_active = 0;  
+            status = 'No';
+        }
+        
+        //showLoader();
+        $.ajax({
+            url: "{% url 'src:update-user-product-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.error == false) {
+                    hideLoader();
+                    openToaster("success", data.message);
+                    
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    function editProductVariant(id, price, user_type, is_distributor){
+        var inputId = '#sale_price_'+id;
+        $('#sale_price_'+id).html('<input class="inputField" type="text" placeholder="Enter Sale Price" onkeypress="return validateFloatKeyPress(this,event);" name="sale_price" id="'+inputId+'" maxlength="10" value="'+price+'">')
+        inputId = '"'+inputId+'"';
+        $('#update_'+id).html("<a href='javascript:void(0)' onclick='updateProductVariant("+id+", document.getElementById("+inputId+").value, "+user_type+", "+is_distributor+")'><img src='static/img/svg/done.svg'></a>")
+    }
+    
+    function updateProductVariant(id, price, user_type, is_distributor){
+        $('#update_'+id).html("loading.....");
+        $.ajax({
+            url: "{% url 'src:update-user-variant-price' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                price: price,
+                user_type: user_type,
+                is_distributor: is_distributor,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                $('#sale_price_'+data.id).html(data.price);
+                $('#update_'+id).html('<a href="javascript:void(0)" onclick="editProductVariant('+data.id+', '+data.price+', '+data.user_type+', '+is_distributor+')"><img src="static/img/svg/editcopy.svg"></a>')
+                $('#container_price_'+id).text(data.container_price)
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+        
+    }
+    
+    $('#addProductDetailsForms').submit(function(e){
+        $('#addUserModal').html('');
+        
+        showLoader();
+        e.preventDefault();
+        $form = $(this)
+        var formData = new FormData(this);
+        
+        $.ajax({
+            url: "{% url 'src:add-user-product-detail' %}",
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                $('.error').remove();
+                console.log(response)
+                if(response.error){
+                    $.each(response.errors, function(name, error){
+                        alert(error);
+                        window.location.reload();
+                    })
+                } else {
+                    hideLoader();
+                    $('#addUserModal').html(response);
+                    
+                    var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                    $("#addUserModalBody").height(mch);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+    
+</script>

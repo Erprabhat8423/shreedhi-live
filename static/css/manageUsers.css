@@ -1,0 +1,539 @@
+.nonoperationalBlock,
+.employeesBlock {
+    display: none;
+}
+
+.tableBox {
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+.barGraphLeft {
+    width: 100%;
+    display: inline-block;
+}
+
+.flex-wrapper {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.iconAddUser {
+    padding-right: 4rem;
+    padding-left: 4rem;
+    background-image: url(/static/img/svg/adduser.svg);
+    background-position: center;
+    background-size: 6rem;
+}
+.iconAddUser:hover {
+    padding-right: 4rem;
+    padding-left: 4rem;
+    background-image: url(/static/img/svg/adduser.svg);
+    background-position: center;
+    background-size: 6rem;
+}
+
+.iconAddEmployee {
+    padding-right: 4rem;
+    padding-left: 4rem;
+    background-image: url(/static/img/svg/addEmployee.svg);
+    background-position: center;
+    background-size: 7rem;
+}
+.iconAddEmployee:hover {
+    padding-right: 4rem;
+    padding-left: 4rem;
+    background-image: url(/static/img/svg/addEmployee.svg);
+    background-position: center;
+    background-size: 7rem;
+}
+
+.single-chart {
+    width: 50%;
+    justify-content: space-around;
+}
+
+.circular-chart {
+    display: block;
+    margin: 10px auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #108bff;
+    stroke-width: 3.8;
+}
+
+.circle {
+    fill: none;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+}
+
+.circular-chart.orange .circle {
+    stroke: #ff9f00;
+    stroke-width: 3.8;
+}
+.circular-chart.blue .circle {
+    stroke: #108bff;
+    stroke-width: 3.8;
+}
+.circular-chart.grey .circle {
+    stroke: #cacaca;
+    stroke-width: 3.8;
+}
+
+.percentageBlue {
+    fill: #108bff;
+    font-family: sans-serif;
+    font-size: 0.6rem;
+    text-anchor: middle;
+}
+
+.percentageOrange {
+    fill: #ffd97f;
+    font-family: sans-serif;
+    font-size: 0.4rem;
+    text-anchor: middle;
+}
+
+.percentageGrey {
+    fill: #cacaca;
+    font-family: sans-serif;
+    font-size: 0.4rem;
+    text-anchor: middle;
+}
+
+div.squareBlue {
+    border: 4px solid #108bff;
+    height: 0px;
+    display: inline-block;
+    width: 0px;
+}
+div.squareOrange {
+    border: 4px solid #ff9f00;
+    height: 0px;
+    display: inline-block;
+    width: 0px;
+}
+div.squareGrey {
+    border: 4px solid #cacaca;
+    height: 0px;
+    display: inline-block;
+    width: 0px;
+}
+
+.modal-AddUser,
+.modal-AddEmployee,
+.modal-ViewEmployee,
+.modal-ViewUser {
+    width: 95%;
+    height: 90%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-radius: 17px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 7px 13px 0px rgba(0, 115, 224, 0.08);
+}
+
+.modal-AddUsers {
+    width: 95%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-radius: 17px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 7px 13px 0px rgba(0, 115, 224, 0.08);
+}
+
+.md-modal {
+    width: 50%;
+    min-height: 25%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-radius: 17px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 7px 13px 0px rgba(0, 115, 224, 0.08);
+}
+
+#step2,
+#step3,
+#step4,
+#headerStep2,
+#headerStep3,
+#headerStep4,
+#addUserModal {
+    display: none;
+}
+
+#stepFooter {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+#stepFooter li {
+    display: block;
+    flex: 0 1 auto;
+    list-style-type: none;
+    background-color: white;
+    z-index: 1;
+}
+
+#stepFooter li:first-child {
+    padding-left: 0;
+}
+
+#stepFooter li:last-child::after {
+    padding-right: 0;
+    border-bottom: 0px solid lightgray;
+}
+
+#li1:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+#li2:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+#li3:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+
+#step2Emp,
+#step3Emp,
+#step4Emp,
+#headerStep2Emp,
+#headerStep3Emp,
+#headerStep4Emp,
+#addEmployeeModal {
+    display: none;
+}
+
+#stepFooterEmp {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+#stepFooterEmp li {
+    display: block;
+    flex: 0 1 auto;
+    list-style-type: none;
+    background-color: white;
+    z-index: 1;
+}
+
+#stepFooterEmp li:first-child {
+    padding-left: 0;
+}
+
+#stepFooterEmp li:last-child::after {
+    padding-right: 0;
+    border-bottom: 0px solid lightgray;
+}
+
+#li1Emp:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+#li2Emp:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+#li3Emp:after {
+    content: "";
+    border-bottom: 3px solid lightgray;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    width: 30%;
+}
+
+#basic,
+#official,
+#attendance,
+#uploads,
+#viewEmployeeModal {
+    display: none;
+}
+
+#user_basic,
+#user_official,
+#user_productDetails,
+#user_cratesSum,
+#user_orderSum,
+#user_uploads,
+#viewUserModal {
+    display: none;
+}
+
+.selectedstep:after {
+    border-bottom: 1px solid #5454ff !important;
+}
+
+.iconCover {
+    background-color: #fff;
+    border: 0px solid rgba(84, 84, 255, 0.31);
+    box-shadow: 0px 0px 6px 0px rgba(84, 84, 255, 0.31);
+    font-size: 1.1rem;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    cursor: pointer;
+}
+.fileUploadContainer {
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    font-size: 0.9rem;
+    padding: 0rem;
+    border-radius: 0.6rem;
+    width: 100%;
+}
+
+.upload {
+    padding: 0.6rem;
+    margin: 0;
+    background-color: #e7e7e7;
+    color: darkgray;
+    text-align: center;
+}
+
+.btn-step {
+    border-radius: 1rem;
+    color: rgb(255, 255, 255);
+    pointer-events: none;
+    border: 1px solid darkgrey;
+    padding: 0.15rem;
+    font-size: 0.9rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    background-color: darkgrey;
+}
+.activeStep {
+    background-color: #5454ff;
+    color: #ffffff;
+}
+
+#modalFooter {
+    height: 8rem;
+    background-color: #ffffff;
+}
+
+.card {
+    display: block;
+    width: 100%;
+    height: 25rem;
+    margin-bottom: 1rem;
+    background-color: #f3f3f3;
+}
+
+.store_ProfileImg {
+    display: block;
+    width: 95%;
+    height: 6.3rem;
+    margin-bottom: 1rem;
+    /* background-color: #f3f3f3; */
+    float: right;
+}
+
+.user_ProfileImg {
+    display: block;
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 1rem;
+    background-color: #f3f3f3;
+    border-radius: 5rem;
+    background-color: #0073e0;
+    margin-top: 5px;
+}
+
+.imgStyleRound {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+    transform: scale(0.7) !important;
+}
+
+.imgStyle {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+}
+.infoTabs {
+    padding: 0.51rem 1rem;
+    margin: 0rem 1rem;
+    color: grey;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.activeInfoTabs {
+    color: #009cff;
+    font-weight: 600;
+    border-bottom: 2px solid #009cff;
+    font-size: 1.1rem;
+}
+
+#contactNumberCont,
+#otherContactCont,
+#emp_contactNumberCont {
+    max-height: 7rem;
+    overflow: auto;
+}
+
+.genderImg {
+    width: 1.5rem;
+}
+
+#emp_AttSetting {
+    max-height: 35rem;
+    overflow: auto;
+}
+
+.fa-trash {
+    color: #d7d7d7;
+}
+
+.activeTab {
+    display: block !important;
+}
+
+.tableRowIcon {
+    margin: 0rem 0.3rem;
+}
+
+.labelContainer {
+    display: inline-block;
+    position: absolute;
+}
+
+.labelContainerOP {
+    display: inline-block;
+    position: absolute;
+    top: 0.5rem;
+}
+#headerViewEmployee,
+#headerViewUser {
+    border-bottom: 0px solid;
+}
+#detailsBoxFirst {
+    display: none;
+}
+
+.cardRow {
+    border: 1px solid #d7d7d7;
+    padding: 0.5rem;
+    border-radius: 0.7rem;
+}
+
+.btn-Map {
+    background-color: #0073e0;
+    color: #fff;
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    min-width: 7rem;
+    font-size: 0.7rem;
+}
+.btn-Map:hover {
+    background-color: #0073e0;
+    color: #fff;
+}
+
+#profilecontainer {
+    position: relative;
+}
+
+.moreInfo {
+    display: none;
+}
+
+#img2 {
+    position: absolute;
+    left: 3rem;
+    bottom: -1.5rem;
+}
+
+.viewText {
+    margin-left: 2.5rem;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.orderSummaryRight {
+    /* border: 1px solid #d7d7d7; */
+    border-radius: 2rem;
+    padding: 1rem;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+}
+
+.TContainer {
+    height: 95%;
+    overflow: auto;
+}
+
+.btnIcon {
+    width: 1rem;
+}
+
+.class_checkbox {
+    width: 1rem;
+    height: 1rem;
+    background-color: #ffffff;
+    border: 1px solid darkgrey;
+    cursor: pointer;
+    border-radius: 10px;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+.class_checkbox.checked {
+    background-image: url(/static/img/svg/selected.svg);
+    border: 1px solid #0686ff;
+    box-shadow: 0px 0px 18px 0px #0686ff;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: 150%;
+}

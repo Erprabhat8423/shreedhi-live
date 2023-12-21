@@ -1,0 +1,397 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 550%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-500" />
+                    <h4 class="modalColHead">Edit Permit Details</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="editPermitDetails" method="POST" autocomplete="off"  action="" aria-label="Product">
+                    {% csrf_token %}
+                     <input type="hidden" name="permit_id" value="{{permit.id}}" >
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Edit Permit Details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="editPermitDetails('{{permit.id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"}
+                            onclick="RegistrationList('{{ permit.vehicle_id }}')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Permit No.*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Permit No.*" name="permit_no" id="permit_no" maxlength="50"  value="{{permit.permit_no}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Permit Registration Date*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Permit Registration Date*" name="permit_registration_date" id="permit_registration_date" maxlength="50" readonly  value="{{permit.permit_registration_date|date:'d/m/Y' }}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Permitted Route*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Permitted Route*" name="permitted_route" id="permitted_route" maxlength="50"  value="{{permit.permitted_route}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+
+
+                 
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Validity*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Validity*" name="permit_valid_till" id="permit_valid_till" maxlength="50" readonly  value="{{permit.permit_valid_till|date:'d/m/Y'}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Purpose*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Purpose*" name="purpose" id="purpose" maxlength="50"  value="{{permit.purpose}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Insurance Copy</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input type="file" class="inputField" type="text" placeholder="Insurance Copy*" name="insurance_copy" id="insurance_copy" maxlength="50"  value="{{permit.insurance_copy}}" />  <a target="_blank" href="{{permit.insurance_copy}}">Click Here For Image</a>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+
+            
+
+                
+                
+               
+                
+                    
+            
+                <div id="newRow">
+                    
+                </div>
+               
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    function editPermitDetails() {
+        if(validateZoneForm()){
+            hideLoader();
+            return false;
+        }else{
+            var vehicle_id="{{vehicle.id}}";
+            $form = $(this)
+            var formData = new FormData(document.getElementById("editPermitDetails"));
+            $.ajax({
+                url:'{% url 'src:edit-PermitDetails' '1' %}',
+                url:url.replace('1',vehicle_id),
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    
+                    if(data.flag){
+                        RegistrationList('{{ permit.vehicle_id}}')
+                    }
+                    else{
+                        openToaster('success',data.message)
+                        window.location= ""
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+        }
+    }
+    
+    
+    
+    function validateZoneForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        if($('#permit_no').val() == ""){
+            $('#permit_no').parent().find('.error_msg').text('Field Is Mandatory ');
+            $('#permit_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("permit_no").value;
+        
+        if(a.length > 50){
+            $('#permit_no').parent().find('.error_msg').text('Length should be less than 50');
+            $('#permit_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#permit_no").val()).length;
+        if(length == 0){
+            $('#permit_no').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#permit_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+
+
+        if($('#permit_registration_date').val() == ""){
+            $('#permit_registration_date').parent().find('.error_msg').text('Please Give Registration Date');
+            $('#permit_registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("permit_registration_date").value;
+        
+        if(a.length > 50){
+            $('#permit_registration_date').parent().find('.error_msg').text('Length should be less than 50');
+            $('#permit_registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#permit_registration_date").val()).length;
+        if(length == 0){
+            $('#permit_registration_date').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#permit_registration_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if($('#permitted_route').val() == ""){
+            $('#permitted_route').parent().find('.error_msg').text('Please Give Permitted Route');
+            $('#permitted_route').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("permitted_route").value;
+        
+        if(a.length > 50){
+            $('#permitted_route').parent().find('.error_msg').text('Length should be less than 50');
+            $('#permitted_route').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#permitted_route").val()).length;
+        if(length == 0){
+            $('#permitted_route').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#permitted_route').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if($('#permit_valid_till').val() == ""){
+            $('#permit_valid_till').parent().find('.error_msg').text('Please Give Validity');
+            $('#permit_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("permit_valid_till").value;
+        
+        if(a.length > 50){
+            $('#permit_valid_till').parent().find('.error_msg').text('Length should be less than 50');
+            $('#permit_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#permit_valid_till").val()).length;
+        if(length == 0){
+            $('#permit_valid_till').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#permit_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+        if($('#purpose').val() == ""){
+            $('#purpose').parent().find('.error_msg').text('Please Give Purose');
+            $('#purpose').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("purpose").value;
+        
+        if(a.length > 50){
+            $('#purpose').parent().find('.error_msg').text('Length should be less than 50');
+            $('#purpose').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#purpose").val()).length;
+        if(length == 0){
+            $('#purpose').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#purpose').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+          
+        if($('#insurance_copy').val() != ""){
+            var ext = $('#insurance_copy').val().split('.').pop().toLowerCase();
+            var oFile = document.getElementById("insurance_copy").files[0]; 
+            if($.inArray(ext, ['png','jpg','jpeg']) == -1 ) {
+                $('#insurance_copy').parent().find('.error_msg').text('Only PNG and JPEG are allowed.');
+                $('#insurance_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            if (oFile.size > 5242880) 
+            {
+                $('#insurance_copy').parent().find('.error_msg').text(' Image file should not be more than 5 MB ');
+                $('#insurance_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            
+        }
+        
+        
+      
+       
+
+        
+
+
+
+       
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function validateDateRange(){
+        if($("#permit_valid_till").val() != "" && $("#permit_registration_date").val() != ""){
+                permit_registration_date = new Date(getDateFormat($("#permit_registration_date").val()));
+                permit_valid_till = new Date(getDateFormat($("#permit_valid_till").val()));
+                $('.error_msg').text('');
+                $('[name="permit_registration_date"]').css("border", "");
+                $('[name="permit_valid_till"]').css("border", "");
+    
+                if(permit_registration_date > permit_valid_till){
+                    $('[name="permit_valid_till"]').parent().find('.error_msg').text('Date Should Be More Than Registration Date');
+                    $('[name="permit_valid_till"]').css("border", "1px solid #db8305");
+                    $("#permit_valid_till").val('')
+                    return false;
+                }
+                }
+    }
+
+
+    function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+    
+    
+    
+    
+    $("#permit_registration_date").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+    });
+    
+    $("#permit_valid_till").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+        
+    });
+
+
+
+    
+</script>

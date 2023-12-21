@@ -1,0 +1,350 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Sub Route</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addRouteForm" method="POST" autocomplete="off" action="" aria-label="Product">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Sub Route details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveRoute()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>State</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="state_id" onchange="getStateTowns(this.value)">
+                            <option value="">Select</option>
+                            {% for state in states %}
+                            <option value="{{state.id}}">{{state.state}}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Route Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Route Name*" name="route_name" maxlength="50" />
+                        <label class="error_msg float-right" id="route_error"></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Route Code</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Route code*" name="route_code" maxlength="10"/>
+                        <label class="error_msg float-right" id="route_error"></label>
+                    </div>
+                </div>
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Production Unit*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="production_unit_id" id="production_unit_id" >
+                            <option value="">Select</option>
+                            {% for production in production_unit %}
+                            <option value="{{production.id}}" {% if production.id == route.production_unit_id|add:"0" %}selected{% endif %}>{{production.production_unit_name}}</option>
+                            {% endfor %}
+                            
+                        </select>
+                        <label class="error_msg float-right" id="route_error"></label>
+                    </div>
+                </div>
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Town mapping</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-3">
+                        <label for="">Town</label>
+                        <select class="inputField selectField" style="width: 100%;" name="town[]" id="town_1" onchange="checkTownMapping(this.value)">
+                            <option value="">Select</option>
+                        </select>
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label for="">Order</label>
+                        <input class="inputField numeric" type="text" placeholder="Order*" name="order[]" maxlength="2" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    
+                </div>
+                <div id="newRow">
+                    
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-right"><a href="javascript:;" onclick="addNewTown()" class="btn btn-primary"><i class="fa fa-plus"></i></a></div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    $('[name="route_code"]').keyup(function(){
+        var txt=$('[name="route_code"]');
+        txt.val(txt.val().replace(/\s/g, ''));
+    });
+    var state_towns = [];
+    function getStateTowns(state_id){
+        if(state_id != ""){
+            showLoader();
+            url = "{% url 'src:get-state-towns' 1 %}";
+            url = url.replace(1,parseInt(state_id));
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        state_towns = data.towns;
+                        html = `<option value="">Select</option>`;
+                        $.each(data.towns, function(key,value){
+                            html += `<option value="`+value.id+`">`+value.town+`</option>`;
+                        });
+                            $('#town_1').html(html)
+                        }else{
+                            hideLoader();
+                            openToaster("danger", data.message);
+                            
+                        }
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                        hideLoader();
+                    }
+                });
+            }
+        }
+        
+        function checkTownMapping(town_id){
+        if(town_id != ""){
+            url = "{% url 'src:check-towns-route-mapping' 1 %}";
+            url = url.replace(1,parseInt(town_id));
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    if(data.flag){
+                        openToaster("danger", data.message);
+                        }
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                        hideLoader();
+                    }
+                });
+            }
+        }
+    
+
+        function addNewTown(){
+            var temp = [];
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+            
+            $('[name="town[]"]').each(function(){
+                if($(this).val() == ""){
+                    error = error + 1;
+                    $(this).parent().find('.error_msg').text('Please select town');
+                }
+            });
+            
+            $('[name="order[]"]').each(function(){
+                if($(this).val() == ""){
+                    error = error + 1;
+                    $(this).parent().find('.error_msg').text('Please enter order');
+                }
+            });
+            
+            if(error > 0){
+                return false;
+            }else{
+                
+                $('[name="town[]"]').each(function(){
+                    temp.push(parseInt($(this).val()));
+                })
+                
+                new_options = `<option value="">Select</option>`;
+                $.each(state_towns, function(key,value){
+                    if($.inArray(value.id, temp) == -1){
+                        new_options +=`<option value="`+value.id+`" >`+value.town+`</option>`
+                    }
+                });
+                
+                
+                new_html = `
+                <div class="row mt-md-3">
+                    <div class="col-md-3">
+                        <select class="inputField selectField" style="width: 100%;" name="town[]"  onchange="checkTownMapping(this.value)">
+                            `+new_options+`
+                            `;
+                            new_html +=`
+                        </select>
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <input class="inputField numeric" type="text" placeholder="Order*" name="order[]" maxlength="2" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    
+                    
+                    <div class="col-md-1 text-right" style="margin-top:3px;">
+                        <a href="javascript:;" onclick="removeTown(this)" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                    </div>
+                </div>
+                `;
+                $('#newRow').append(new_html);
+                
+                $('.selectField').select2();
+            }
+            
+        }
+        
+        function removeTown(element){
+            $(element).parent().parent().remove();
+        }
+        function saveRoute() {
+            showLoader();
+            if(validateRouteForm()){
+                hideLoader();
+                return false;
+            }else{
+                $.ajax({
+                    url: "{% url 'src:add-route' %}",
+                    method: 'POST',
+                    data: $('#addRouteForm').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            $("#addProductModal").html('');
+                            $("#addProductModal").hide();
+                            getList('route')
+                            openToaster("success", data.message);
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    // hideLoader();
+                });
+            } 
+        }
+        
+        
+        function validateRouteForm(){
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+            if($.trim($('[name="route_name"]').val()) == ""){
+                $('[name="route_name"]').parent().find('.error_msg').text('Please enter sub route name');
+                $('[name="route_name"]').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+            if($.trim($('[name="route_code"]').val()) == ""){
+                $('[name="route_code"]').parent().find('.error_msg').text('Please enter sub route code');
+                $('[name="route_code"]').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+            if($('[name="state_id"]').val() == ""){
+                $('[name="state_id"]').parent().find('.error_msg').text('Please select state');
+                $('[name="state_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+            if($.trim($('[name="production_unit_id"]').val()) == ""){
+                $('[name="production_unit_id"]').parent().find('.error_msg').text('Please select Production Unit');
+                $('[name="production_unit_id"]').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+
+            
+            $('[name="town[]"]').each(function(){
+                if($.trim($(this).val()) == ""){
+                    error = error + 1;
+                    $(this).parent().find('.error_msg').text('Please select town');
+                }
+            })
+            
+            $('[name="order[]"]').each(function(){
+                if($.trim($(this).val()) == ""){
+                    error = error + 1;
+                    $(this).parent().find('.error_msg').text('Please enter order');
+                }
+            })
+            
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        
+        
+    </script>

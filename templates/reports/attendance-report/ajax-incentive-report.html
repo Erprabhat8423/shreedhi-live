@@ -1,0 +1,41 @@
+{% load static %}
+
+<thead>
+<tr>
+    <th>Sap Code</th>
+    <th>Distributor Name</th>
+    <!--<th>SS Incentive</th>-->
+    <th>Distributor Incentive</th>
+    <!--<th>Primary  TPT Amount</th>-->
+    <!--<th>Distributor TPT Amount</th>-->
+    {% for slab in superstockists_distinct_slab %}
+    <th>{{slab.slab_detail}}</th>
+    {% endfor %}
+    <th>NET Amount</th>
+    
+</tr>
+</thead>
+<tbody id="tablebody">
+{% if superstockists %}
+{% for superstockist in superstockists %}
+<tr>
+    <td>{{superstockist.emp_sap_id}}</td>
+    <td>{{superstockist.name}} <strong>({{superstockist.store_name}})</strong></td>
+    <!--<td>{{superstockist.ss_incentive}}</td>-->
+    <td>{{superstockist.distributor_incentive}}</td>
+    <!--<td>{{superstockist.primary_transporter_amount}}</td>-->
+    <!--<td>{{superstockist.secondary_transporter_amount}}</td>-->
+    {% for slab_amount in superstockist.slab_amount_list %}
+    <td>{{slab_amount}}</td>
+    {% endfor %}
+    <td>{{superstockist.net_amount}}</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td colspan="7" style="text-align: center;">
+        No Record Found...
+    </td>
+</tr>
+{% endif %}
+</tbody>

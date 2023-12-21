@@ -1,0 +1,69 @@
+{% load static %}
+<style>
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+    .centered{
+        top: 30%!important;
+    }
+</style>
+<div class="modal-AddUser centered" style="width: 45%!important; min-height: 20%; max-height: 53%;">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+         <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-8">
+                        <h5 class="mt-md-2">Order Status</h5>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-close float-right" type="button" style="margin:0 -1rem; min-width:2rem" onclick="manipulateModal('addUserModal','close')">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="header">Username</th>
+                                    <th class="header">Status</th>
+                                    <th class="header">Update On Date/Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ initiate_order_details.user_name }}</td>
+                                    <td> Initiated </td>
+                                    <td>{% if initiate_order_details.order_date %} {{ initiate_order_details.order_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %}</td>
+                                </tr>
+                                {% if order_details %}
+                                {% for order in order_details %}
+                                <tr>
+                                    <td>{{ order.final_status_user_name }}</td>
+                                    <td> {% if order.level_id == 2 %} Forwarded {% elif order.level_id == 3 %} Approved {% else %} Delivered {% endif %}</td>
+                                    <td>{% if order.final_update_date_time %} {{ order.final_update_date_time  | date:"d/m/Y h:i A" }} {% else %} - {% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    

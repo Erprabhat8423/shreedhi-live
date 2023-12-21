@@ -1,0 +1,186 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="orderForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg">
+                        <div class="row">
+                            <div class="col-md-8  text-left">
+                                <div class="row">
+                                    <div class="col-md-4 form-group text-left">
+                                        <label>Import file</label>
+                                        <input type="file" name="order_sheet" id="order_sheet"  class="inputField" onchange="fileUploader(this.id,'', 'File', 'order_sheet_error')" required />
+                                        <span id="order_sheet_error" style="color: red; font-size: 11px;"></span>
+                                    </div>
+                                    <div class="col-md-4 form-group text-left" style="margin-top: 30px;">
+                                        <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" required readonly>
+                                    </div>
+                                    <div class="col-md-4 form-group text-left" style="margin-top: 30px;">
+                                        <input type="submit" class="btn btn-primary" value="Upload"/>
+                                    </div>
+                                   
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="col-md-4 text-right">
+                                <button type="button" id="" class="btn iconBox iconExportExcel"  onclick="exportExcel()"></button>
+                                {% if error_length == 0 %}
+                                {% if excel_data %}
+                                <button class="btn btn-save float-right" id="updateBtn" type="button" onclick="updateOrdersAmount()">Save</button>
+                                <button class="btn btn-close float-right" id="cancelBtn" type="button" onclick="cancel()" >Close</button>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <input type="hidden" name="item_code" value="{{item_code_values}}">
+                        <input type="hidden" name="today_date" value="{{today_dates}}">                        
+                        <div class="row" style="margin-top:10px;">
+                            <div class="table-responsive">
+                                <table class="table" id="addOrgTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            {% for header,product_name in header_list %}
+                                            <th style="width:15%;">{% if product_name != 'None' %}{{product_name}}{% else %}{% endif %}<br>{{header}}
+                                               
+                                                <small style="color: red;"><br/>{{item_code_errors|index:forloop.counter0}}</small>
+                                            </th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if excel_data %}
+                                        {% for data in excel_data %}
+                                        <tr>
+                                            <td>{{forloop.counter}}</td>
+                                            <td>{{data.vehicle_no}}<input type="hidden" name="vehicle_no[]" value="{{data.vehicle_no}}">
+                                                <small style="color: red;"><br/>{% if data.vehicle_no_error %}{{data.vehicle_no_error}}{% endif %}</small>
+                                                <small style="color: red;"><br/>{% if data.order_id_error %}{{data.order_id_error}}{% endif %}</small>
+                                            </td>
+                                            <td>{{data.sap_id}} <input type="hidden" name="sap_id[]" value="{{data.sap_id}}">
+                                            <small style="color: red;"><br/>{% if data.sap_id_error %}{{data.sap_id_error}}{% endif %}</small>
+                                            </td>
+                                            <td>{{data.distributor_name}}
+                                               
+                                            </td>
+                                            {% for product in data.product_list %}
+                                            <td>{{product}}
+                                                <input type="hidden" name="item_sku_code[]" value="{{item_code|index:forloop.counter0}}">
+                                                <input type="hidden" name="qty_{{data.sap_id}}{{item_code|index:forloop.counter0}}[]" value="{{product}}">
+                                                <input type="hidden" name="veh_{{data.sap_id}}{{data.vehicle_no}}{{item_code|index:forloop.counter0}}[]" value="{{product}}">
+                                                {% comment %} <input type="hidden" name="veh_{{data.sap_id}}{{item_code|index:forloop.counter0}}[]" value="{{product}}"> {% endcomment %}
+                                            </td>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="2">Please upload excel to preview data.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock content %}
+{% block script %}
+<script>
+    function exportExcel(){
+        window.location.href = "{% url 'src:export-order-template' %}";
+    }
+    $(document).ready(function () {
+        $("#order_datepicker").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0"
+            ,maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+    });
+    function updateOrdersAmount(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-order-list' %}",
+            method: 'POST',
+            data: $('#orderForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag=="True"){
+                    openToaster("success", data.message);
+                    window.location.href = "{% url 'src:upload-order-list' %}";
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+        
+    }
+    function cancel(){
+        window.location.href = "{% url 'src:upload-order-list' %}";
+    }
+
+    function fileUploader(id, previewId, fileType, error_id) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            document.getElementById(error_id).innerHTML = '';
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['xlsx'])===-1){
+                    error = 1;   
+                    document.getElementById(error_id).innerHTML = ''+fileType+' should be excel(xlsx)*';
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        
+    }
+    
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22.67" height="23.625" viewBox="0 0 20.781 21.656">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #b7b7b7;
+        stroke-width: 2px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="drilldown" class="cls-1" d="M257.769,655.664H238V635" transform="translate(-237 -635)"/>
+</svg>

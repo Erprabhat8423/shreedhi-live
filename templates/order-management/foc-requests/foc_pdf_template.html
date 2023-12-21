@@ -1,0 +1,72 @@
+<style>
+    .header-title h2,
+    .header-title h3 {
+      display: inline-block;
+    }
+    h3 {
+      font-size: 18px;
+      text-align: center;
+      padding: 15px 0px 0px 0px;
+      margin: 0px;
+    }
+    
+    table {
+      width: 750px;
+      border-collapse: collapse;
+      margin: 0px auto;
+    }
+    
+    /* Zebra striping */
+    tr:nth-of-type(odd) {
+      background: #eee;
+    }
+    
+    th {
+      background: #3498db;
+      color: #000000;
+      font-weight: bold;
+    }
+    
+    td,
+    th {
+      padding: 5px;
+      border: 1px solid #ccc;
+      text-align: left;
+      font-size: 12px;
+    }
+  </style>
+  
+  <div class="col-md-12">
+    <div class="col-12" style="margin-bottom: 15px;">
+      <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th colspan="{{ columns_length }}">
+            <h3> Foc List </h3>
+          </th>
+        </tr>
+        <tr>
+          <th class="user_name_foc" {% if 'user_name_foc' not in columns %} style="display: none;" {% endif %}>Employee Name</th>
+          <th class="request_by_name_foc" {% if 'request_by_name_foc' not in columns %} style="display: none;" {% endif %}>User Name</th>
+          <th class="foc_status_foc" {% if 'foc_status_foc' not in columns %} style="display: none;" {% endif %}>Status</th>
+          <th class="foc_delivery_date_foc" {% if 'foc_delivery_date_foc' not in columns %} style="display: none;" {% endif %}>Delivery Date</th>
+          <th class="created_at_foc" {% if 'created_at_foc' not in columns %} style="display: none;" {% endif %}>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in foc_requests %}
+        <tr>
+          <td class="user_name_foc" {% if 'user_name_foc' not in columns %} style="display: none;" {% endif %}>{{ result.user_name }}</td>
+          <td class="request_by_name_foc" {% if 'request_by_name_foc' not in columns %} style="display: none;" {% endif %}>{{ result.request_by_name }}</td>
+          <td class="foc_status_foc" {% if 'foc_status_foc' not in columns %} style="display: none;" {% endif %}> {% if result.foc_status == 1 %} Initiated {% elif result.foc_status == 2 %} Forward {% elif result.foc_status == 3 %} Approved {% else %} Delivered {% endif %} </td>
+          <td class="foc_delivery_date_foc" {% if 'foc_delivery_date_foc' not in columns %} style="display: none;" {% endif %}> {% if result.foc_delivery_date %} {{ result.foc_delivery_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %} </td>
+          <td class="created_at_foc" {% if 'created_at_foc' not in columns %} style="display: none;" {% endif %}> {% if result.created_at %} {{ result.created_at  | date:"d/m/Y h:i A" }} {% else %} - {% endif %} </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  

@@ -1,0 +1,98 @@
+.checkbox-custom{
+    display: inline-block;
+    position: relative;
+    padding-left: 17px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .checkbox-custom input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .checkmark {
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    height: 15px;
+    width: 15px;
+    background-color: #8c8c8c;
+    border-radius: 4px
+  }
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  .checkbox-custom input:checked ~ .checkmark:after {
+    display: block;
+  }
+  .checkbox-custom .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2.4px 2.4px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  .containeline-chart{
+    width: 100%;
+    display: block;
+ }
+
+
+  .sales-plan-deta-table .table-hover tbody tr:hover {
+    font-weight: 700;
+}
+.zone-wise-table{ border-radius: 10px;}
+.zone-wise-table .table tr td {
+    border-left: 1px solid #dee2e6;
+    padding: 4px 8px;
+    color: #27285e;
+    font-size: 11px;
+}
+.zone-wise-table .table tr th {
+    border-left: 1px solid #dee2e6;
+    border-bottom: 0;
+    padding: 6px 8px;
+}
+.zone-wise-table .table tr td:first-child{
+    border-left: 0;
+    color: #0686ff;
+    font-weight: 800;
+    font-size: 12px;
+}
+.zone-wise-table .table tr th:first-child{
+    border-left: 0;
+}
+.zone-wise-table .table th:hover{
+    background-color: rgb(255, 233, 181);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered{
+  color: #000;
+  font-weight: 600;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: #000 transparent transparent transparent;}
+  .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #000 transparent;}
+
+
+.zone-wise-table  .table-hover tbody tr:hover {
+      color: #27285e;
+      background-color: #cedfff !important;
+      font-weight: 600;
+      box-shadow: 0;
+      box-shadow: 0px 0px 0px 0px rgb(84 84 255 / 31%);
+  }
+  
+  

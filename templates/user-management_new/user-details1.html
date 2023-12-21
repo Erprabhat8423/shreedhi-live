@@ -1,0 +1,1104 @@
+{% load static %}
+<div class="modal-ViewUser centered">
+  <div class="modal-header" id="headerViewUser">
+    <div class="col-12 p-0">
+      <div class="row">
+        <div class="col-6">
+          <h5 class="mt-md-2" style="color: #0085d9;"><b>{{user.store_name }}</b> &nbsp; &nbsp;</h5>
+          <h6>{{user.salutation }} {{user.first_name }} {{user.middle_name }} {{user.last_name }}</h6>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-close float-right mt-3" type="button" onclick="manipulateModal('viewUserModal','close')">
+            Close
+          </button>
+        </div>
+      </div>
+      <div class="row" id="infoPills">
+        <div class="col-sm-12 p-0">
+          <ul class="nav nav-tabs">
+            <li class="infoTabs activeInfoTabs" id="user_basicTab" onclick="changeInfoTab('user_basic')">Basic info
+            </li>
+            <li class="infoTabs" id="user_officialTab" onclick="changeInfoTab('user_official')">Official
+              Details
+            </li>
+            <li class="infoTabs" id="user_productDetailsTab" onclick="changeInfoTab('user_productDetails')">
+              Product
+              Details
+            </li>
+            <!--<li class="infoTabs" id="user_cratesSumTab" onclick="changeInfoTab('user_cratesSum')">Crates-->
+            <!--  Summary-->
+            <!--</li>-->
+            <li class="infoTabs" id="user_orderSumTab" onclick="changeInfoTab('user_orderSum')">Order
+              Summary
+            </li>
+            <li class="infoTabs" id="user_uploadsTab" onclick="changeInfoTab('user_uploads')">Uploads
+            </li>
+            <li class="infoTabs" id="user_schemesTab" onclick="changeInfoTab('user_schemes')">Scheme's
+            </li>
+            <li class="infoTabs" id="user_incentiveTab" onclick="changeInfoTab('user_incentive')">Incentive
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-body pt-0" id="viewUserModalBody" style="overflow: auto; height: 479px;">
+    <div class="row h-100">
+      <div class="col-md-12 p-0 h-100 activeTab" id="user_basic">
+        <div class="row">
+          <div class="col-md-7">
+            <div class="row">
+              <div class="col-md-12 p-0 mt-2">
+                <div class="row">
+                  <div class="col-md-2 p-0 text-center">
+                    <img src="{% if user.profile_image %}{{ user.profile_image }}{% else %}{% static 'img/svg/profile.svg' %}{% endif %}" style="width: 7rem;">
+                  </div>
+                  <div class="col-md-10 p-10">
+                    {% if user_contact %}
+                    <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                    <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                      Contact No.*
+                    </h6>
+                    {% endif %}  
+                    {% for user_contact in user_contacts %}
+                    <div class="row mt-2">
+                      <div class="col-md-4 pr-0">
+                        <h6 class="viewText mt-0">{{user_contact.country_code}} {{user_contact.contact_number}}</h6>
+                      </div>
+                      <div class="col-md-4 pr-0">
+                        <h6 class="viewText mt-0">{{user_contact.contact_type_name}}</h6>
+                        
+                      </div>
+                      {% if user_contact.is_primary == 1 %}
+                      <div class="col-md-4 pr-0">
+                        <button class="btn btn-step activeStep">
+                          &#10004;
+                        </button>
+                        <span class="viewText m-0">Primary</span>
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Date of Birth
+                </h6>
+                <h6 class="viewText">{{user.date_of_birth | date:"d/m/Y"}}</h6>
+              </div>
+              <div class="col-md-6">
+                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Email id
+                </h6>
+                <h6 class="viewText">{% if user.official_email %}{{user.official_email}}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Gender
+                </h6>
+                <h6 class="viewText">{{user.gender | title }}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Blood group
+                </h6>
+                <h6 class="viewText">{% if user.blood_group %}{{ user.blood_group }}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-6">
+                <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Father's Name
+                </h6>
+                <h6 class="viewText">{% if user.father_name %}{{user.father_name }}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Mother's Name
+                </h6>
+                <h6 class="viewText">{% if user.father_name %}{{user.mother_name }}{% else %}-{% endif %}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Correspondance Address
+                </h6>
+                <h6 class="viewText">{% if user_correspondence_address.address_line_1 %} {{user_correspondence_address.address_line_1}},{% endif %} {% if user_correspondence_address.address_line_2 %} {{user_correspondence_address.address_line_2}},{% endif %} {{user_correspondence_address.state_name}}, {{user_correspondence_address.country_name}},{{user_correspondence_address.pincode}}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Permanent Address
+                </h6>
+                <h6 class="viewText">{% if user_permanent_address.address_line_1 %}{% if user_permanent_address.address_line_1 %} {{user_permanent_address.address_line_1}},{% endif %} {% if user_permanent_address.address_line_2 %} {{user_permanent_address.address_line_2}},{% endif %} {{user_permanent_address.state_name}}, {{user_permanent_address.country_name}},{{user_permanent_address.pincode}}{%else%}-{%endif%}</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5" style="border-left: 1px solid #d7d7d7;">
+            <div class="row">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                  Other Contact Person
+                </h6>
+              </div>
+            </div>
+            {% if contact_person %}
+            {% for contact_person in contact_persons %}
+            <div class="row mt-2 cardRow">
+              <div class="col-md-7 p-0">
+                <h6 class="m-0">{{contact_person.contact_person_name}}</h6>
+                <label class="smallText m-0">{{contact_person.designation}}</label>
+              </div>
+              <div class="col-md-5 p-0">
+                <h6 class="m-0">{{contact_person.contact_number}}</h6>
+              </div>
+            </div>
+            
+            {% endfor %}
+            {% else %}
+            <div class="row mt-2 cardRow">
+              <p>No Record Found</p>
+            </div>
+            {% endif %}
+            
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 p-0 h-100" id="user_official">
+        <div class="row">
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Organisations*
+            </h6>
+            <h6 class="viewText">{% if user.organization_name %}{{user.organization_name}} {% else %}-{% endif %}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Department*
+            </h6>
+            <h6 class="viewText">{% if user.department_name %}{{user.department_name}} {% else %}-{% endif %}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Roles
+            </h6>
+            <h6 class="viewText">{{user.role_name}}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              SAP ID
+            </h6>
+            <h6 class="viewText">{% if user.emp_sap_id %}{{user.emp_sap_id}}{% else %}-{% endif %}</h6>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Aadhar Card No*
+            </h6>
+            <h6 class="viewText">{{user.aadhaar_nubmer}}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/PAN.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              PAN Card No*
+            </h6>
+            <h6 class="viewText">{% if user.pan_number %}{{user.pan_number}}{% else %}-{% endif %}
+            </h6></div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Date of Joining
+              </h6>
+              <h6 class="viewText">{% if user.date_of_joining %}{{user.date_of_joining|date:"d/m/Y" }}{% else %}-{% endif %}</h6>
+            </div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Working Hour(Order Timing)
+              </h6>
+              <h6 class="viewText">{% if user.working_shift_name %}{{user.working_shift_name}}{% else %}-{% endif %}{% if user.order_timing %}({{user.order_timing}}){% else %}{% endif %}</h6>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Reporting to
+              </h6>
+              <h6 class="viewText">{% if user.reporting_to_name %}{{user.reporting_to_name}}{% else %}-{% endif %}</h6>
+            </div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Email id (Official)
+              </h6>
+              <h6 class="viewText">{% if user.official_email %}{{user.official_email}}{% else %}-{% endif %}</h6>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h5 class="mt-2 mb-0" style="display: inline-block;">
+                Area Details
+              </h5>
+            </div>
+            
+            <div class="col-md-10">
+              <div class="row mt-3">
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Zone
+                  </h6>
+                </div>
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Town
+                  </h6>
+                </div>
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Route
+                  </h6>
+                </div>
+              </div>
+              <div class="row cardRow mt-3">
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.zone_name}}</h6>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.town_name}}</h6>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.route_name}}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 p-0 h-100" id="user_productDetails">
+          <div class="row h-100">
+            <div class="col-md-12 TContainer">
+              <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                <thead>
+                  <tr>
+                    <th class="header">SKU Code</th>
+                    <th class="header">Product Name</th>
+                    <th class="header">Product Variant</th>
+                    <th class="header">MRP</th>
+                    <th class="header">Sales Price</th>
+                    <th class="header">Container Sales Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if user_variants %}
+                  {% for user_variant in user_variants %}
+                  <tr>
+                    <td>{% if user_variant.item_sku_code %} {{ user_variant.item_sku_code }} {% endif %}</td>
+                    <td>{% if user_variant.product_name %} {{ user_variant.product_name }} {% endif %}</td>
+                    <td>{% if user_variant.variant_name %} {{ user_variant.variant_name }} {% endif %}</td>
+                    <td>{% if user_variant.mrp %} {{ user_variant.mrp }} {% endif %}</td>
+                    <td> {{ user_variant.sp_user }} </td>
+                    <td> {{ user_variant.container_sp_user }} </td>
+                  </tr>
+                  {% endfor %}
+                  {% else %}
+                  <tr>
+                    <td colspan="6" style="text-align: center;">No Record Found...</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 p-0 h-100" id="user_cratesSum">
+          <div class="row">
+            <div class="col-md-4">
+              <h6><img src="{% static 'img/svg/openingCrates.svg' %}" class="profileIconSize">&nbsp;&nbsp;&nbsp;Crates
+                Ledger</h6>
+              </div>
+              <div class="col-md-4 offset-md-4 text-right">
+                <h6><img src="{% static 'img/svg/openingCrates.svg' %}" class="profileIconSize">&nbsp;&nbsp;&nbsp;20</h6>
+                <h6 class="smalltext lightGrey">No. of crates with Distributor</h6>
+              </div>
+            </div>
+            <div class="row" style="height: 90%;">
+              <div class="col-md-12 TContainer">
+                <p>Coming Soon</p>
+                <!-- <table class="table table-striped table-borderless text-center" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header">Date</th>
+                      <th class="header">Delievery crates</th>
+                      <th class="header">Recieved Crates</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                  </tbody>
+                </table> -->
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-12 p-0 h-100" id="user_orderSum">
+            <div class="row h-100">
+              
+              <div class="col-md-6 TContainer">
+                <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header">OrderID</th>
+                      <th class="header">Order Amount</th>
+                      <th class="header">Date/Time</th>
+                      <th class="header">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if user_order_details %}
+                    {% for order in user_order_details %}
+                    <tr>
+                      <td onclick="getOrderDetails('{{ order.id }}')">{{ order.order_code }}</td>
+                      <td onclick="getOrderDetails('{{ order.id }}')">{{ order.order_total_amount }}</td>
+                      <td onclick="getOrderDetails('{{ order.id }}')">{% if order.order_date %} {{ order.order_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %}</td>
+                      <td onclick="getOrderDetails('{{ order.id }}')">{% if order.order_status == 1 %} Initiated {% elif order.order_status == 2 %} Forwarded {% elif order.order_status == 3 %} Approved {% elif order.order_status == 4 %} Delivered  {% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                      <th colspan="4" text-align="center">No Record Found...</td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6" style="height: 90%;overflow: auto;" id="ajax-order-details">
+                  {% if user_order_details %}
+                  <div class="orderSummaryRight h-100">
+                    <h6><img src="{% static 'img/svg/order/order_No.svg' %}" class="profileIconSize" /> <strong>Order Code: </strong> {{ order_details.order_code }}</h6>
+                    <table class="table table-bordered">
+                      <thead>
+                          <tr>
+                              <th class="header" style="width: 40%;">Product/Variant</th>
+                              <th class="header">Quantity</th>
+                              <th class="header">Rate <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize" /></th>
+                              <th class="header">Amount <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize" /></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% if user_order_item_details %}
+                            {% for order_item in user_order_item_details %}
+                            <tr>
+                                <td>{{ order_item.product_name }}/{{ order_item.product_variant_name }}
+                                        {% if order_item.free_scheme > 0 %}
+                                        <br/>
+                                        <small style="color: orange;">
+                                        - {{order_item.free_schemes}}
+                                        </small>
+                                        {% endif %}
+                                        {% if order_item.flat_schemes > 0 %}
+                                        <br/>
+                                        <small style="color: #0073e0;">
+                                        - {{order_item.flat_scheme}}
+                                        </small>
+                                        {% endif %}
+                                    
+                                </td>
+                                <td>{{ order_item.quantity }} {% if order_item.packaging_type == '0' %} {{order_item.product_container_type}} {% else %} {{order_item.product_packaging_type_name}} {% endif %}</td>
+                                <td>{{ order_item.rate }}</td>
+                                <td>{{ order_item.amount }}</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th colspan="3" style="text-align:right">Total Amount</th>
+                                <th>{{ order_details.order_total_amount  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            {% if total_incentive > 0 %}
+                            <tr>
+                                <th colspan="3" style="text-align:right">Total Discount</th>
+                                <th>{{ total_incentive  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" style="text-align:right">Final Invoice Amount</th>
+                                <th>{{ find_order_amount  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            {% endif %}
+                            {% if quantitative_scheme %}
+                            <tr>
+                                <th colspan="4">
+                                    <h6>Bonus Scheme</h6>
+                                    <div class="col-md-12 p-0">
+                                        {% if quantitative_scheme %}
+                                        <small style="color: orange;">
+                                            {{quantitative_scheme}}
+                                        </small>
+                                        <br/>
+                                        {% endif %}
+                                        {% if flat_scheme %}
+                                        <small style="color: orange;">
+                                            {{flat_scheme}}
+                                        </small>
+                                        <br/>
+                                        {% endif %}
+                                        {% if bulk_scheme %}
+                                        <small style="color: orange;">
+                                            {{bulk_scheme}}
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                </th>
+                            </tr>
+                            {% endif %}
+                      </tbody>
+                  </table>
+                  </div>
+                   {% else %}
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 p-0 h-100" id="user_uploads">
+              <div class="row">
+                <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                  <h6><img src="{% static 'img/svg/aadhaar.svg' %}"> &nbsp;&nbsp; Aadhar Card</h6>
+                  <div class="card">
+                    {% if user_documents.aadhaar_card %}
+                    <img src="{{ user_documents.aadhaar_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                    {% else %}
+                    <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                  <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; PAN Card</h6>
+                  <div class="card">
+                    {% if user_documents.pan_card %}
+                    <img src="{{ user_documents.pan_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                    {% else %}
+                    <img src="{% static 'img/svg/PANGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                  <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; CIN</h6>
+                  <div class="card">
+                    {% if user_documents.cin %}
+                    <img src="{{ user_documents.cin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                    {% else %}
+                    <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                  <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; GSTIN</h6>
+                  <div class="card">
+                    {% if user_documents.gstin %}
+                    <img src="{{ user_documents.gstin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                    {% else %}
+                    <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                  <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; FSSAI</h6>
+                  <div class="card">
+                    {% if user_documents.fssai %}
+                    <img src="{{ user_documents.fssai }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                    {% else %}
+                    <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-12 p-0 h-100" id="user_schemes" style="display: none;">
+              <div class="row h-100">
+                <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header">Scheme Type</th>
+                      <th class="header">Order Code</th>
+                      <th class="header">Product Variant</th>
+                      <th class="header">On Order Of</th>
+                      <th class="header">Free Product Variant</th>
+                      <th class="header">Quantity</th>
+                      <th class="header">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if user_scheme_details %}
+                    {% for scheme_details in user_scheme_details %}
+                    <tr>
+                      <td>{% if scheme_details.scheme_type %} {{ scheme_details.scheme_type|title }} {% endif %}</td>
+                      <td>{% if scheme_details.order_code %} {{ scheme_details.order_code }} {% endif %}</td>
+                      <td>{% if scheme_details.product_variant %} {{ scheme_details.product_variant }} {%else%} - {% endif %}</td>
+                      <td>{% if scheme_details.on_order_of %} {{ scheme_details.on_order_of }} {%else%} - {% endif %}</td>
+                      <td>{% if scheme_details.free_variant_name %} {{ scheme_details.free_variant_name }} {%else%} - {% endif %}</td>
+                      <td>{% if scheme_details.container_quantity %} {{ scheme_details.container_quantity }} {% if scheme_details.container_quantity > 1 %}Crates{%else%}Crate{%endif%}, {% endif %} {% if scheme_details.pouch_quantity %} {{ scheme_details.pouch_quantity }} {% if scheme_details.pouch_quantity > 1 %}Pouches{%else%}Pouch{%endif%} {% endif %}</td>
+                      <td>{% if scheme_details.incentive_amount %} {{ scheme_details.incentive_amount }} {%else%} - {% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                      <td colspan="7" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="col-md-12 p-0 h-100" id="user_incentive" style="display: none;">
+              <form id="incentiveForm" method="POST" enctype="multipart/form-data" >
+              {% csrf_token %}
+              <div class="row ">
+                <div class="col-md-12">
+                  <div class="col-md-3 pull-left">
+                  <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                    Payment Cycle
+                  </h6>
+                  <select class="inputField selectField" style="width: 100% !important;" name="payment_cycle" id="payment_cycle">
+                    <option value="1" {% if incentive.payment_cycle == 1 %}selected{% endif %}>Fortnightly</option>
+                    <option value="2" {% if incentive.payment_cycle == 2 %}selected{% endif %}>Monthly</option>
+                  </select>
+                  <input type="hidden" name="user_id" value="{{user.id}}" />
+                </div>
+                <div class="col-md-3 pull-right p-2">
+                  <button class="btn btn-save float-right" type="submit" >
+                    Save
+                  </button>
+                </div>
+              </div>
+                <div class="col-md-12">
+                  <div class="col-md-3">
+                  <!-- <a href="#">Create Incentive</a> -->
+                </div>
+              </div>
+              <style>
+                .display_child , .display_slab{
+                  width: 20px;
+                  background-color: #eadddd;
+                  border-radius: 50%;
+                  padding: .3rem;
+                }
+                .display_slab{
+                  float: right;
+                  background-color: #0085d9;
+                }
+                .drilldown{
+                  margin-top: -20px;
+                  height: 20px;
+                }
+                .productClassRow{
+                  background-color: #f7f7ee;
+                  border-bottom: 1px solid rgb(223, 223, 223);
+                }
+                #user_incentive td{
+                  vertical-align: middle;
+                }
+                .slabrow{
+                  color: #0085d9;
+                }
+              </style>
+              <div class="col-md-12">
+                <table class="table table-borderless" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header" colspan="4">&nbsp;</th>
+                      <!--<th class="header" style="width: 20%">SS Incentive</th>-->
+                      <th class="header" style="width: 20%">Distributor Incentive</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for productClass in productClassList %}
+                    <tr class="row{{productClass.id}} productClassRow">
+                      <td colspan="3">
+                        <img src="{% if productClass.levelFlag > 1 %}{% static 'img/svg/collaps.svg' %}{%else%}{% static 'img/svg/add.svg' %}{%endif%}" {% if productClass.levelFlag > 1 %} class="fa-minus display_child"{%else%} class="fa-plus display_child"{%endif%}  onclick="toggleChild({{productClass.id}},'product', this,{{productClass.id}})">
+                        {{productClass.product_class}}
+                        <img src="{% static 'img/svg/slab.svg' %}" class="display_slab slab_{{productClass.id}}"  onclick="toggleSlabChild({{productClass.id}},'productClass',this, '{{productClass.product_class}}',0, 0, {{productClass.id}})">
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField" type="hidden" name="level_flag_{{productClass.id}}" id="level_flag_{{productClass.id}}" maxlength="6"  value="{% if productClass.levelFlag > 0 %}{{productClass.levelFlag}}{% else %}1{% endif %}"  />
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField" type="hidden" name="slab_flag_{{productClass.id}}" id="slab_flag_{{productClass.id}}" value="{% if productClass.is_slab %}{{productClass.is_slab}}{% else %}0{% endif %}" maxlength="6" />
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField ss_incentive_{{productClass.id}}" type="hidden" placeholder="SS Incentive*" name="ss_incentive_{{productClass.id}}" value="{% if productClass.ss_incentive %}{{productClass.ss_incentive}}{% else %}{% endif %}"
+                        id="ss_incentive" maxlength="6" {% if productClass.levelFlag > 1 %}style="display:none"{%endif%} />
+                        <label class="error_msg float-right" id="ss_incentive_error"></label>
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField distributor_incentive_{{productClass.id}}" type="text" placeholder="Distributor Incentive*" name="distributor_incentive_{{productClass.id}}" value="{% if productClass.distributor_incentive %}{{productClass.distributor_incentive}}{% else %}{% endif %}"
+                        id="distributor_incentive" maxlength="6"  {% if productClass.levelFlag > 1 %}style="display:none"{%endif%}  />
+                        <label class="error_msg float-right" id="distributor_incentive_error"></label>
+                      </td>
+                    </tr>
+                    
+                    {% if productClass.incentiveSlabDetails %}
+                    {% for pc_slab in productClass.incentiveSlabDetails %}
+                      <tr class="product_child_{{productClass.id}}  slab_productClass_{{productClass.id}} slab_product_child_0 slab_productclass_child_{{productClass.id}}">
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td colspan="1">
+                      {% if forloop.counter == 1 %}
+                      <div class="row slabrow"><small>&#x20b9; Slab for {{productClass.product_class}}</small></div>
+                      {%endif%}
+                      <div class="row">
+                      <div class="col-sm-8 px-0">
+                        <select class="inputField selectField" style="width: 100% !important;" name="slab_id_productClass_{{productClass.id}}[]" class="slab_id{{productClass.id}}" >
+                          {% for pc_master_slab in productClass.produClassSlabDetails %}
+                              <option value="{{pc_master_slab.id}}" {% if pc_slab.slab_id == pc_master_slab.id %}selected{% endif %}>{{pc_master_slab.more_than_quantity}} - {{pc_master_slab.upto_quantity}}</option>
+                          {% endfor %}
+                          </select>
+                      </div>
+                      <div class="col-sm-4">
+                      <img src="{% static 'img/svg/delete.svg' %}" style="padding-top: 5px;" onclick=removeSlab(this)>
+                      </div>
+                      </div>
+                      </td>
+                      <td colspan="2">
+                      <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField " type="text" placeholder="Slab Incentive*" name="ss_incentive_productClass_{{productClass.id}}[]" id="ss_incentive" maxlength="6"
+                      value="{% if pc_slab.ss_incentive %}{{pc_slab.ss_incentive}}{%endif%}"  />
+                      <label class="error_msg float-right" id="ss_incentive_error"></label>
+                      </td>
+                      <!-- <td>
+                      <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField " type="text" placeholder="Distributor Slab Incentive*" name="distributor_incentive_productClass_{{productClass.id}}[]"
+                      id="distributor_incentive" maxlength="6"  value="{% if pc_slab.distributor_incentive %}{{pc_slab.distributor_incentive}}{%endif%}" />
+                      <label class="error_msg float-right" id="distributor_incentive_error"></label>
+                      </td> -->
+                    </tr>
+                    {% endfor %}
+                    {%endif%}
+                    {% for product in productClass.product %}
+                    <tr {% if not productClass.productlevelFlag and not product.variant_levelFlag %}style="display: none;"{%endif%} class="product_{{product.product_class_id}}">
+                      <td>&nbsp;</td>
+                      <td colspan="2">
+                        <img src="{% static 'img/svg/drilldown.svg' %}" class="drilldown">
+                        <img src="{% if product.variant_levelFlag %}{% static 'img/svg/collaps.svg' %}{%else%}{% static 'img/svg/add.svg' %}{%endif%}" {% if product.variant_levelFlag %} class="fa-minus display_child"{%else%} class="fa-plus display_child"{%endif%}  onclick="toggleChild({{product.id}},'variant', this, {{productClass.id}})">
+                        {{product.product_name}}
+                        <!-- <img src="{% static 'img/svg/slab.svg' %}" class="display_slab  productClass_child_{{product.product_class_id}} slab_product_{{product.id}}"   onclick="toggleSlabChild({{productClass.id}},'product',this, '{{product.product_name}}', {{productClass.id}}, {{product.id}}, {{productClass.id}})"> -->
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField" type="hidden" name="slab_flag_{{productClass.id}}_{{product.id}}" id="slab_flag_{{productClass.id}}_{{product.id}}"  value="{% if product.is_slab %}{{product.is_slab}}{% else %}0{% endif %}" maxlength="6" />
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField productClass_child_{{product.product_class_id}}  product_ss_incentive_{{product.id}}" type="hidden" placeholder="SS Incentive*" name="ss_incentive_{{productClass.id}}_{{product.id}}"
+                        id="ss_incentive" maxlength="6" value="{% if product.ss_incentive %}{{product.ss_incentive}}{% else %}{% endif %}"  {% if product.variant_levelFlag %}style="display:none"{%endif%} />
+                        <label class="error_msg float-right" id="ss_incentive_error"></label>
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField productClass_child_{{product.product_class_id}} product_distributor_incentive_{{product.id}}" type="text" placeholder="Distributor Incentive*" name="distributor_incentive_{{productClass.id}}_{{product.id}}"
+                        id="distributor_incentive" maxlength="6" value="{% if product.distributor_incentive %}{{product.distributor_incentive}}{% else %}{% endif %}" {% if product.variant_levelFlag %}style="display:none"{%endif%} />
+                        <label class="error_msg float-right" id="distributor_incentive_error"></label>
+                      </td>
+                    </tr>
+                    
+
+                    {% for variant in product.variant %}
+                    <tr {% if not product.variant_levelFlag %}style="display: none;"{%endif%} class="product_child_{{product.product_class_id}}  product_variant_{{product.id}}">
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td colspan="1">
+                        <img src="{% static 'img/svg/drilldown.svg' %}" class="drilldown">
+                        {{variant.variant_name}}
+                        <!-- <img src="{% static 'img/svg/slab.svg' %}" class="display_slab  productClass_child_{{product.product_class_id}} slab_{{product.id}}"   onclick="toggleSlabChild({{variant.id}},'variant',this, '{{variant.variant_name}}',{{productClass.id}}, {{product.id}}, {{productClass.id}})"> -->
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField" type="hidden" name="slab_flag_{{productClass.id}}_{{product.id}}_{{variant.id}}" id="slab_flag_{{productClass.id}}_{{product.id}}_{{variant.id}}"  value="{% if variant.is_slab %}{{variant.is_slab}}{% else %}0{% endif %}" maxlength="6" />
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField  productClass_child_{{product.product_class_id}}  product_child_{{product.id}}   variant_ss_incentive_{{variant.id}} " type="hidden" placeholder="SS Incentive*" name="ss_incentive_{{productClass.id}}_{{product.id}}_{{variant.id}}"
+                        id="variant_ss_incentive" maxlength="6"  value="{% if variant.ss_incentive %}{{variant.ss_incentive}}{% else %}{% endif %}" {% if not product.variant_levelFlag %}style="display:no1ne"{%endif%} />
+                        <label class="error_msg float-right" id="ss_incentive_error"></label>
+                      </td>
+                      <td>
+                        <input onkeyup="return validateFloatKeyPress(this,event);" class="inputField  productClass_child_{{product.product_class_id}}  product_child_{{product.id}}   variant_distributor_incentive_{{variant.id}} " type="text" placeholder="Distributor Incentive*" name="distributor_incentive_{{productClass.id}}_{{product.id}}_{{variant.id}}"
+                        id="variant_distributor_incentive" maxlength="6"  value="{% if variant.distributor_incentive %}{{variant.distributor_incentive}}{% else %}{% endif %}" {% if not product.variant_levelFlag  %}style="display:1none"{%endif%} />
+                        <label class="error_msg float-right" id="distributor_incentive_error"></label>
+                      </td>
+                    </tr>
+                    
+
+                    {% endfor %}
+                    {% endfor %}
+                   {% endfor %}
+                  </tbody>
+                </table>
+                <br>
+                <br>
+                <br>
+                <br>
+                
+      <script>
+function toggleChild(id,type,el,product_class_id){
+
+  if($(el).hasClass('fa-plus')){
+    $(el).removeClass("fa-plus");
+    $(el).addClass("fa-minus");
+    $(el).attr("src","{% static 'img/svg/collaps.svg' %}");
+  }else{
+    $(el).attr("src","{% static 'img/svg/add.svg' %}");
+    $(el).removeClass("fa-minus");
+    $(el).addClass("fa-plus");
+  }
+  if(type=='product'){
+    if($("#level_flag_"+product_class_id).val() == '1'){
+      $("#level_flag_"+product_class_id).val(2);
+    }else{
+      $("#level_flag_"+product_class_id).val(1);
+    }
+    if(($("tr").hasClass("slab_productClass_"+id) || $("tr").hasClass("slab_productclass_child_"+id)) && 1 == 2 ){
+      var question = "All Slab added to this Product Class will be removed. Do you want to proceed?";
+      $.confirm({
+        title: 'Confirm!',
+        content: question,
+        buttons: {
+          confirm: function () {
+            $(".product_"+id).toggle();
+            $(".slab_"+id).toggle();
+            $(".ss_incentive_"+id).toggle();
+            $(".distributor_incentive_"+id).toggle();
+            $(".product_child_"+id).hide();
+            $(".productClass_child_"+id).show();
+            $((".product_plus_icon")).removeClass("fa-minus");
+            $((".product_plus_icon")).addClass("fa-plus");
+            $(".slab_productClass_"+id).remove();
+            $(".slab_product_child_"+id).remove();
+            $(".slab_productclass_child_"+id).remove();
+          },
+				cancel: function () {
+					
+				}
+			}
+		});
+    }else{
+      $(".product_"+id).toggle();
+      // $(".slab_"+id).toggle();
+      $(".ss_incentive_"+id).toggle();
+      $(".distributor_incentive_"+id).toggle();
+      // $(".product_child_"+id).hide();
+      $(".productClass_child_"+id).show();
+      $((".product_plus_icon")).removeClass("fa-minus");
+      $((".product_plus_icon")).addClass("fa-plus");
+    }
+    $(".ss_incentive_"+id).val("");
+    $(".distributor_incentive_"+id).val("");
+    $(".product_child_"+id).val("");
+    
+  }else if(type=='variant'){
+    if($("#level_flag_"+product_class_id).val() == '2'){
+      $("#level_flag_"+product_class_id).val(3);
+    }else{
+      $("#level_flag_"+product_class_id).val(2);
+    }
+    if($("tr").hasClass("slab_product_"+id)  || $("tr").hasClass("slab_product_child_"+id)){
+      var question = "All Slab added to this Product Class will be removed. Do you want to proceed?";
+      $.confirm({
+        title: 'Confirm!',
+        content: question,
+        buttons: {
+          confirm: function () {
+            $(".product_variant_"+id).toggle();
+            $(".slab_product_"+id).toggle();
+            $(".product_ss_incentive_"+id).toggle();
+            $(".product_distributor_incentive_"+id).toggle();
+            $(".variant_ss_incentive_"+id).show();
+            $(".variant_distributor_incentive_"+id).show();
+            $(".slab_product_child_"+id).remove();
+            $(".slab_variant_"+id).remove();
+          },
+				cancel: function () {
+					
+				}
+			}
+		});
+    }else{
+     
+      $(".product_variant_"+id).toggle();
+      $(".slab_product_"+id).toggle();
+      $(".product_ss_incentive_"+id).toggle();
+      $(".product_distributor_incentive_"+id).toggle();
+      $(".variant_ss_incentive_"+id).show();
+      $(".variant_distributor_incentive_"+id).show();
+    }
+  }
+  
+    $(".product_ss_incentive_"+id).val("");
+    $(".product_distributor_incentive_"+id).val("");
+    $(".product_child_"+id).val("");
+} 
+
+function toggleSlabChild(id,type,el,product,class_id, product_id, product_class_id){
+    var options = '';
+    $.ajax({
+        url: "{% url 'src:get-options-list' %}",
+        method: 'POST',
+        data:{id: 'slab_id', val:id, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+        success: function (data) {
+            options = data.options;
+            // $('#slab_id').html(data.options)
+            // $("#slab_id").select2();
+        
+    var html = '<tr class="product_child_'+class_id+'  product_varia1nt_'+id+' slab_'+type+'_'+id+' slab_product_child_'+product_id+' slab_productclass_child_'+product_class_id+'">';
+    html += '<td>&nbsp;</td>';
+    html += '<td>&nbsp;</td>';
+    html += '<td colspan="1">';
+    if($("tr").hasClass("slab_"+type+"_"+id)== false){
+    html += '<div class="row slabrow"><small>&#x20b9; Slab for '+product+'</small></div>';}
+    html += '<div class="row">';
+    html += '<div class="col-sm-8 px-0">';
+    html += '<select class="inputField selectField" style="width: 100% !important;" name="slab_id_'+type+'_'+id+'[]" class="slab_id'+id+'" >';
+    html += options;
+    html += '</select>';
+    html += '</div>';
+    html += '<div class="col-sm-4">';
+    html += '<img src="{% static 'img/svg/delete.svg' %}" style="padding-top: 5px;" onclick=removeSlab(this)>';
+    html += '</div>';
+    html += '</div>';
+    html += '</td>';
+    html += '<td colspan="2">';
+    html += '<input onkeyup="return validateFloatKeyPress(this,event);" class="inputField " type="text" placeholder="Slab Incentive*" name="ss_incentive_'+type+'_'+id+'[]" id="ss_incentive" maxlength="6" />';
+    html += '<label class="error_msg float-right" id="ss_incentive_error"></label>';
+    html += '</td>';
+    // html += '<td>';
+    // html += '<input onkeyup="return validateFloatKeyPress(this,event);" class="inputField " type="text" placeholder="Distributor Slab Incentive*" name="distributor_incentive_'+type+'_'+id+'[]"';
+    // html += 'id="distributor_incentive" maxlength="6" />';
+    // html += '<label class="error_msg float-right" id="distributor_incentive_error"></label>';
+    // html += '</td></tr>';
+    html += '</tr>';
+    $(".slab_id"+id).select2();
+  if(type=='productClass'){
+    // $(el).parent().parent().after(html);
+    $("#slab_flag_"+product_class_id).val(1);
+    var className = "slab_"+type+"_"+id
+    // $(".ss_incentive_"+id).hide();
+    // $(".distributor_incentive_"+id).hide();
+  }else if(type=='product'){
+    // $(el).parent().parent().after(html);
+    $("#slab_flag_"+product_class_id+"_"+product_id).val(1);
+    var className = 'slab_product_child_'+product_id
+    $(".product_ss_incentive_"+id).hide();
+    $(".product_distributor_incentive_"+id).hide();
+  }else if(type=='variant'){
+    // $(el).parent().parent().after(html);
+    $("#slab_flag_"+product_class_id+"_"+product_id+"_"+id).val(1);
+    var className = 'slab_'+type+'_'+id
+    $(".variant_ss_incentive_"+id).hide();
+    $(".variant_distributor_incentive_"+id).hide();
+
+  }
+  if($("tr").hasClass(className)){
+    var slab_p = $('.'+className).length;
+    var c = 1;
+    if (slab_p < 4){
+    $('tr.'+className).each(function() {
+    if ( c == slab_p){
+      $(this).after(html);
+    }
+    c++;
+});
+}
+  }else{
+    $(el).parent().parent().after(html);
+  }
+  $("#slab_id").select2();
+
+},
+        error: function (err) {
+            console.log(err)
+        }
+    });
+}
+// $("tr").on("keyup", '.inputfield', function(event) { 
+    
+$('.inputfield').bind("keyup",function(e) {
+    var float = parseFloat($(this).attr('data-float'));
+
+    /* 2 regexp for validating integer and float inputs *****
+        > integer_regexp : allow numbers, but do not allow leading zeros
+        > float_regexp : allow numbers + only one dot sign (and only in the middle of the string), but do not allow leading zeros in the integer part
+    *************************************************************************/
+    var integer_regexp = (/[^0-9]|^0+(?!$)/g);
+    var float_regexp = (/[^0-9\.]|^\.+(?!$)|^0+(?=[0-9]+)|\.(?=\.|.+\.)/g);
+
+    var regexp = (float % 1 === 0) ? integer_regexp : float_regexp;
+    if (regexp.test(this.value)) {
+        this.value = this.value.replace(regexp, '');
+    }
+});
+function removeSlab(el){
+  $(el).parent().parent().parent().parent().remove();
+}
+
+$('#incentiveForm').submit(function(e){
+				// showLoader();
+				e.preventDefault();
+				$form = $(this)
+				var formData = new FormData(this);
+				url =  "{% url 'src:create-incentive' %}";
+				$.ajax({
+					url: url,
+					type: 'POST',
+					data: formData,
+					success: function (response) {
+						if(response.error){
+							hideLoader();
+							$(".text-danger").html('');
+							var data = response.message;
+                      openToaster("danger", "Something went wrong!");
+                   } else {
+							hideLoader();
+							openToaster("success", response.message);
+						}
+					},
+					cache: false,
+					contentType: false,
+					processData: false
+				});
+		});
+		
+      </script>
+
+
+              </div>
+              </div>
+            </form>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function getOrderDetails(id) {
+        $('#ajax-order-details').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            $.ajax({
+                url: "{% url 'src:get-user-order-details' %}",
+                method: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    //hideLoader();
+                    $('#ajax-order-details').html(data);
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+      </script>

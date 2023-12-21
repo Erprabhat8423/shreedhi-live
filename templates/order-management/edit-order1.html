@@ -1,0 +1,839 @@
+{% load static %}
+<style>
+   
+</style>
+<div class="modal-AddUser centered" style="width: 85%!important; margin-bottom: 100px;">
+    <form name="editOrderDetails" id="editOrderDetails" method="POST" enctype="multipart/form-data" action="{% url 'src:update-order' %}" >
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{order_details.id}}">
+        <input type="hidden" name="user_id" value="{{order_details.user_id}}">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-8">
+                        <h5 class="mt-md-2"><strong>{{ order_details.user_name }} - {{ order_details.order_code }}</strong>(<small>{{ order_details.order_date  | date:"d/m/Y h:i A" }}</small>)</h5>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-save float-right" type="submit" id="save-button" >
+                            Update
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto; ">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        
+                        <div class="col-md-6 p-md-0 text-left">
+                            <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;<span
+                            style="font-size: 1.2rem;" id="order_total_amount">{{ order_details.order_total_amount  }}</span>
+                            <input type="hidden" name="order_amount" id="order_amount" value="{{ order_details.order_total_amount  }}">
+                            <h6 class="smalltext lightGrey">Total Amt.</h6>
+                        </div>
+                        <div class="col-md-6 p-md-0 text-right" style="display: none;">
+                            <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;<span
+                            style="font-size: 1.2rem;" id="outstanding_amount_text">{{ order_details.user_details.outstanding_amount }}</span>
+                            <input type="hidden" name="outstanding_amount" id="outstanding_amount" value="{{ order_details.user_details.outstanding_amount  }}">
+                            <input type="hidden" name="current_outstanding_amount" id="current_outstanding_amount" value="{{current_outstanding_amount}}">
+                            <h6 class="smalltext lightGrey">Outstanding Amt.</h6>
+                        </div>
+                        <table class="table table-bordered order_tables">
+                            <thead>
+                                <tr>
+                                    <th class="header">Product</th>
+                                    <th class="header">Variant</th>
+                                    <th class="header">Quantity</th>
+                                    <th class="header">Rate</th>
+                                    <th class="header">Amount</th>
+                                    <th class="header">Vehicle No.</th>
+                                    <th class="header action_class">Action</th>
+                                </tr>
+                            </thead>
+                            
+                            {% if order_item_list %}
+                            <tbody class="orders">
+                                {% for order_item in order_item_list %}
+                                <tr>
+                                    <td width="20%">
+                                        <select class="inputField select2 product_index" required name="product_id[]" id="product_id_{{forloop.counter}}" onchange="getProductVariant(this.id, this.value)" style="width:100%" >
+                                            <option value="">Select Products</option>
+                                            {% for product in products %}
+                                            <option value="{{ product.id }}" {% if order_item.product_id == product.id %} selected {% endif %}>{{product.product_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td width="20%">
+                                        <select class="inputField product_variant_index" required name="product_variant_id[]" id="product_variant_id_{{forloop.counter}}" onchange="getProductVariantDetails(this.id, this.value); " style="width:100%">
+                                            <option value="">Select Product Variant</option>
+                                            {% for variant in order_item.user_product_variants %}
+                                            <option value="{{ variant.product_variant_id }}" {% if order_item.product_variant_id == variant.product_variant_id %} selected {% endif %}>{{variant.variant_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td width="25%">
+                                        <div class="col-md-4 is_allow_class" id="is_allow_id_{{forloop.counter}}" style="float:right;">
+                                        {% if order_item.is_allow %}
+                                        
+                                		<input type="radio" id="radio-one-{{forloop.counter}}" name="packaging_type_{{forloop.counter}}" value="0" title="Container" onclick="getProductValues(this.id)" class="radion_one_class" {% if order_item.packaging_type == '0' %}checked {% endif %}/>&nbsp;C
+                                		
+                                		
+                                		<input type="radio" id="radio-two-{{forloop.counter}}" name="packaging_type_{{forloop.counter}}" value="1" title="Packaging" onclick="getProductValues(this.id)" class="radion_two_class" {% if order_item.packaging_type == '1' %}checked {% endif %}/>&nbsp;P
+                                	{% else %}
+                                	<input type="hidden" id="radio-one-{{forloop.counter}}" name="packaging_type_{{forloop.counter}}" value="1" title="Container" onclick="getProductValues(this.id)" class="radion_one_class" {% if order_item.packaging_type == '0' %}checked {% endif %}/>
+                                		
+                                		
+                                		<input type="hidden" id="radio-two-{{forloop.counter}}" name="packaging_type_{{forloop.counter}}" value="0" title="Packaging" onclick="getProductValues(this.id)" class="radion_two_class" {% if order_item.packaging_type == '1' %}checked {% endif %}/>
+                                	{% endif %}
+                                	</div>
+                                	    <div class="col-md-8" style="float:left;">
+                                        <input type="text" name="quantity[]" required id="quantity_{{forloop.counter}}" class="inputField quantity_index" onkeyup="disableButton()" onkeypress="return validateFloatKeyPress(this,event);" onchange="getAmount(this.id, this.value)" maxlength="5" value="{{ order_item.quantity }}" >
+                                        
+                                        <br/>
+                                        <small style="color: orange;" id="scheme_{{forloop.counter}}" class="scheme_index">
+                                            {% if order_item.free_schemes %}{{order_item.free_schemes}} {% endif%}
+                                        </small>
+                                        <small style="color: #0073e0;" id="flat_scheme_{{forloop.counter}}" class="flat_scheme_index">
+                                            {% if order_item.free_schemes %}<br/>{% endif%}
+                                            {% if order_item.flat_scheme %}{{order_item.flat_scheme}}{% endif%}
+                                        </small>
+                                        
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="rate[]" id="rate_{{forloop.counter}}" readonly class="inputField numeric rate_index"  value="{{ order_item.rate }}" ></td>
+                                    <td><input type="text" name="amount[]" id="amount_{{forloop.counter}}" readonly  class="inputField numeric order_amounts"  value="{{ order_item.amount }}" ></td>
+                                    <td width="15%" id='123'>
+                                        <select class="inputField selectField select2 vehicle_index"
+                                        name="vehicle_id[]" id="vehicle_id_{{forloop.counter}}" required>
+                                        <option value="">Select Vehicle</option>
+                                        {% for vehicle in vehicle %}
+                                            <option style="width: 20px;" value="{{ vehicle.id }}" {% if order_item.vehicle_id == vehicle.id %} selected{% endif %}>
+                                            {{ vehicle.registration_number }}({{vehicle.route_name}})</option>
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="action_class">
+                                        {% if forloop.counter > 1 %}
+                                        <div class="remove-action remove-action-hover1">
+                                            <button type="button" class="btn btn-danger DeleteProductLine ">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                            
+                        </table>
+                        <div class="col-md-6 p-md-0 text-left" id="bonus_scheme_id">
+                            {% if quantitative_scheme or flat_scheme or  bulk_scheme %}
+                            
+                            <h6>Bonus Scheme</h6>
+                            {% if quantitative_scheme %}
+                            <small style="color: orange;">
+                                {{quantitative_scheme}}
+                            </small>
+                            <br/>
+                            {% endif %}
+                            {% if flat_scheme %}
+                            <small style="color: orange;">
+                                {{flat_scheme}}
+                            </small>
+                            <br/>
+                            {% endif %}
+                            {% if bulk_scheme %}
+                            <small style="color: orange;">
+                                {{bulk_scheme}}
+                            </small>
+                            {% endif %}
+                            
+                            
+                            {% endif %}
+                            
+                        </div>
+                        <input type="hidden" name="quantitative_scheme_id" id="quantitative_scheme_id" value="{{quantitative_pack_scheme_id}}">
+                        <input type="hidden" name="quantitative_container" id="quantitative_container" value="{{quantitative_pack_container_quantity}}">
+                        <input type="hidden" name="quantitative_pouch" id="quantitative_pouch" value="{{quantitative_pack_pouch_quantity}}">
+                        <input type="hidden" name="quantitative_free_variant_id" id="quantitative_free_variant_id" value="{{quantitative_pack_free_variant_id}}">
+                        
+                        <input type="hidden" name="flat_pack_scheme_id" id="flat_pack_scheme_id" value="{{ flat_pack_scheme_id }}">
+                        <input type="hidden" name="flat_pack_scheme_incentive_amount" id="flat_pack_scheme_incentive_amount" value="{{ flat_pack_scheme_amount }}">
+                        <input type="hidden" name="flat_pack_unit_id" id="flat_pack_unit_id" value="{{flat_pack_unit_id}}">
+                        <input type="hidden" name="flat_pack_unit_name" id="flat_pack_unit_name" value="{{flat_pack_unit_name}}">
+                        
+                        <input type="hidden" name="bulk_pack_scheme_id" id="bulk_pack_scheme_id" value="{{ bulk_pack_scheme_id }}">
+                        <input type="hidden" name="bulk_pack_scheme_incentive_amount" id="bulk_pack_scheme_incentive_amount" value="{{ bulk_pack_scheme_amount }}">
+                        <input type="hidden" name="bulk_pack_unit_id" id="bulk_pack_unit_id" value="{{bulk_pack_unit_id}}">
+                        <input type="hidden" name="bulk_pack_unit_name" id="bulk_pack_unit_name" value="{{bulk_pack_unit_name}}">
+                        <div class="col-md-6 p-md-0 text-right">
+                            <a href="javascript:;" class="add-product-row btn btn-primary">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </div>
+                        <br clear="all"><br clear="all"><br clear="all">
+                        <br clear="all"><br clear="all"><br clear="all">
+                        <br clear="all"><br clear="all"><br clear="all">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var variant_id = [];
+        {% for order_item in order_item_list %}
+        variant_id.push(parseInt({{order_item.product_variant_id}}));
+        {% endfor %}
+        
+        $(document).ready(function () {
+            $('.product_index').select2();
+            $('.product_variant_index').select2();
+            
+            $(".order_tables").on("click", ".DeleteProductLine", function() {
+                showLoader();
+                $(this).closest("tr").remove();
+                totalSum();
+                resetTableRowIndex();
+                addVariantId(); 
+                getBonusSchemeDetails();
+                var length = $('#step1 table tr').length;
+                length = parseInt(length)-1;
+                
+                if(length == 1){
+                    $('.action_class').hide();
+                }else{
+                    $('.action_class').show();
+                }
+            });
+            
+            
+            $(".add-product-row").click(function(){
+
+                var length = $('#step1 table tr').length;
+                length = parseInt(length);
+                vachile_id= '#vehicle_id_'+length 
+
+                if(length == 1){
+                    $('.action_class').hide();
+                }else{
+                    $('.action_class').show();
+                }
+                var orders = `<tr>    <td width="20%">
+                    <select class="inputField select2 product_index" name="product_id[]" required id="product_id_` + length + `" onchange="getProductVariant(this.id, this.value)" style="width:100%">
+                        <option value="">Select Products</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}">{{product.product_name}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td width="20%">
+                    <select class="inputField product_variant_index" name="product_variant_id[]" required id="product_variant_id_` + length + `" onchange="getProductVariantDetails(this.id, this.value);" style="width:100%">
+                        <option value="">Select Product Variant</option>
+                    </select>
+                </td>
+                <td>
+                <div class="col-md-4 is_allow_class" id="is_allow_id_` + length + `" style="float:right;">
+                    <input type="hidden" id="radio-two-` + length + `" name="packaging_type_` + length + `" value="1" title="Packaging" onclick="getProductValues(this.id)" class="radion_two_class"  />&nbsp;    
+        		<input type="hidden" id="radio-one-` + length + `" name="packaging_type_` + length + `" value="0" title="Container" onclick="getProductValues(this.id)" class="radion_one_class" checked/>&nbsp;
+        		
+        	</div>
+        	    <div class="col-md-8" style="float:left;">
+                <input type="text" name="quantity[]" required id="quantity_` + length + `" onkeyup="disableButton()" onkeypress="return validateFloatKeyPress(this,event);" onchange="getAmount(this.id, this.value)" class="inputField quantity_index" maxlength="5" value="" >
+                    <small style="color: orange;" id="scheme_` + length + `" class="scheme_index">
+                    </small>
+                    <small style="color: #0073e0;" id="flat_scheme_` + length + `" class="flat_scheme_index">
+                    </small>
+                </div>    
+                </td>
+                <td><input type="text" name="rate[]" id="rate_` + length + `" readonly class="inputField numeric rate_index"  value="" ></td>
+                <td><input type="text" name="amount[]" id="amount_` + length + `" readonly class="inputField numeric order_amounts"  value="" ></td>
+                
+                <td width="15%">
+                    <select class="inputField selectField select2 vehicle_index"
+                        name="vehicle_id[]" id="vehicle_id_` + length + `" required>
+                        <option value="">Select Vehicle</option>
+                        {% for vehicle in vehicle %}
+                            <option style="width: 20px;" value="{{ vehicle.id }}" {% if vehicle.id == selects_vehicle_id.id %} selected {% endif %}>
+                            {{ vehicle.registration_number }}({{vehicle.route_name}})</option>
+                        {% endfor %}
+
+                    </select>
+                </td>
+
+                <td class="action_class">
+                    <div class="remove-action remove-action-hover1">
+                        <button type="button" class="btn btn-danger DeleteProductLine ">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td></tr>`;
+                
+                $(".order_tables tbody").append(orders);
+                
+                $('#product_id_'+length).select2();
+                $('#product_variant_id_'+length).select2();
+                $('#vehicle_id_'+length).select2();
+                getOption('{{order_details.user_id}}','vehicle_id', '1',vachile_id);
+            });
+            
+            
+        });
+        
+        function addVariantId(){
+            variant_id = [];
+            $.each($(".product_variant_index option:selected"), function(){
+                if($(this).val()){
+                    variant_id.push(parseInt($(this).val()));
+                } 
+            });
+        }
+        
+        /*function checkVariantExists(value, id) {
+            if ($.inArray(parseInt(value), variant_id) >= 0) {
+                $('#'+ id + ' option[value="' + value + '"]').prop('selected', false);
+                $('#'+ id).trigger('change');
+                openToaster("warning", 'This product variant is already selected');
+                addVariantId();
+                return false;
+            } else {
+                addVariantId();
+                return true;
+            }
+        }*/
+        
+        function disableButton(){
+            $('#save-button').prop('disabled', true);
+            $('#save-button').html('Loading...');
+        }
+        function getAmount(id, quantity){
+            var counts = id.split("_"); 
+            
+            var crate_type = $("input[id='radio-one-"+counts[1]+"']:checked").val();
+            var pouch_type = $("input[id='radio-two-"+counts[1]+"']:checked").val();
+            
+            if(crate_type){
+                packaging_type = crate_type;
+            }else if(pouch_type){
+                packaging_type = pouch_type;
+            }else{
+                packaging_type = '0';
+            }
+            
+            var rate = $('#rate_'+counts[1]).val();
+            if(quantity<=0){
+                var amount = 0;
+            }else{
+                if(rate == ''){rate=0;}else{rate=rate;}
+                var amount = rate*quantity
+            }
+            $('#amount_'+counts[1]).val(amount)
+            totalSum()
+            
+            product_variant_id = $('#product_variant_id_'+counts[1]).val();
+            quantity = $('#quantity_'+counts[1]).val();
+            var product_variant = '#product_variant_id_'+counts[1];
+            if(product_variant_id == ''){
+                product_variant_id = 0;
+            }else{
+                product_variant_id =product_variant_id;
+            }
+            getSchemeDetails(product_variant, product_variant_id);
+            if(product_variant_id!='' && quantity!=''){
+                $.ajax({
+                    url: "{% url 'src:get-product-free-scheme' %}",
+                    method: 'GET',
+                    data: { product_variant_id:product_variant_id, quantity:quantity, user_id:{{order_details.user_id}}, order_id:{{order_details.id}}, packaging_type:packaging_type },
+                    success: function (data) {
+                        getBonusSchemeDetails();
+                        $('#save-button').prop('disabled', false);
+                        $('#save-button').html('Update');
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }else{
+                getBonusSchemeDetails();
+                $('#save-button').prop('disabled', false);
+                $('#save-button').html('Update');
+            }
+            
+        }
+        
+        function totalSum(){
+            var enter_amount = 0;
+            $(".order_amounts").each(function () {
+                var amount = parseFloat($(this).val());
+                if (amount > 0) {
+                    enter_amount = enter_amount + amount;
+                }
+            });
+            var order_amount = $('#order_amount').val();
+            var outstanding_amount = $('#outstanding_amount').val();
+            
+            outstanding_amount = (parseFloat(outstanding_amount)+parseFloat(order_amount));
+            outstanding_amount = outstanding_amount-parseFloat(enter_amount); 
+            $('#outstanding_amount_text').html(outstanding_amount); 
+            $('#current_outstanding_amount').val(outstanding_amount);  
+            if(enter_amount == 0){
+                $('#order_total_amount').html(0);
+            }else{
+                $('#order_total_amount').html(enter_amount.toFixed(2));
+            }
+        }
+        
+        function resetTableRowIndex(){
+
+            productobj = $('#step1').find('.product_index');
+            $.each( productobj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'product_id_'+sum);
+            });
+            
+            productVariantObj = $('#step1').find('.product_variant_index');
+            $.each( productVariantObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'product_variant_id_'+sum);
+            });
+            
+            schemeObj = $('#step1').find('.scheme_index');
+            $.each( schemeObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'scheme_'+sum);
+            });
+            
+            flatschemeObj = $('#step1').find('.flat_scheme_index');
+            $.each( flatschemeObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'flat_scheme_'+sum);
+            });
+            
+            quantityObj = $('#step1').find('.quantity_index');
+            $.each( quantityObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'quantity_'+sum);
+            });
+            
+            rateObj = $('#step1').find('.rate_index');
+            $.each( rateObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'rate_'+sum);
+            });
+            
+            amountObj = $('#step1').find('.order_amounts');
+            $.each( amountObj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'amount_'+sum);
+            });
+            
+            radioOneObj = $('#step1').find('.radion_one_class');
+            $.each( radioOneObj, function( key, value ) {
+                id=value.id;
+                name=value.name;
+                var sum = key+1;
+                $('#'+id).attr('name', 'packaging_type_'+sum);
+                $('#'+id).attr('id', 'radio-one-'+sum);
+                
+            });
+            
+            radioTwoObj = $('#step1').find('.radion_two_class');
+            $.each( radioTwoObj, function( key, value ) {
+                id=value.id;
+                name=value.name;
+                var sum = key+1;
+                $('#'+id).attr('name', 'packaging_type_'+sum);
+                $('#'+id).attr('name', 'packaging_type_'+sum);
+                $('#'+id).attr('id', 'radio-two-'+sum);
+                
+            });
+            
+            radioTwoObj = $('#step1').find('.radion_two_class');
+            $.each( radioTwoObj, function( key, value ) {
+                id=value.id;
+                name=value.name;
+                var sum = key+1;
+                $('#'+id).attr('name', 'packaging_type_'+sum);
+                $('#'+id).attr('name', 'packaging_type_'+sum);
+                $('#'+id).attr('id', 'radio-two-'+sum);
+                
+            });
+            
+            isAllowObj = $('#step1').find('.is_allow_class');
+            $.each( isAllowObj, function( key, value ) {
+                id=value.id;
+                name=value.name;
+                var sum = key+1;
+                $('#'+id).attr('id', 'is_allow_id_'+sum);
+                
+            });
+
+            vehicleobj = $('#step1').find('.vehicle_index');
+            $.each( vehicleobj, function( key, value ) {
+                id=value.id;
+                var sum = key+1;
+                $('#'+id).attr('id', 'vehicle_id_'+sum);
+            });
+            
+            // radiotwoObj = $('#step1').find('.label_two_class');
+            // $.each( radiotwoObj, function( key, value ) {
+            //     id=value.id;
+            //     name=value.name;
+            //     var sum = key+1;
+            //     $('#'+id).attr('for', 'radio-two-'+sum);
+            //     $('#'+id).attr('id', 'radio_two_'+sum);
+                
+            // });
+            
+        };
+        
+        function getProductVariant(id, product_id){
+            var counts = id.split("_");
+            id = counts[2];
+            id = 'product_variant_id_'+id;
+            quantity = 'quantity_'+counts[2];
+            $('#'+quantity).val('');
+            rate = 'rate_'+counts[2];
+            $('#'+rate).val('');
+            amount = 'amount_'+counts[2];
+            $('#'+amount).val('');
+            // getAmount(quantity, '1');
+            scheme = 'scheme_'+counts[2];
+            $('#'+scheme).html('')
+            flat_scheme = 'flat_scheme_'+counts[2];
+            $('#'+flat_scheme).html('')
+            
+            is_allow_id = 'is_allow_id_'+counts[2];
+            $('#'+is_allow_id).html('')
+            
+            $.ajax({
+                url: "{% url 'src:get-user-product-variant-list' %}",
+                method: 'GET',
+                data: { product_id:product_id, user_id:{{order_details.user_id}} },
+                success: function (data) {
+                    $('[id="'+id+'"]').html(data.options)
+                    
+                    getBonusSchemeDetails();
+                    totalSum();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+            
+        };
+        
+        function getProductValues(id){
+            var counts = id.split("-");
+            id = counts[2];
+            product_variant_id = $('#product_variant_id_'+id).val();
+            var id = 'product_variant_id_'+id;
+            getSchemeDetails(id, product_variant_id);
+            
+            var counts = id.split("_");
+            variantId = id;
+            id = counts[3];
+            
+            var crate_type = $("input[id='radio-one-"+id+"']:checked").val();
+            var pouch_type = $("input[id='radio-two-"+id+"']:checked").val();
+            
+            if(crate_type){
+                packaging_type = crate_type;
+            }else if(pouch_type){
+                packaging_type = pouch_type;
+            }else{
+                packaging_type = '0';
+            }
+            
+            scheme = 'scheme_'+id;
+            rate = 'rate_'+id;
+            amount = 'amount_'+id;
+            quantity = 'quantity_'+id;
+            if($('#'+quantity).val() == ''){
+                $('#'+quantity).val('1');
+            }
+            
+            quantity = $('#'+quantity).val();
+            if(product_variant_id !=''){
+                $.ajax({
+                    url: "{% url 'src:get-user-product-variant-details' %}",
+                    method: 'GET',
+                    data: { product_variant_id:product_variant_id, user_id:{{order_details.user_id}}, packaging_type:packaging_type },
+                    success: function (data) {
+                        if(packaging_type == '0'){
+                            var rate_amount = data.variants.container_sp_user
+                        } else {
+                            var rate_amount = data.variants.sp_user
+                        }
+                        
+                        $('#'+rate).val(rate_amount)
+                        if(quantity!=''){
+                            var total_amount =parseInt(quantity)*parseFloat(rate_amount);
+                            $('#'+amount).val(total_amount)
+                        }
+                        // getBonusSchemeDetails();
+                        totalSum();
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }else{
+                //$('#quantity_'+id).val('');
+                $('#'+amount).val('');
+                $('#'+rate).val('');
+                $('#'+scheme).html('');
+                totalSum();
+                getBonusSchemeDetails();
+            }
+            
+            
+        }
+        
+        function getProductVariantDetails(id, product_variant_id){
+            
+            var counts = id.split("_");
+            variantId = id;
+            id = counts[3];
+            
+            var crate_type = $("input[id='radio-one-"+id+"']:checked").val();
+            var pouch_type = $("input[id='radio-two-"+id+"']:checked").val();
+            
+            if(crate_type){
+                packaging_type = crate_type;
+            }else if(pouch_type){
+                packaging_type = pouch_type;
+            }else{
+                packaging_type = '0';
+            }
+            
+            var scheme_id = 'radio-one-'+id;
+            scheme = 'scheme_'+id;
+            flat_scheme = 'flat_scheme_'+id;
+            rate = 'rate_'+id;
+            amount = 'amount_'+id;
+            quantity = 'quantity_'+id;
+            if($('#'+quantity).val() == ''){
+                $('#'+quantity).val('1');
+            }
+            
+            quantity = $('#'+quantity).val();
+            if(product_variant_id !=''){
+                $.ajax({
+                    url: "{% url 'src:get-user-product-variant-details' %}",
+                    method: 'GET',
+                    data: { product_variant_id:product_variant_id, user_id:{{order_details.user_id}}, packaging_type:packaging_type },
+                    success: function (data) {
+                        if(data.is_allow == '1'){
+                            var html = '<input type="radio" id="radio-one-'+id+'" name="packaging_type_'+id+'" value="0" title="Container" onclick="getProductValues(this.id)" class="radion_one_class" checked />&nbsp;C <input type="radio" id="radio-two-'+id+'" name="packaging_type_'+id+'" value="1" title="Packaging" onclick="getProductValues(this.id)" class="radion_two_class"/>&nbsp;P';
+                            $('#is_allow_id_'+id).html(html);
+                        }else{
+                            var html = '<input type="hidden" id="radio-one-'+id+'" name="packaging_type_'+id+'" value="1" title="Container" onclick="getProductValues(this.id)" class="radion_one_class" checked /> <input type="hidden" id="radio-two-'+id+'" name="packaging_type_'+id+'" value="0" title="Packaging" onclick="getProductValues(this.id)" class="radion_two_class"/>'
+                            $('#is_allow_id_'+id).html(html);
+                        }
+                        if(packaging_type == '0'){
+                            var rate_amount = data.variants.container_sp_user
+                        } else {
+                            var rate_amount = data.variants.sp_user
+                        }
+                        
+                        $('#'+rate).val(rate_amount)
+                        if(quantity!=''){
+                            var total_amount =parseInt(quantity)*parseFloat(rate_amount);
+                            $('#'+amount).val(total_amount)
+                        }
+                        getProductValues(scheme_id);
+                        // getBonusSchemeDetails();
+                        totalSum();
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }else{
+                //$('#quantity_'+id).val('');
+                $('#'+amount).val('');
+                $('#'+rate).val('');
+                $('#'+scheme).html('');
+                $('#'+flat_scheme).html('');
+                totalSum();
+                getBonusSchemeDetails();
+                addVariantId();
+            } 
+        };
+        
+        function getSchemeDetails(id, product_variant_id){
+            
+            var variants = $('select[name="product_variant_id[]"]').map(function(){
+                if(this.value!=''){
+                    return this.value;
+                }else{
+                    return 0;
+                }
+            }).get();
+            
+            var variants_quantity = $('input[name="quantity[]"]').map(function(){
+                if(this.value!=''){
+                    return this.value;
+                }else{
+                    return 0;
+                }
+            }).get();
+            
+            
+            var counts = id.split("_");
+            id = counts[3];
+            
+            var crate_type = $("input[id='radio-one-"+id+"']:checked").val();
+            var pouch_type = $("input[id='radio-two-"+id+"']:checked").val();
+            
+            if(crate_type){
+                packaging_type = crate_type;
+            }else if(pouch_type){
+                packaging_type = pouch_type;
+            }else{
+                packaging_type = '0';
+            }
+            
+            scheme  = 'scheme_'+id;
+            flat_scheme  = 'flat_scheme_'+id;
+            rate    = 'rate_'+id;
+            amount  = 'amount_'+id;
+            quantity = 'quantity_'+id;
+            quantity = $('#'+quantity).val();
+            if(product_variant_id !=''){
+                $.ajax({
+                    url: "{% url 'src:get-scheme-details' %}",
+                    method: 'GET',
+                    data: { order_id:'{{order_details.id}}', route_id:'{{order_details.route_id}}', town_id:'{{order_details.town_id}}', product_variant_id:product_variant_id, quantity:quantity, user_id:{{order_details.user_id}}, variants:variants, variants_quantity:variants_quantity, packaging_type:packaging_type },
+                    success: function (data) {
+                        if(data.free_scheme !=''){
+                            $('#'+scheme).html(data.free_scheme)
+                        }else{
+                            $('#'+scheme).html('')
+                        }
+                        if(data.flat_scheme !=''){
+                            $('#'+flat_scheme).html(data.flat_scheme)
+                        }else{
+                            $('#'+flat_scheme).html('')
+                        }
+                        // if(data.bonus_scheme_text !=''){
+                            //     $('#bonus_scheme_id').html('<h6>Bonus Scheme</h6><small style="color: orange;">'+data.bonus_scheme_text+'</small>');
+                            // }else{
+                                //     $('#bonus_scheme_id').html('');
+                                // }
+                                getBonusSchemeDetails();
+                                addVariantId();
+                            },
+                            error: function (err) {
+                                console.log(err)
+                            }
+                        });
+                    }
+                };
+                
+                function getBonusSchemeDetails(){
+                    $('#bonus_scheme_id').html('<div style="margin-top:2px; text-align:left"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+                        var variants = $('select[name="product_variant_id[]"]').map(function(){
+                            if(this.value!=''){
+                                return this.value;
+                            }else{
+                                return 0;
+                            }
+                        }).get();
+                        
+                        var variants_quantity = $('input[name="quantity[]"]').map(function(){
+                            if(this.value!=''){
+                                return this.value;
+                            }else{
+                                return 0;
+                            }
+                        }).get();
+                        
+                        if(variants.length > 0){
+                            $.ajax({
+                                url: "{% url 'src:get-bonus-scheme-details' %}",
+                                method: 'GET',
+                                data: { user_id:{{order_details.user_id}}, variants:variants, variants_quantity:variants_quantity },
+                                success: function (data) {
+                                    hideLoader();
+                                    if(data.bonus_scheme_text !=''){
+                                        $('#bonus_scheme_id').html('<h6>Bonus Scheme</h6><small style="color: orange;">'+data.bonus_scheme_text+'</small>');
+                                    }else{
+                                        $('#bonus_scheme_id').html('');
+                                    }
+                                    
+                                    $('#quantitative_scheme_id').val(data.quantitative_scheme_id);
+                                    $('#quantitative_container').val(data.quantitative_container);
+                                    $('#quantitative_pouch').val(data.quantitative_pouch);
+                                    $('#quantitative_free_variant_id').val(data.quantitative_free_variant_id);
+                                    
+                                    $('#flat_pack_scheme_id').val(data.flat_scheme_id);
+                                    $('#flat_pack_scheme_incentive_amount').val(data.flat_scheme_incentive);
+                                    $('#flat_pack_unit_id').val(data.flat_unit_id);
+                                    $('#flat_pack_unit_name').val(data.flat_unit_name);
+                                    $('#bulk_pack_scheme_id').val(data.bulk_scheme_id);
+                                    $('#bulk_pack_scheme_incentive_amount').val(data.bulk_scheme_incentive);
+                                    $('#bulk_pack_unit_id').val(data.bulk_unit_id);
+                                    $('#bulk_pack_unit_name').val(data.bulk_unit_name);
+                                },
+                                error: function (err) {
+                                    console.log(err)
+                                }
+                            });
+                        }else{
+                            $('#bonus_scheme_id').html('');
+                        }
+                    };
+
+                    function getOption(val, id, flag,getOption){
+                        user_id = $('#user_id').val();
+                        if(val=='0'){
+                            val = user_id
+                        }
+                        if(id == 'vehicle_id'){
+                            $('[name="'+id+'"]').html('<option value="" selected>Select Vehicle</option>')
+                        }
+                        
+                        if(id != ""){
+                            $.ajax({
+                                url: "{% url 'src:get-options-vehicle-list' %}",
+                                method: 'POST',
+                                data:{id: id, val:val, flag:flag, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                                success: function (data) {
+                                    if(getOption=='0'){
+                                        $('[name="vehicle_id[]"]').html(data)
+                                        }else{
+                                        $(getOption).html(data)
+                                    }
+                                        },
+                                error: function (err) {
+                                    console.log(err)
+                                }
+                            });
+                        } 
+                    };
+                </script>
+                
+                
+                
+                

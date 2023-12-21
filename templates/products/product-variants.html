@@ -1,0 +1,84 @@
+{% load static %}
+<input type="hidden" name="page" id="page" value="2" />
+<input type="hidden" name="page_status" id="page_status" value="0" />
+<input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+<table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+style="width: 100%;">
+<thead>
+    <tr>
+        <th class="item_sku_code">
+            Item Code
+            <i class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        <th class="variant_name">Variant Name<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        <th class="variant_size">Variant Size<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        <th class="no_of_pouch">No. of pouch<i class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        <th class="container_size">Container Size<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        <th class="mrp">Price Breakdown<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+        </th>
+        
+        
+        <th>Action</th>
+    </tr>
+</thead>
+<tbody id="tablebody">
+    {% if product_variants %}
+    {% for product_variant in product_variants %}
+    <tr>
+        <td class="item_sku_code">{{ product_variant.item_sku_code }}</td>
+        <td class="variant_name">{{ product_variant.variant_name }}</td>
+        <td class="variant_size">{{ product_variant.variant_size }}</td>
+        <td class="no_of_pouch">{{ product_variant.no_of_pouch }}</td>
+        <td class="container_size">{{ product_variant.container_size }}</td>
+        <td onclick="priceBreakdown('{{ product_variant.gst }}','{{ product_variant.mrp }}',{{ product_variant.sp_distributor }},{{ product_variant.sp_superstockist }},{{ product_variant.sp_employee }})"><i class="fa fa-rupee"></i> View</td>
+        <td >
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="javascript:void(0)"
+                    onclick="editProductVariant('{{ product_variant.id }}')" ><img
+                    src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                    <div class="col-md-5">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox" name="is_active"
+                            id="is_active_variant_{{ product_variant.id }}"
+                            {% if product_variant.status == 1 %} checked="" {% else %}
+                            {% endif %}
+                            onclick="updateProductVariantStatus('{{ product_variant.id }}', '{{ product_variant.status }}')">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr id="loading" style="display: none;">
+            <td class="text-center" colspan="10"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="10" style="text-align: center;">No Record Found...</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>

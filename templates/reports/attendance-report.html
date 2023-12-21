@@ -1,0 +1,65 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">Attendance Report &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-close float-right" type="button" onclick="closeModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="row">
+            <div class="col-md-12 p-0 h-100 w-100 text-right">
+                <input type="text" style="width: 12% !important;" placeholder="Attendance Date" value="{{current_data}}" class="inputField" id="attendance_date" onchange="filterAttendance(this.value)" readonly>
+            </div>
+
+            <div class="col-md-12 p-0 h-100 w-100" id="ajaxDistributors">
+                <table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Day start</th>
+                            <th>Day end</th>
+                            <th>Total working hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{user.name}}</td>
+                            <td>{{user.start_time}}
+                                <!-- <br>
+                                <b>{{user.store_name}}</b>  -->
+                                <!--<a href="javascript:void(0)">-->
+                                <!--    <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">-->
+                                <!--</a>-->
+                            </td>
+                            <td>
+                                {% if user.end_time is not None %}
+                                {{user.end_time}}
+                                <!--<a href="javascript:void(0)">-->
+                                <!--    <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">-->
+                                <!--</a>-->
+                                {% endif %}
+                            </td>
+                            <td>{{user.working_hours|floatformat:2}} Hours</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,607 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/sales-planning-index.css' %}">
+{% endblock %}
+
+
+
+
+<div class="row px-3" id="containerHeight">
+    <div class="col-md-8 col-12 pr-3 pl-0 h-100 mob-pr-0">
+        <div class="row border-redius-17 h-100" id="">
+            <div class="col-md-12 col-12 primaryContainer h-100 px-0  " id="mainbox">
+                <div class="row mb-2" id="topRow">
+                    <div class="col-sm-4 col-12 px-0 mob-mt-8  mob-mb-8">
+                        <h6 class="font-wt-b">{{page_title}} 
+                            <i class="fa fa-star add_to_fav ml-2 {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')">
+                            </i>
+                        </h6>
+                    </div>
+                    <div class="col-md-8 col-12 px-0 ">
+                        <div class="row mb-2  mob-justfy-start" id="secondRow" style="justify-content: flex-end;">
+                            <input class="search searchTable search col-sm-4 mr-1" style="    padding: 4px 28px;" placeholder="Search" type="search" data-column="all">
+                            <a class="btn iconBox iconPlan col-sm-2 px-2" href="{% url 'src:add-sales-plan' %}">Add Plan</a>
+                            
+                            <div class="dropdown" >
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                    <input type="hidden" name="show_columns" id="show_columns" value="session,period,created_on,last_updated_on,revised_count" >
+                                    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" />
+                                    </a>
+                                    <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> 
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown show-hide " id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck"  onclick="showHideColumns(this,'table_session',2)"/>
+                                    <label class="mb-0" for="table_session">Session</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" onclick="showHideColumns(this, 'table_period',3)"/>
+                                    <label class="mb-0" for="table_period">Period</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" onclick="showHideColumns(this, 'table_created_on')"/>
+                                    <label class="mb-0" for="table_created_on">Created On</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" onclick="showHideColumns(this,'table_last_updated_on')"/>
+                                    <label class="mb-0" for="table_last_updated_on">Last Updated On</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" onclick="showHideColumns(this,'table_revised_count')"/>
+                                    <label class="mb-0" for="table_revised_count">Revised Count</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column " id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" id="lock_table_session" onclick="toggleFreeze(this.id,'table_session',2)" />
+                                <label class="mb-0" for="lock_table_session">Session</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" id="lock_table_period" onclick="toggleFreeze(this.id,'table_period',3)" />
+                                <label class="mb-0" for="lock_table_period">Period</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" id="lock_table_created_on" onclick="toggleFreeze(this.id,'table_created_on',4)" />
+                                <label class="mb-0" for="lock_table_created_on">Created on</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" id="lock_table_last_updated_on" onclick="toggleFreeze(this.id,'table_last_updated_on',5)" />
+                                <label class="mb-0" for="lock_last_updated_on">Last Updated On</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" id="lock_table_revised_count" onclick="toggleFreeze(this.id,'table_revised_count',6)" />
+                                <label class="mb-0" for="lock_table_revised_count">Revised Count</label>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="dropdown " >
+                        <button class="btn iconBox iconSetting" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> </button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table" id="tableBox">
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_pages" id="total_pages" value="" />
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="plan-check-box" id="">
+                            <label class="checkbox-custom">
+                                <input type="checkbox" >
+                                <span class="checkmark"></span>
+                            </label>
+                        </th>
+                        
+                        <th class="table_session">Session
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                        <th class="table_period">Period<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_created_on">Created On<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_last_updated_on">Last Update On
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_revised_count">Revised Count
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody ">
+                    {% for sales_plan in sales_plans %}
+                    <tr {% if forloop.first %} class="odd selected" {% endif %} >
+                        <td class="" > 
+                            <label class="checkbox-custom">
+                                <input type="checkbox" >
+                                <span class="checkmark"></span>
+                            </label> 
+                            
+                        </td>
+                        <td class="table_session" >  {{sales_plan.session}}  </td>
+                        <td class="table_period" > {{sales_plan.financial_year}} </td>
+                        <td class="table_created_on" > {{sales_plan.created_at|date:'d-m-Y'}} </td>
+                        <td class="table_last_updated_on" > {{sales_plan.updated_at|date:'d-m-Y'}} </td>
+                        <td class="table_revised_count" > {{sales_plan.revised_count}} </td>
+                        <td>
+                            <div class="row float-right">
+                                
+                                <div class="col-md-5">
+                                    <label class="switch">
+                                        <input type="checkbox" class="checkbox" name="is_active"
+                                        id="is_active_{{ sales_plan.id }}"
+                                        {% if sales_plan.status == 1 %} checked="" {% else %}
+                                        {% endif %}
+                                        onclick="updateSalesPlanStatus('{{ sales_plan.id }}', '{{ sales_plan.status }}')">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <a href="{% url 'src:edit-sales-plan' sales_plan.id %}" class="ml-2">
+                                    <img class="tableRowIcon tableRowIcon-product-icon mr-2 " src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                </a> 
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>      
+</div>                        
+</div>
+
+<div class="col-md-4 col-12 px-0 mob-h-100 h-100 mob-mt-8 mob-mb-8 ">
+    <div class="primaryContainerBG h-100" id="">
+        <div class="col-sm-12 col-12 px-0">
+            <div class="row  border-bottom pb-2">
+                <div class="col-sm-9 col-6 px-0">
+                    <div class="font-13 dark-blue-color font-wt-b mt-2">Stats</div>
+                    <div class="font-11 grey-color font-wt-b">Sales Plan 2020-2021</div>
+                </div>
+                <div class="col-sm-3 col-6 px-0 ">
+                    <select class="inputField selectField w-100 All "  name="" id="">
+                        <option value="All">Yearly</option>
+                        <option value="Select">Select</option>
+                    </select>
+                </div>
+                
+            </div>
+            
+            <div class="row my-3">
+                <div class="col-sm-5 col-6 px-0 dark-blue-color">
+                    Product
+                </div>
+                <div class="col-sm-7 col-6 px-0">
+                    <select class="inputField selectField w-100 All "  name="salutation" id="salutation">
+                        <option value="All">PPM</option>
+                        <option value="Select">Butter</option>
+                    </select>
+                </div>
+                
+            </div>
+            <div class="col-sm-12 col-12 px-0   " style="">
+                <div class="row w-100" style="justify-content: center; height: 250px; ">
+                    <canvas id="myLineChart" aria-label="chart" role="img" style="width: 100%;height: 100%; "></canvas>
+                </div>
+                
+                
+            </div>
+            
+        </div>
+        <div class="row  mt-2  mob-h-100" >
+            
+            <div class="font-wt-b font-13 dark-blue-color"> PPM sale Zone wise <span class="grey-color">(2016-2017)</span></div>
+            
+            <div class="border mt-3 zone-wise-table  "  id="tableBox">
+                <table class="table table-borderless table-striped table-hover mt-0 ">
+                    <thead>
+                        <tr class="font-wt-b grey-color ">
+                            <th style=" border-radius: 17px 0 0 0; border-top: 0;">Distric</th>
+                            <th style=" border-top: 0;">Apr</th>
+                            <th style=" border-top: 0;">May</th>
+                            <th style=" border-top: 0;">Jun</th>
+                            <th style=" border-top: 0;">jul</th>
+                            <th style=" border-radius: 0  17px 0 0 ; border-top: 0;">Aug</th>
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        <tr> 
+                            <td>Agra</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td >12345</td>
+                            <td>12345</td>
+                            <td>12345</td>
+                        </tr>
+                        
+                    </tbody>
+                    
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+
+<script>
+    var linechartvar = document.getElementById("myLineChart").getContext("2d");
+    var myLineChart = new Chart(linechartvar, {
+        type: "line",
+        data: {
+            datasets: [
+            {
+                label: 'Actual',
+                data: [19000, 63000, 20000, 74000,20000, 32000, 60000, 25000,20000, 63000, 10000, 44000],
+                backgroundColor: "transparent",
+                borderColor: '#f9bf23',
+                borderWidth: 2,
+                type: "line",
+            }, 
+            {
+                label: 'Planned ',
+                data: [21000, 33000, 22000, 44000,22000, 37000, 56000, 28000,40000, 68000, 20000, 64000],
+                backgroundColor: "transparent",
+                borderColor: '#5b99c9',
+                borderWidth: 2,
+                type: "line",
+            }, 
+            {
+                label: 'Tentative',
+                data: [20000, 32000, 60000, 25000,19000, 63000, 20000, 74000,45000, 67000, 39000, 84000],
+                backgroundColor: "transparent",
+                borderColor: '#cb5c5c',
+                borderWidth: 2,
+                // Changes this dataset to become a line
+                type: 'line'
+            }],
+            labels: ['Apr' ,'May', 'Jun' ,'Jul','Aug','Sep','Oct','Nov','Dec','Jan', 'Feb', 'Mar']
+        },
+        
+        options: {
+            // maintainAspectRatio: false,
+            responsive:false,
+            title: {
+                display: true,
+                text: 'Total Sale in (Ltr)',
+                fontSize: 12,
+                fontColor: '#969696',
+                position: 'left',
+            },
+            
+            tooltips: {
+                enabled: true,
+                display: true,
+                backgroundColor: "#ccc",
+                fontColor: '#000',
+                titleFontSize: 20,
+                tittleFontColor: "green",
+                titleSpacing: 3,
+                bodyFontSize: 20,
+                bodyFontColor: "block",
+                bodySpacing: 3,
+            },
+            
+            legend: {
+                display: true,
+                position: "bottom",
+                align: "end",
+                fontColor: "green",
+                // lable: {
+                    //     fontSize: 30,
+                    //     fontColor: "green",
+                    //     boxWidth: 50,                
+                    // },
+                },
+                animation: {
+                    duration: 2000,
+                    easing: "easeInOutBounce",
+                    
+                },
+                
+            }
+        });
+        
+        
+        
+        
+    </script>   
+    
+    
+    
+    
+    
+    <!-- *************************************Modal********************************** -->
+    
+    <div class="overlayModal" id="AddnewHolidayModal" data-keyboard="false" data-backdrop="static" style="display: none;">
+        
+        
+    </div>
+    
+    
+    <!-- *************************************Modal********************************** -->
+    {% endblock content %}
+    
+    {% block script %}
+    
+    <script src="{% static 'js/chart/chart.js' %}"></script>
+    
+    
+    
+    <script>
+        {% for message in messages %}
+        {% if 'invalid' in message.tags %}
+        openToaster("danger", "{{ message }}");
+        {% else %}
+        openToaster("success", "{{ message }}");
+        {% endif %}
+        {% endfor %}
+    </script>
+    
+    
+    <script>
+        
+        
+        function updateSalesPlanStatus(id, active_status) {
+            if ($('#is_active_' + id).prop("checked") == true) {
+                is_active = 1;
+                status = 'Unblock';
+            } else {
+                is_active = 0;  
+                status = 'Block';
+            }
+            
+            $.ajax({
+                url: "{% url 'src:update-sales-plan-status' %}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    is_active: is_active,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        hideLoader();
+                        openToaster("danger", data.message);
+                        if ($('#is_active_' + id).prop("checked") == true) {
+                            $('#is_active_' + id).prop("checked",false);
+                        }else{
+                            $('#is_active_' + id).prop("checked",true); 
+                        }
+                    }else{
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                        }
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        function freezeColumn(id, colNo) {
+            $('#' + id).addClass("frezedIcon frezedCell");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+            });
+            $('#' + id + ' #freeze').show();
+            $('#' + id + ' #unfreeze').hide();
+        }
+        
+        function unfreezeColumn(id, colNo) {
+            $('#' + id).removeClass("frezedIcon frezedCell");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+            });
+            $('#' + id + ' #unfreeze').show();
+            $('#' + id + ' #freeze').hide();
+        }
+        
+        function toggleFreeze(inputid, colid, colNo) {
+            var checkbox = document.getElementById(inputid);
+            
+            if (checkbox.checked == true) {
+                $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+                $("#addOrgTable tbody tr").each(function (index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+                });
+                $('.' + colid + ' #freeze').show();
+                $('.' + colid + ' #unfreeze').hide();
+            } else {
+                $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+                $("#addOrgTable tbody tr").each(function (index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+                });
+                $('.' + colid + ' #unfreeze').show();
+                $('.' + colid + ' #freeze').hide();
+            }
+        }
+        
+        function showHideColumns(element, el_class) {
+            var checkbox_val = [];
+            var checkbox = $(element);
+            if ($(element).is(':checked')) {
+                $('.'+el_class).hide();
+            }else{
+                $('.'+el_class).show();
+            }
+            $("input:checkbox[class=colCheck]").each(function () {
+                if(!$(this).is(':checked')){
+                    checkbox_val.push($(this).attr("id"))
+                }
+            });
+            checkbox_str = checkbox_val.join(',');
+            $('#show_columns').val(checkbox_str);
+        }
+        
+        $(document).ready(function () {
+            setHeightWidth();
+            
+            
+            var checkbox_val = ["session","period","created_on","last_updated_on","revised_count"];
+            checkbox_str = checkbox_val.join(',');
+            $('#show_columns').val(checkbox_str);
+            
+            $(".colCheck").change(function () {
+                if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                    $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                } else {
+                    $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                }
+            });
+            
+            $(".colFreezeCheck").change(function () {
+                if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                    $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                } else {
+                    $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                }
+            });
+            
+            
+            $('#addOrgTable').tablesorter({
+                widgets: ["zebra", "resizable", "stickyHeaders"],
+                widgetOptions: {
+                    resizable_addLastColumn: true,
+                    resizable: false,
+                    resizable_widths: ["3%","20%", "20%", "15%", "15%", "15%","12%","15%"],
+                    stickyHeaders_attachTo: ".primaryContainerBG",
+                }
+            });
+            
+            $("#addOrgTable tbody tr").click(function () {
+                $(this).addClass("selected").siblings().removeClass("selected");
+            });
+            
+            $(".primaryContainerBG").scroll(function () {
+                var divTable = $(".primaryContainerBG");
+                $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+            });
+            
+        });
+        
+        $(window).resize(function () {
+            setHeightWidth();
+        });
+        
+        
+        
+    </script>
+    {% endblock %}

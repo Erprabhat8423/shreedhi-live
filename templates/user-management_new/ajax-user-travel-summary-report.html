@@ -1,0 +1,42 @@
+{% load static %}
+
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="width: 2%; text-align: center;">Sr No.</th>
+            {% if time_period == '1'%}
+            <th style="width: 10%; text-align: center;"> Employee Name  </th>
+            {% else %}
+            <th style="width: 10%; text-align: center;"> Date  </th>
+            {% endif %}
+            <th style="width: 10%; text-align: center;"> Distance Travelled in Kilometer  </th>
+            <th style="width: 10%; text-align: center;"> Charges  </th>
+            <th style="width: 10%; text-align: center;"> Total Charges  </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if user_tracking_details %}
+        {% for user_tracking in user_tracking_details %}
+        <tr>
+            <td style="text-align: center;">{{ forloop.counter }}.</td>
+            {% if time_period == '1'%}
+            <td style="text-align: center;">{{ user_tracking.user_name  }}</td>
+            {% else %}
+            <td style="text-align: center;">{{ user_tracking.travel_date  }}</td>
+            {% endif %}
+            <td style="text-align: center;">{{ user_tracking.distance_travelled }}</td>
+            <td style="text-align: center;">{{ user_tracking.charges  }}</td>
+            <td style="text-align: center;">{{ user_tracking.total_charges  }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <th style="text-align: center;" colspan="5">No Record Found...</th>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<script>
+    $('#travel_month_picker').val('{{month_date}}');
+</script>

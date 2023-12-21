@@ -1,0 +1,182 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="schemeForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg">
+                        <div class="row">
+                            <div class="col-md-6  text-left">
+                                <div class="row">
+                                    <div class="col-md-6 form-group text-left">
+                                        <label>Import file</label>
+                                        <input type="file" name="scheme_sheet" id="scheme_sheet"  class="inputField" onchange="fileUploader(this.id,'', 'File', 'scheme_sheet_error')" required />
+                                        <span id="scheme_sheet_error" style="color: red; font-size: 11px;"></span>
+                                    </div>
+                                    <div class="col-md-6 form-group text-left" style="margin-top: 30px;">
+                                        <input type="submit" class="btn btn-primary" value="Upload"/>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="col-md-6 text-right">
+                                <button type="button" id="" class="btn iconBox iconExportExcel"  onclick="exportExcel()"></button>
+                                {% if excel_data %}
+                                <button class="btn btn-save float-right" id="updateBtn" type="button" onclick="updateSchemeAmount()">Save</button>
+                                <button class="btn btn-close float-right" id="cancelBtn" type="button" onclick="cancel()" >Close</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="row" style="margin-top:10px;">
+                            <div class="table-responsive">
+                                <table class="table" id="addOrgTable">
+                                    <thead>
+                                        <tr>
+                                            <th>SAP ID</th>
+                                            <th>State</th>
+                                            <th>Route</th>
+                                            <th>Town</th>
+                                            <th>Variant Material Code</th>
+                                            <th>On Order Of Quantity</th>
+                                            <th>Free Variant Material Code</th>
+                                            <th>Container Quantity</th>
+                                            <th>Pouch Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if excel_data %}
+                                        {% for data in excel_data %}
+                                        <tr>
+                                            <td>{{data.sap_id}} - {% if data.state_temp == '0' %} <span style="color: red;">(Invalid SAP ID)</span> {% else %} {{data.user_name}} {% endif %} <input type="hidden" name="sap_id[]" value="{{data.sap_id}}"></td>
+                                            <td>{{data.state}} {% if data.state_temp %} <span style="color: red;">({{data.state_temp}})</span> {% endif %}<input type="hidden" name="state[]" value="{{data.state}}"></td>
+                                            <td>{{data.route}} {% if data.route_temp %} <span style="color: red;">({{data.route_temp}})</span> {% endif %}<input type="hidden" name="route[]" value="{{data.route}}"></td>
+                                            <td>{{data.town}} {% if data.route_town_temp %} <span style="color: red;">({{data.route_town_temp}})</span> {% endif %}<input type="hidden" name="town[]" value="{{data.town}}"></td>
+                                            <td>{{data.variant_material_code}} {% if data.variant_material_code_temp %} <span style="color: red;">({{data.variant_material_code_temp}})</span> {% endif %} <input type="hidden" name="variant_material_code[]" value="{{data.variant_material_code}}"></td>
+                                            <td>{{data.on_order_of_quantity}} <input type="hidden" name="on_order_of_quantity[]" value="{{data.on_order_of_quantity}}"></td>
+                                            <td>{{data.free_variant_material_code}} {% if data.free_variant_material_code_temp %} <span style="color: red;">({{data.free_variant_material_code_temp}})</span> {% endif %} <input type="hidden" name="free_variant_material_code[]" value="{{data.free_variant_material_code}}"></td>
+                                            <td>{{data.container}} <input type="hidden" name="container[]" value="{{data.container}}"></td>
+                                            <td>{{data.pouch}} <input type="hidden" name="pouch[]" value="{{data.pouch}}"></td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9">Please upload scheme excel to preview data.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    
+    function exportExcel(){
+        window.location.href = "{% url 'src:export-scheme-template' %}";
+    }
+    
+    function updateSchemeAmount(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-scheme' %}",
+            method: 'POST',
+            data: $('#schemeForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    openToaster("success", data.message);
+                    setTimeout(function(){ window.location.reload(); }, 500);
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+        
+    }
+    function cancel(){
+        window.location.href = "{% url 'src:upload-scheme' %}";
+    }
+    function fileUploader(id, previewId, fileType, error_id) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            document.getElementById(error_id).innerHTML = '';
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['xlsx'])===-1){
+                    error = 1;   
+                    document.getElementById(error_id).innerHTML = ''+fileType+' should be excel(xlsx)*';
+                    
+                    // $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    // if(file1){                        
+                    //     var file_size=$("#"+id).get(0).files[i].size;
+                    //     file_size = Math.round((file_size / 1024));
+                    //     if(file_size>2048){
+                    //         error = 1;
+                            
+                    //         document.getElementById(error_id).innerHTML = ''+fileType+' should be upto 2MB*';
+                            
+                    //         // $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                    //         $("#"+id).val('');
+                    //     }else{
+                    //         error = 0;
+                    //     }                        
+                    // } else {
+                    //     error = 0; 
+                    // }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        
+    }
+</script>
+{% endblock %}

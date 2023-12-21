@@ -1,0 +1,82 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sales Port|403 Forbidden</title>
+    <link rel="icon" type="image/png" href="/static/img/favicon.ico">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/plugins/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/static/plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/plugins/jquery.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    
+    <style>
+        
+        .forbiddenContainer {
+            background-image: url(/static/img/png/forbidden.png);
+            background-repeat: no-repeat;
+            background-size: 20%;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="comingSoon" id="bodyContainer">
+        <div class="row paddingleftRight marginBottom3rem forbiddenContainer" id="containerHeight" style="height: 500px;">
+        </div>
+        
+        <h3 class="text-center">You'll be automatically redirected in <sh3an id="count">5</span> seconds...</h3>
+        
+        <footer class="footer footer-bottom" id="footer">
+            <div class="row">
+                <div class="col-sm-10 p-0">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <span class="footerText lightGrey">©copyright</span>
+                            <span class="footerText">
+                                2020. <span class="blackFont"><strong>SalesPort</strong> a product of </span><a href="#">Sort String </a><span class="blackFont">Solutions LLP </span> </span><br class="break">
+                                <span class="hyphen"></span>
+                                <a href="https://sortstring.com/privacy-policy" target="_blank"><span class="footerText lightGrey">- Privacy Poilcy</span></a>
+                                <a href="https://sortstring.com/contact" target="_blank"><span class="footerText lightGrey">- Help</span></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 iconAlignment p-0">
+                        <a href="https://www.facebook.com/sortstringsolutions/" target="_blank"><img src="/static/img/svg/Facebook.svg" class="socialMediaIcon"></a>
+                        <a href="https://www.linkedin.com/company/sortstring-solutions/" target="_blank"><img src="/static/img/svg/Instagram.svg" class="socialMediaIcon"></a>
+                        <a href="https://twitter.com/sort_string" target="_blank"><img src="/static/img/svg/Twitter.svg" class="socialMediaIcon"></a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        
+        
+        <script>
+            var counter = 5;
+            
+            setInterval(function() {
+                counter--;
+                if (counter >= 0) {
+                    span = document.getElementById("count");
+                    span.innerHTML = counter+' seconds...';
+                }
+
+                if (counter == 0) {
+                    url = "{% url 'login' %}";
+                    window.location.href = url;
+                }
+                
+            }, 1000);
+            
+        </script>
+        
+        
+    </body>
+    </html>
+    
+    

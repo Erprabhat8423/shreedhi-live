@@ -1,0 +1,155 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">Vehicle Tracking &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-close float-right" type="button" onclick="closeModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="row">
+            <div class="col-md-12 p-0 h-100 w-100 text-right">
+                <input type="text" style="width: 12% !important;" placeholder="Track Date" value="{{current_data}}" class="inputField" id="track_date" onchange="filterTrack(this.value,'{{vehicle.id}}')" readonly>
+            </div>
+            
+            <div class="col-md-12 p-0 h-100 w-100" id="ajaxDistributors">
+                {% if tracks %}
+                <div id="map" style="height: 650px; margin-top: 20px;"></div>    
+                <script>
+                    
+                    function initMap() {
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 20,
+                            center: {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} },
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                        
+                        var flightPlanCoordinates = [
+                        {% for track in tracks %}
+                        {lat: {{track.latitude}}, lng: {{track.longitude}} },
+                        {% endfor %}
+                        ];
+                        var flightPath = new google.maps.Polyline({
+                            path: flightPlanCoordinates,
+                            geodesic: true,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 2
+                        });
+                        
+                        flightPath.setMap(map);
+                        
+                        var startLatLng = {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} };
+                        var marker = new google.maps.Marker({
+                            position: startLatLng,
+                            map,
+                            icon: "{% static '/img/png/start.png' %}",
+                            title: 'Day Started - {{first_track.created_at|date:'H:i:s a'}}'
+                        });
+                        marker.setMap(map);
+                        
+                        
+                        {% for track in tracks %}
+                        {% if not forloop.first and not forloop.last %}
+                        var middleLatLng = {lat: {{track.latitude}}, lng: {{track.longitude}}};
+                        var marker = new google.maps.Marker({
+                            position: middleLatLng,
+                            map,
+                            icon: "{% static '/img/png/walk.gif' %}",
+                            title: 'Poll Time - {{track.created_at|date:'H:i:s a'}}'
+                        });
+                        marker.setMap(map);
+                        {% endif %}
+                        {% endfor %}
+                        
+                        
+                        var endLatLng = {lat: {{last_track.latitude}}, lng: {{last_track.longitude}} };
+                        var marker = new google.maps.Marker({
+                            position: endLatLng,
+                            map,
+                            icon: "{% static '/img/png/end.png' %}",
+                            title: 'Last Location - {{last_track.created_at|date:'H:i:s a'}} '
+                        });
+                        marker.setMap(map);
+                        
+                        var latlng = [
+                        new google.maps.LatLng({{first_track.latitude}}, {{first_track.longitude}} ),
+                        new google.maps.LatLng({{last_track.latitude}}, {{last_track.longitude}} ),
+                        
+                        {% for track in tracks %}
+                        {% if not forloop.first and not forloop.last %}
+                        new google.maps.LatLng({{track.latitude}},{{track.longitude}}),
+                        {% endif %}
+                        {% endfor %}
+                        ]; 
+                        var latlngbounds = new google.maps.LatLngBounds();
+                        for (var i = 0; i < latlng.length; i++) {
+                            latlngbounds.extend(latlng[i]);
+                        }
+                        map.fitBounds(latlngbounds);
+                    }
+                    
+                    
+                    
+                </script>
+                
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initMap&libraries=&v=weekly">
+                </script>
+                <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initMap&libraries=&v=weekly"> -->
+                    <!-- </script> -->
+                    
+                    
+                    {% else %}
+                    <div class="no_track_section">
+                    </div>
+                    
+                    {% endif %}
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $("#track_date").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+        })
+    </script>
+    
+    <script>
+        function closeModal() {
+            $("#addUserModal").hide();
+        }
+        
+        function filterTrack(track_date,vehicle_id){
+            var url = "{% url 'src:ajax-vehicle-tracking' '1' %}";
+            url = url.replace('1',vehicle_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: { track_date:track_date },
+                success: function (data) {
+                    $('#ajaxDistributors').html(data);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        
+    </script>

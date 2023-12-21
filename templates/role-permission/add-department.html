@@ -1,0 +1,1129 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-2 p-md-0 modalDeptBG">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Department</h4>
+                </div>
+            </div>
+
+            <div class="col-md-10 p-md-4">
+                <form name="department_reg" method="POST" autocomplete="off" action="" aria-label="Department">
+                    {% csrf_token %}
+                    <input type="hidden" name="organization_id" id="organization_id" value="{{ organization_id }}" />
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5><b>{{ organization_name | title }} </b></h5>
+                        </div>
+                        <div class="col-md-4 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveDepartment()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                                onclick="manipulateModal('addDeptModal','close')">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>Department Name</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField widthSetter" type="text" placeholder="Department Name*" maxlength="50"
+                                id="department_name" name="department_name" />
+                            <label class="error_msg float-right" id="department_name_error"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 p-md-0">
+                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />
+                                    &nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>LandLine No.</b>
+                                    </h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <img src="{% static 'img/svg/mobile_no.svg' %}"
+                                        class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;"><b>Mobile No.</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <div class="row widthSetter">
+                                <div class="col-md-3 pl-md-0">
+                                    <!-- <input class="inputField mobileCode" type="text" placeholder="+91" data-mask="+00"
+                                        id="landLineCode" name="landLineCode" /> -->
+                                        <select class="inputField selectCountryCode" style="width: 100%;" id="landLineCode"
+                                        name="landLineCode">
+                                        <option data-countryCode="IN" value="+91" selected="">+91 </option>
+                                        <option data-countryCode="DZ" value="+213"
+                                            {% if country_code == '+213' %} selected="" {% endif %}>+213
+                                        </option>
+                                        <option data-countryCode="AD" value="+376"
+                                            {% if country_code == '+376' %} selected="" {% endif %}>+376
+                                        </option>
+                                        <option data-countryCode="AO" value="+244"
+                                            {% if country_code == '+244' %} selected="" {% endif %}>+244
+                                        </option>
+                                        <option data-countryCode="AI" value="+1264"
+                                            {% if country_code == '+1264' %} selected="" {% endif %}>+1264
+                                        </option>
+                                        <option data-countryCode="AG" value="+1268"
+                                            {% if country_code == '+1268' %} selected="" {% endif %}>+1268
+                                        </option>
+                                        <option data-countryCode="AR" value="+54"
+                                            {% if country_code == '+54' %} selected="" {% endif %}>+54
+                                        </option>
+                                        <option data-countryCode="AM" value="+374"
+                                            {% if country_code == '+374' %} selected="" {% endif %}>+374
+                                        </option>
+                                        <option data-countryCode="AW" value="+297"
+                                            {% if country_code == '+297' %} selected="" {% endif %}>+297
+                                        </option>
+                                        <option data-countryCode="AU" value="+61"
+                                            {% if country_code == '+61' %} selected="" {% endif %}>+61
+                                        </option>
+                                        <option data-countryCode="AT" value="+43"
+                                            {% if country_code == '+43' %} selected="" {% endif %}>+43
+                                        </option>
+                                        <option data-countryCode="AZ" value="+994"
+                                            {% if country_code == '+994' %} selected="" {% endif %}>+994
+                                        </option>
+                                        <option data-countryCode="BS" value="+1242"
+                                            {% if country_code == '+1242' %} selected="" {% endif %}>+1242
+                                        </option>
+                                        <option data-countryCode="BH" value="+973"
+                                            {% if country_code == '+973' %} selected="" {% endif %}>+973
+                                        </option>
+                                        <option data-countryCode="BD" value="+880"
+                                            {% if country_code == '+880' %} selected="" {% endif %}>+880
+                                        </option>
+                                        <option data-countryCode="BB" value="+1246"
+                                            {% if country_code == '+1246' %} selected="" {% endif %}>+1246
+                                        </option>
+                                        <option data-countryCode="BY" value="+375"
+                                            {% if country_code == '+375' %} selected="" {% endif %}>+375
+                                        </option>
+                                        <option data-countryCode="BE" value="+32"
+                                            {% if country_code == '+32' %} selected="" {% endif %}>+32
+                                        </option>
+                                        <option data-countryCode="BZ" value="+501"
+                                            {% if country_code == '+501' %} selected="" {% endif %}>+501
+                                        </option>
+                                        <option data-countryCode="BJ" value="+229"
+                                            {% if country_code == '+229' %} selected="" {% endif %}>+229
+                                        </option>
+                                        <option data-countryCode="BM" value="+1441"
+                                            {% if country_code == '+1441' %} selected="" {% endif %}>+1441
+                                        </option>
+                                        <option data-countryCode="BT" value="+975"
+                                            {% if country_code == '+975' %} selected="" {% endif %}>+975
+                                        </option>
+                                        <option data-countryCode="BO" value="+591"
+                                            {% if country_code == '+591' %} selected="" {% endif %}>+591
+                                        </option>
+                                        <option data-countryCode="BA" value="+387"
+                                            {% if country_code == '+387' %} selected="" {% endif %}>+387
+                                        </option>
+                                        <option data-countryCode="BW" value="+267"
+                                            {% if country_code == '+267' %} selected="" {% endif %}>+267
+                                        </option>
+                                        <option data-countryCode="BR" value="+55"
+                                            {% if country_code == '+55' %} selected="" {% endif %}>+55
+                                        </option>
+                                        <option data-countryCode="BN" value="+673"
+                                            {% if country_code == '+673' %} selected="" {% endif %}>+673
+                                        </option>
+                                        <option data-countryCode="BG" value="+359"
+                                            {% if country_code == '+359' %} selected="" {% endif %}>+359
+                                        </option>
+                                        <option data-countryCode="BF" value="+226"
+                                            {% if country_code == '+226' %} selected="" {% endif %}>+226
+                                        </option>
+                                        <option data-countryCode="BI" value="+257"
+                                            {% if country_code == '+257' %} selected="" {% endif %}>+257
+                                        </option>
+                                        <option data-countryCode="KH" value="+855"
+                                            {% if country_code == '+855' %} selected="" {% endif %}>+855
+                                        </option>
+                                        <option data-countryCode="CM" value="+237"
+                                            {% if country_code == '+237' %} selected="" {% endif %}>+237
+                                        </option>
+                                        <option data-countryCode="CA" value="+1"
+                                            {% if country_code == '+1' %} selected="" {% endif %}>+1
+                                        </option>
+                                        <option data-countryCode="CV" value="+238"
+                                            {% if country_code == '+238' %} selected="" {% endif %}>+238
+                                        </option>
+                                        <option data-countryCode="KY" value="+1345"
+                                            {% if country_code == '+1345' %} selected="" {% endif %}>+1345
+                                        </option>
+                                        <option data-countryCode="CF" value="+236"
+                                            {% if country_code == '+236' %} selected="" {% endif %}>+236
+                                        </option>
+                                        <option data-countryCode="CL" value="+56"
+                                            {% if country_code == '+56' %} selected="" {% endif %}>+56
+                                        </option>
+                                        <option data-countryCode="CN" value="+86"
+                                            {% if country_code == '+86' %} selected="" {% endif %}>+86
+                                        </option>
+                                        <option data-countryCode="CO" value="+57"
+                                            {% if country_code == '+57' %} selected="" {% endif %}>+57
+                                        </option>
+                                        <option data-countryCode="KM" value="+269"
+                                            {% if country_code == '+269' %} selected="" {% endif %}>+269
+                                        </option>
+                                        <option data-countryCode="CG" value="+242"
+                                            {% if country_code == '+242' %} selected="" {% endif %}>+242
+                                        </option>
+                                        <option data-countryCode="CK" value="+682"
+                                            {% if country_code == '+682' %} selected="" {% endif %}>+682
+                                        </option>
+                                        <option data-countryCode="CR" value="+506"
+                                            {% if country_code == '+506' %} selected="" {% endif %}>+506
+                                        </option>
+                                        <option data-countryCode="HR" value="+385"
+                                            {% if country_code == '+385' %} selected="" {% endif %}>+385
+                                        </option>
+                                        <option data-countryCode="CU" value="+53"
+                                            {% if country_code == '+53' %} selected="" {% endif %}>+53
+                                        </option>
+                                        <option data-countryCode="CY" value="+90392"
+                                            {% if country_code == '+90392' %} selected="" {% endif %}>+90392
+                                        </option>
+                                        <option data-countryCode="CY" value="+357"
+                                            {% if country_code == '+357' %} selected="" {% endif %}>+357
+                                        </option>
+                                        <option data-countryCode="CZ" value="+42"
+                                            {% if country_code == '+42' %} selected="" {% endif %}>+42
+                                        </option>
+                                        <option data-countryCode="DK" value="+45"
+                                            {% if country_code == '+45' %} selected="" {% endif %}>+45
+                                        </option>
+                                        <option data-countryCode="DJ" value="+253"
+                                            {% if country_code == '+253' %} selected="" {% endif %}>+253
+                                        </option>
+                                        <option data-countryCode="DM" value="+1809"
+                                            {% if country_code == '+1809' %} selected="" {% endif %}>+1809
+                                        </option>
+                                        <option data-countryCode="DO" value="+1809"
+                                            {% if country_code == '+1809' %} selected="" {% endif %}>+1809
+                                        </option>
+                                        <option data-countryCode="EC" value="+593"
+                                            {% if country_code == '+593' %} selected="" {% endif %}>+593
+                                        </option>
+                                        <option data-countryCode="EG" value="+20"
+                                            {% if country_code == '+20' %} selected="" {% endif %}>+20
+                                        </option>
+                                        <option data-countryCode="SV" value="+503"
+                                            {% if country_code == '+503' %} selected="" {% endif %}>+503
+                                        </option>
+                                        <option data-countryCode="GQ" value="+240"
+                                            {% if country_code == '+240' %} selected="" {% endif %}>+240
+                                        </option>
+                                        <option data-countryCode="ER" value="+291"
+                                            {% if country_code == '+291' %} selected="" {% endif %}>+291
+                                        </option>
+                                        <option data-countryCode="EE" value="+372"
+                                            {% if country_code == '+372' %} selected="" {% endif %}>+372
+                                        </option>
+                                        <option data-countryCode="ET" value="+251"
+                                            {% if country_code == '+251' %} selected="" {% endif %}>+251
+                                        </option>
+                                        <option data-countryCode="FK" value="+500"
+                                            {% if country_code == '+500' %} selected="" {% endif %}>+500
+                                        </option>
+                                        <option data-countryCode="FO" value="+298"
+                                            {% if country_code == '+298' %} selected="" {% endif %}>+298
+                                        </option>
+                                        <option data-countryCode="FJ" value="+679"
+                                            {% if country_code == '+679' %} selected="" {% endif %}>+679
+                                        </option>
+                                        <option data-countryCode="FI" value="+358"
+                                            {% if country_code == '+358' %} selected="" {% endif %}>+358
+                                        </option>
+                                        <option data-countryCode="FR" value="+33"
+                                            {% if country_code == '+33' %} selected="" {% endif %}>+33
+                                        </option>
+                                        <option data-countryCode="GF" value="+594"
+                                            {% if country_code == '+594' %} selected="" {% endif %}>+594
+                                        </option>
+                                        <option data-countryCode="PF" value="+689"
+                                            {% if country_code == '+689' %} selected="" {% endif %}>+689
+                                        </option>
+                                        <option data-countryCode="GA" value="+241"
+                                            {% if country_code == '+241' %} selected="" {% endif %}>+241
+                                        </option>
+                                        <option data-countryCode="GM" value="+220"
+                                            {% if country_code == '+220' %} selected="" {% endif %}>+220
+                                        </option>
+                                        <option data-countryCode="GE" value="+7880"
+                                            {% if country_code == '+7880' %} selected="" {% endif %}>+7880
+                                        </option>
+                                        <option data-countryCode="DE" value="+49"
+                                            {% if country_code == '+49' %} selected="" {% endif %}>+49
+                                        </option>
+                                        <option data-countryCode="GH" value="+233"
+                                            {% if country_code == '+233' %} selected="" {% endif %}>+233
+                                        </option>
+                                        <option data-countryCode="GI" value="+350"
+                                            {% if country_code == '+350' %} selected="" {% endif %}>+350
+                                        </option>
+                                        <option data-countryCode="GR" value="+30"
+                                            {% if country_code == '+30' %} selected="" {% endif %}>+30
+                                        </option>
+                                        <option data-countryCode="GL" value="+299"
+                                            {% if country_code == '+299' %} selected="" {% endif %}>+299
+                                        </option>
+                                        <option data-countryCode="GD" value="+1473"
+                                            {% if country_code == '+1473' %} selected="" {% endif %}>+1473
+                                        </option>
+                                        <option data-countryCode="GP" value="+590"
+                                            {% if country_code == '+590' %} selected="" {% endif %}>+590
+                                        </option>
+                                        <option data-countryCode="GU" value="+671"
+                                            {% if country_code == '+671' %} selected="" {% endif %}>+671
+                                        </option>
+                                        <option data-countryCode="GT" value="+502"
+                                            {% if country_code == '+502' %} selected="" {% endif %}>+502
+                                        </option>
+                                        <option data-countryCode="GN" value="+224"
+                                            {% if country_code == '+224' %} selected="" {% endif %}>+224
+                                        </option>
+                                        <option data-countryCode="GW" value="+245"
+                                            {% if country_code == '+245' %} selected="" {% endif %}>+245
+                                        </option>
+                                        <option data-countryCode="GY" value="+592"
+                                            {% if country_code == '+592' %} selected="" {% endif %}>+592
+                                        </option>
+                                        <option data-countryCode="HT" value="+509"
+                                            {% if country_code == '+509' %} selected="" {% endif %}>+509
+                                        </option>
+                                        <option data-countryCode="HN" value="+504"
+                                            {% if country_code == '+504' %} selected="" {% endif %}>+504
+                                        </option>
+                                        <option data-countryCode="HK" value="+852"
+                                            {% if country_code == '+852' %} selected="" {% endif %}>+852
+                                        </option>
+                                        <option data-countryCode="HU" value="+36"
+                                            {% if country_code == '+36' %} selected="" {% endif %}>+36
+                                        </option>
+                                        <option data-countryCode="IS" value="+354"
+                                            {% if country_code == '+354' %} selected="" {% endif %}>+354
+                                        </option>
+                                        
+                                        <option data-countryCode="ID" value="+62"
+                                            {% if country_code == '+62' %} selected="" {% endif %}>+62
+                                        </option>
+                                        <option data-countryCode="IR" value="+98"
+                                            {% if country_code == '+98' %} selected="" {% endif %}>+98
+                                        </option>
+                                        <option data-countryCode="IQ" value="+964"
+                                            {% if country_code == '+964' %} selected="" {% endif %}>+964
+                                        </option>
+                                        <option data-countryCode="IE" value="+353"
+                                            {% if country_code == '+353' %} selected="" {% endif %}>+353
+                                        </option>
+                                        <option data-countryCode="IL" value="+972"
+                                            {% if country_code == '+972' %} selected="" {% endif %}>+972
+                                        </option>
+                                        <option data-countryCode="IT" value="+39"
+                                            {% if country_code == '+39' %} selected="" {% endif %}>+39
+                                        </option>
+                                        <option data-countryCode="JM" value="+1876"
+                                            {% if country_code == '+1876' %} selected="" {% endif %}>+1876
+                                        </option>
+                                        <option data-countryCode="JP" value="+81"
+                                            {% if country_code == '+81' %} selected="" {% endif %}>+81
+                                        </option>
+                                        <option data-countryCode="JO" value="+962"
+                                            {% if country_code == '+962' %} selected="" {% endif %}>+962
+                                        </option>
+                                        <option data-countryCode="KZ" value="+7"
+                                            {% if country_code == '+7' %} selected="" {% endif %}>+7
+                                        </option>
+                                        <option data-countryCode="KE" value="+254"
+                                            {% if country_code == '+254' %} selected="" {% endif %}>+254
+                                        </option>
+                                        <option data-countryCode="KI" value="+686"
+                                            {% if country_code == '+686' %} selected="" {% endif %}>+686
+                                        </option>
+                                        <option data-countryCode="KP" value="+850"
+                                            {% if country_code == '+850' %} selected="" {% endif %}>+850
+                                        </option>
+                                        <option data-countryCode="KR" value="+82"
+                                            {% if country_code == '+82' %} selected="" {% endif %}> +82
+                                        </option>
+                                        <option data-countryCode="KW" value="+965"
+                                            {% if country_code == '+965' %} selected="" {% endif %}>+965
+                                        </option>
+                                        <option data-countryCode="KG" value="+996"
+                                            {% if country_code == '+996' %} selected="" {% endif %}>+996
+                                        </option>
+                                        <option data-countryCode="LA" value="+856"
+                                            {% if country_code == '+856' %} selected="" {% endif %}>+856
+                                        </option>
+                                        <option data-countryCode="LV" value="+371"
+                                            {% if country_code == '+371' %} selected="" {% endif %}>+371
+                                        </option>
+                                        <option data-countryCode="LB" value="+961"
+                                            {% if country_code == '+961' %} selected="" {% endif %}>+961
+                                        </option>
+                                        <option data-countryCode="LS" value="+266"
+                                            {% if country_code == '+261' %} selected="" {% endif %}>+266
+                                        </option>
+                                        <option data-countryCode="LR" value="+231"
+                                            {% if country_code == '+231' %} selected="" {% endif %}>+231
+                                        </option>
+                                        <option data-countryCode="LY" value="+218"
+                                            {% if country_code == '+218' %} selected="" {% endif %}>+218
+                                        </option>
+                                        <option data-countryCode="LI" value="+417"
+                                            {% if country_code == '+417' %} selected="" {% endif %}>+417
+                                        </option>
+                                        <option data-countryCode="LT" value="+370"
+                                            {% if country_code == '+370' %} selected="" {% endif %}>+370
+                                        </option>
+                                        <option data-countryCode="LU" value="+352"
+                                            {% if country_code == '+352' %} selected="" {% endif %}>+352
+                                        </option>
+                                        <option data-countryCode="MO" value="+853"
+                                            {% if country_code == '+853' %} selected="" {% endif %}>+853
+                                        </option>
+                                        <option data-countryCode="MK" value="+389"
+                                            {% if country_code == '+389' %} selected="" {% endif %}>+389
+                                        </option>
+                                        <option data-countryCode="MG" value="+261"
+                                            {% if country_code == '+261' %} selected="" {% endif %}>+261
+                                        </option>
+                                        <option data-countryCode="MW" value="+265"
+                                            {% if country_code == '+265' %} selected="" {% endif %}>+265
+                                        </option>
+                                        <option data-countryCode="MY" value="+60"
+                                            {% if country_code == '+60' %} selected="" {% endif %}>+60
+                                        </option>
+                                        <option data-countryCode="MV" value="+960"
+                                            {% if country_code == '+960' %} selected="" {% endif %}>+960
+                                        </option>
+                                        <option data-countryCode="ML" value="+223"
+                                            {% if country_code == '+223' %} selected="" {% endif %}>+223
+                                        </option>
+                                        <option data-countryCode="MT" value="+356"
+                                            {% if country_code == '+356' %} selected="" {% endif %}>+356
+                                        </option>
+                                        <option data-countryCode="MH" value="+692"
+                                            {% if country_code == '+692' %} selected="" {% endif %}>+692
+                                        </option>
+                                        <option data-countryCode="MQ" value="+596"
+                                            {% if country_code == '+596' %} selected="" {% endif %}>+596
+                                        </option>
+                                        <option data-countryCode="MR" value="+222"
+                                            {% if country_code == '+222' %} selected="" {% endif %}>+222
+                                        </option>
+                                        <option data-countryCode="YT" value="+269"
+                                            {% if country_code == '+269' %} selected="" {% endif %}>+269
+                                        </option>
+                                        <option data-countryCode="MX" value="+52"
+                                            {% if country_code == '+52' %} selected="" {% endif %}>+52
+                                        </option>
+                                        <option data-countryCode="FM" value="+691"
+                                            {% if country_code == '+691' %} selected="" {% endif %}>+691
+                                        </option>
+                                        <option data-countryCode="MD" value="+373"
+                                            {% if country_code == '+373' %} selected="" {% endif %}>+373
+                                        </option>
+                                        <option data-countryCode="MC" value="+377"
+                                            {% if country_code == '+377' %} selected="" {% endif %}>+377
+                                        </option>
+                                        <option data-countryCode="MN" value="+976"
+                                            {% if country_code == '+976' %} selected="" {% endif %}>+976
+                                        </option>
+                                        <option data-countryCode="MS" value="+1664"
+                                            {% if country_code == '+1664' %} selected="" {% endif %}>+1664
+                                        </option>
+                                        <option data-countryCode="MA" value="+212"
+                                            {% if country_code == '+212' %} selected="" {% endif %}>+212
+                                        </option>
+                                        <option data-countryCode="MZ" value="+258"
+                                            {% if country_code == '+258' %} selected="" {% endif %}>+258
+                                        </option>
+                                        <option data-countryCode="MN" value="+95"
+                                            {% if country_code == '+95' %} selected="" {% endif %}>+95
+                                        </option>
+                                        <option data-countryCode="NA" value="+264"
+                                            {% if country_code == '+264' %} selected="" {% endif %}>+264
+                                        </option>
+                                        <option data-countryCode="NR" value="+674"
+                                            {% if country_code == '+674' %} selected="" {% endif %}>+674
+                                        </option>
+                                        <option data-countryCode="NP" value="+977"
+                                            {% if country_code == '+977' %} selected="" {% endif %}>+977
+                                        </option>
+                                        <option data-countryCode="NL" value="+31"
+                                            {% if country_code == '+31' %} selected="" {% endif %}>+31
+                                        </option>
+                                        <option data-countryCode="NC" value="+687"
+                                            {% if country_code == '+687' %} selected="" {% endif %}>+687
+                                        </option>
+                                        <option data-countryCode="NZ" value="+64"
+                                            {% if country_code == '+64' %} selected="" {% endif %}>+64
+                                        </option>
+                                        <option data-countryCode="NI" value="+505"
+                                            {% if country_code == '+505' %} selected="" {% endif %}>+505
+                                        </option>
+                                        <option data-countryCode="NE" value="+227"
+                                            {% if country_code == '+227' %} selected="" {% endif %}>+227
+                                        </option>
+                                        <option data-countryCode="NG" value="+234"
+                                            {% if country_code == '+234' %} selected="" {% endif %}>+234
+                                        </option>
+                                        <option data-countryCode="NU" value="+683"
+                                            {% if country_code == '+683' %} selected="" {% endif %}>+683
+                                        </option>
+                                        <option data-countryCode="NF" value="+672"
+                                            {% if country_code == '+672' %} selected="" {% endif %}>+672
+                                        </option>
+                                        <option data-countryCode="NP" value="+670"
+                                            {% if country_code == '+670' %} selected="" {% endif %}>+670
+                                        </option>
+                                        <option data-countryCode="NO" value="+47"
+                                            {% if country_code == '+47' %} selected="" {% endif %}>+47
+                                        </option>
+                                        <option data-countryCode="OM" value="+968"
+                                            {% if country_code == '+968' %} selected="" {% endif %}>+968
+                                        </option>
+                                        <option data-countryCode="PW" value="+680"
+                                            {% if country_code == '+680' %} selected="" {% endif %}>+680
+                                        </option>
+                                        <option data-countryCode="PA" value="+507"
+                                            {% if country_code == '+507' %} selected="" {% endif %}>+507
+                                        </option>
+                                        <option data-countryCode="PG" value="+675"
+                                            {% if country_code == '+675' %} selected="" {% endif %}>+675
+                                        </option>
+                                        <option data-countryCode="PY" value="+595"
+                                            {% if country_code == '+595' %} selected="" {% endif %}>+595
+                                        </option>
+                                        <option data-countryCode="PE" value="+51"
+                                            {% if country_code == '+51' %} selected="" {% endif %}>+51
+                                        </option>
+                                        <option data-countryCode="PH" value="+63"
+                                            {% if country_code == '+63' %} selected="" {% endif %}>+63
+                                        </option>
+                                        <option data-countryCode="PL" value="+48"
+                                            {% if country_code == '+48' %} selected="" {% endif %}>+48
+                                        </option>
+                                        <option data-countryCode="PT" value="+351"
+                                            {% if country_code == '+351' %} selected="" {% endif %}>+351
+                                        </option>
+                                        <option data-countryCode="PR" value="+1787"
+                                            {% if country_code == '+1787' %} selected="" {% endif %}>+1787
+                                        </option>
+                                        <option data-countryCode="QA" value="+974"
+                                            {% if country_code == '+974' %} selected="" {% endif %}>+974
+                                        </option>
+                                        <option data-countryCode="RE" value="+262"
+                                            {% if country_code == '+262' %} selected="" {% endif %}>+262
+                                        </option>
+                                        <option data-countryCode="RO" value="+40"
+                                            {% if country_code == '+40' %} selected="" {% endif %}>+40
+                                        </option>
+                                        <option data-countryCode="RU" value="+7"
+                                            {% if country_code == '+7' %} selected="" {% endif %}>+7
+                                        </option>
+                                        <option data-countryCode="RW" value="+250"
+                                            {% if country_code == '+250' %} selected="" {% endif %}>+250
+                                        </option>
+                                        <option data-countryCode="SM" value="+378"
+                                            {% if country_code == '+378' %} selected="" {% endif %}>+378
+                                        </option>
+                                        <option data-countryCode="ST" value="+239"
+                                            {% if country_code == '+239' %} selected="" {% endif %}>+239
+                                        </option>
+                                        <option data-countryCode="SA" value="+966"
+                                            {% if country_code == '+966' %} selected="" {% endif %}>+966
+                                        </option>
+                                        <option data-countryCode="SN" value="+221"
+                                            {% if country_code == '221' %} selected="" {% endif %}>+221
+                                        </option>
+                                        <option data-countryCode="CS" value="+381"
+                                            {% if country_code == '+381' %} selected="" {% endif %}>+381
+                                        </option>
+                                        <option data-countryCode="SC" value="+248"
+                                            {% if country_code == '+248' %} selected="" {% endif %}>+248
+                                        </option>
+                                        <option data-countryCode="SL" value="+232"
+                                            {% if country_code == '+232' %} selected="" {% endif %}>+232
+                                        </option>
+                                        <option data-countryCode="SG" value="+65"
+                                            {% if country_code == '+65' %} selected="" {% endif %}>+65
+                                        </option>
+                                        <option data-countryCode="SK" value="+421"
+                                            {% if country_code == '+421' %} selected="" {% endif %}>+421
+                                        </option>
+                                        <option data-countryCode="SI" value="+386"
+                                            {% if country_code == '+386' %} selected="" {% endif %}>+386
+                                        </option>
+                                        <option data-countryCode="SB" value="+677"
+                                            {% if country_code == '+677' %} selected="" {% endif %}>+677
+                                        </option>
+                                        <option data-countryCode="SO" value="+252"
+                                            {% if country_code == '+252' %} selected="" {% endif %}>+252
+                                        </option>
+                                        <option data-countryCode="ZA" value="+27"
+                                            {% if country_code == '+27' %} selected="" {% endif %}>+27
+                                        </option>
+                                        <option data-countryCode="ES" value="+34"
+                                            {% if country_code == '+34' %} selected="" {% endif %}>+34
+                                        </option>
+                                        <option data-countryCode="LK" value="+94"
+                                            {% if country_code == '+94' %} selected="" {% endif %}>+94
+                                        </option>
+                                        <option data-countryCode="SH" value="+290"
+                                            {% if country_code == '+290' %} selected="" {% endif %}>+290
+                                        </option>
+                                        <option data-countryCode="KN" value="+1869"
+                                            {% if country_code == '+1869' %} selected="" {% endif %}>+1869
+                                        </option>
+                                        <option data-countryCode="SC" value="+1758"
+                                            {% if country_code == '+1758' %} selected="" {% endif %}>+1758
+                                        </option>
+                                        <option data-countryCode="SD" value="+249"
+                                            {% if country_code == '+249' %} selected="" {% endif %}>+249
+                                        </option>
+                                        <option data-countryCode="SR" value="+597"
+                                            {% if country_code == '+597' %} selected="" {% endif %}>+597
+                                        </option>
+                                        <option data-countryCode="SZ" value="+268"
+                                            {% if country_code == '+268' %} selected="" {% endif %}>+268
+                                        </option>
+                                        <option data-countryCode="SE" value="+46"
+                                            {% if country_code == '+49' %} selected="" {% endif %}>+46
+                                        </option>
+                                        <option data-countryCode="CH" value="+41"
+                                            {% if country_code == '+41' %} selected="" {% endif %}>+41
+                                        </option>
+                                        <option data-countryCode="SI" value="+963"
+                                            {% if country_code == '+963' %} selected="" {% endif %}>+963
+                                        </option>
+                                        <option data-countryCode="TW" value="+886"
+                                            {% if country_code == '+886' %} selected="" {% endif %}>+886
+                                        </option>
+                                        <option data-countryCode="TJ" value="+7"
+                                            {% if country_code == '+7' %} selected="" {% endif %}>+7
+                                        </option>
+                                        <option data-countryCode="TH" value="+66"
+                                            {% if country_code == '+66' %} selected="" {% endif %}>+66
+                                        </option>
+                                        <option data-countryCode="TG" value="+228"
+                                            {% if country_code == '+228' %} selected="" {% endif %}>+228
+                                        </option>
+                                        <option data-countryCode="TO" value="+676"
+                                            {% if country_code == '+676' %} selected="" {% endif %}>+676
+                                        </option>
+                                        <option data-countryCode="TT" value="+1868"
+                                            {% if country_code == '+1868' %} selected="" {% endif %}>+1868
+                                        </option>
+                                        <option data-countryCode="TN" value="+216"
+                                            {% if country_code == '+216' %} selected="" {% endif %}>+216
+                                        </option>
+                                        <option data-countryCode="TR" value="+90"
+                                            {% if country_code == '+90' %} selected="" {% endif %}>+90
+                                        </option>
+                                        <option data-countryCode="TM" value="+7"
+                                            {% if country_code == '+7' %} selected="" {% endif %}>+7
+                                        </option>
+                                        <option data-countryCode="TM" value="+993"
+                                            {% if country_code == '+993' %} selected="" {% endif %}>+993
+                                        </option>
+                                        <option data-countryCode="TC" value="+1649"
+                                            {% if country_code == '+1649' %} selected="" {% endif %}>+1649
+                                        </option>
+                                        <option data-countryCode="TV" value="+688"
+                                            {% if country_code == '+688' %} selected="" {% endif %}>+688
+                                        </option>
+                                        <option data-countryCode="UG" value="+256"
+                                            {% if country_code == '+256' %} selected="" {% endif %}>+256
+                                        </option>
+                                        <option data-countryCode="UA" value="+380"
+                                            {% if country_code == '+380' %} selected="" {% endif %}>+380
+                                        </option>
+                                        <option data-countryCode="AE" value="+971"
+                                            {% if country_code == '+971' %} selected="" {% endif %}>+971
+                                        </option>
+                                        <option data-countryCode="UY" value="+598"
+                                            {% if country_code == '+598' %} selected="" {% endif %}>+598
+                                        </option>
+                                        <option data-countryCode="UZ" value="+7"
+                                            {% if country_code == '+7' %} selected="" {% endif %}>+7
+                                        </option>
+                                        <option data-countryCode="VU" value="+678"
+                                            {% if country_code == '+678' %} selected="" {% endif %}>+678
+                                        </option>
+                                        <option data-countryCode="VA" value="+379"
+                                            {% if country_code == '+379' %} selected="" {% endif %}>+379
+                                        </option>
+                                        <option data-countryCode="VE" value="+58"
+                                            {% if country_code == '+58' %} selected="" {% endif %}>+58
+                                        </option>
+                                        <option data-countryCode="VN" value="+84"
+                                            {% if country_code == '+84' %} selected="" {% endif %}>+84
+                                        </option>
+                                        <option data-countryCode="VG" value="+84"
+                                            {% if country_code == '+84' %} selected="" {% endif %}>+1284
+                                        </option>
+                                        <option data-countryCode="VI" value="+84"
+                                            {% if country_code == '+84' %} selected="" {% endif %}>+1340
+                                        </option>
+                                        <option data-countryCode="WF" value="+681"
+                                            {% if country_code == '+681' %} selected="" {% endif %}>+681
+                                        </option>
+                                        <option data-countryCode="YE" value="+969"
+                                            {% if country_code == '+969' %} selected="" {% endif %}>+969
+                                        </option>
+                                        <option data-countryCode="YE" value="+967"
+                                            {% if country_code == '+967' %} selected="" {% endif %}>+967
+                                        </option>
+                                        <option data-countryCode="ZM" value="+260"
+                                            {% if country_code == '+260' %} selected="" {% endif %}>+260
+                                        </option>
+                                        <option data-countryCode="ZW" value="+263"
+                                            {% if country_code == '+263' %} selected="" {% endif %}>+263
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 pl-md-0">
+                                    <input class="inputField phoneCode" type="text" placeholder="Code" data-mask="000"
+                                        id="phoneCode" name="phoneCode" value="{% if code %} {{code}} {% endif %}" />
+                                </div>
+                                <div class="col-md-4 pl-md-0">
+                                    <input class="inputField landLineNo" type="text" placeholder="Landline No."
+                                        id="landLineNo" name="landLineNo" value="{% if landline %} {{landline}} {% endif %}" data-mask="000000" />
+                                    <label class="error_msg float-right" id="landline_no_error"></label>
+                                </div>
+                                <div class="col-md-2 pl-md-0">
+                                    <input class="inputField phoneCode" type="text" placeholder="Ext." data-mask="000"
+                                      id="dept_ext" name="dept_ext" />
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <div class="row widthSetter">
+                                <div class="col-md-2 p-md-0">
+                                    <!-- <input class="inputField mobileCode" type="text" placeholder="+91" data-mask="+00"
+                                        id="mobileCode" name="mobileCode" /> -->
+                                    <select class="inputField selectCountryCode" style="width: 100%;" id="mobileCode"
+                                        name="mobileCode">
+                                        <option data-countryCode="DZ" value="+213">+213</option>
+                                        <option data-countryCode="AD" value="+376">+376</option>
+                                        <option data-countryCode="AO" value="+244">+244</option>
+                                        <option data-countryCode="AI" value="+1264">+1264</option>
+                                        <option data-countryCode="AG" value="+1268">+1268</option>
+                                        <option data-countryCode="AR" value="+54">+54</option>
+                                        <option data-countryCode="AM" value="+374">+374</option>
+                                        <option data-countryCode="AW" value="+297">+297</option>
+                                        <option data-countryCode="AU" value="+61">+61</option>
+                                        <option data-countryCode="AT" value="+43">+43</option>
+                                        <option data-countryCode="AZ" value="+994">+994</option>
+                                        <option data-countryCode="BS" value="+1242">+1242</option>
+                                        <option data-countryCode="BH" value="+973">+973</option>
+                                        <option data-countryCode="BD" value="+880">+880</option>
+                                        <option data-countryCode="BB" value="+1246">+1246</option>
+                                        <option data-countryCode="BY" value="+375">+375</option>
+                                        <option data-countryCode="BE" value="+32">+32</option>
+                                        <option data-countryCode="BZ" value="+501">+501</option>
+                                        <option data-countryCode="BJ" value="+229">+229</option>
+                                        <option data-countryCode="BM" value="+1441">+1441</option>
+                                        <option data-countryCode="BT" value="+975">+975</option>
+                                        <option data-countryCode="BO" value="+591">+591</option>
+                                        <option data-countryCode="BA" value="+387">+387</option>
+                                        <option data-countryCode="BW" value="+267">+267</option>
+                                        <option data-countryCode="BR" value="+55">+55</option>
+                                        <option data-countryCode="BN" value="+673">+673</option>
+                                        <option data-countryCode="BG" value="+359">+359</option>
+                                        <option data-countryCode="BF" value="+226">+226</option>
+                                        <option data-countryCode="BI" value="+257">+257</option>
+                                        <option data-countryCode="KH" value="+855">+855</option>
+                                        <option data-countryCode="CM" value="+237">+237</option>
+                                        <option data-countryCode="CA" value="+1">+1</option>
+                                        <option data-countryCode="CV" value="+238">+238</option>
+                                        <option data-countryCode="KY" value="+1345">+1345</option>
+                                        <option data-countryCode="CF" value="+236">+236</option>
+                                        <option data-countryCode="CL" value="+56">+56</option>
+                                        <option data-countryCode="CN" value="+86">+86</option>
+                                        <option data-countryCode="CO" value="+57">+57</option>
+                                        <option data-countryCode="KM" value="+269">+269</option>
+                                        <option data-countryCode="CG" value="+242">+242</option>
+                                        <option data-countryCode="CK" value="+682">+682</option>
+                                        <option data-countryCode="CR" value="+506">+506</option>
+                                        <option data-countryCode="HR" value="+385">+385</option>
+                                        <option data-countryCode="CU" value="+53">+53</option>
+                                        <option data-countryCode="CY" value="+90392">+90392</option>
+                                        <option data-countryCode="CY" value="+357">+357</option>
+                                        <option data-countryCode="CZ" value="+42">+42</option>
+                                        <option data-countryCode="DK" value="+45">+45</option>
+                                        <option data-countryCode="DJ" value="+253">+253</option>
+                                        <option data-countryCode="DM" value="+1809">+1809</option>
+                                        <option data-countryCode="DO" value="+1809">+1809</option>
+                                        <option data-countryCode="EC" value="+593">+593</option>
+                                        <option data-countryCode="EG" value="+20">+20</option>
+                                        <option data-countryCode="SV" value="+503">+503</option>
+                                        <option data-countryCode="GQ" value="+240">+240</option>
+                                        <option data-countryCode="ER" value="+291">+291</option>
+                                        <option data-countryCode="EE" value="+372">+372</option>
+                                        <option data-countryCode="ET" value="+251">+251</option>
+                                        <option data-countryCode="FK" value="+500">+500</option>
+                                        <option data-countryCode="FO" value="+298">+298</option>
+                                        <option data-countryCode="FJ" value="+679">+679</option>
+                                        <option data-countryCode="FI" value="+358">+358</option>
+                                        <option data-countryCode="FR" value="+33">+33</option>
+                                        <option data-countryCode="GF" value="+594">+594</option>
+                                        <option data-countryCode="PF" value="+689">+689</option>
+                                        <option data-countryCode="GA" value="+241">+241</option>
+                                        <option data-countryCode="GM" value="+220">+220</option>
+                                        <option data-countryCode="GE" value="+7880">+7880</option>
+                                        <option data-countryCode="DE" value="+49">+49</option>
+                                        <option data-countryCode="GH" value="+233">+233</option>
+                                        <option data-countryCode="GI" value="+350">+350</option>
+                                        <option data-countryCode="GR" value="+30">+30</option>
+                                        <option data-countryCode="GL" value="+299">+299</option>
+                                        <option data-countryCode="GD" value="+1473">+1473</option>
+                                        <option data-countryCode="GP" value="+590">+590</option>
+                                        <option data-countryCode="GU" value="+671">+671</option>
+                                        <option data-countryCode="GT" value="+502">+502</option>
+                                        <option data-countryCode="GN" value="+224">+224</option>
+                                        <option data-countryCode="GW" value="+245">+245</option>
+                                        <option data-countryCode="GY" value="+592">+592</option>
+                                        <option data-countryCode="HT" value="+509">+509</option>
+                                        <option data-countryCode="HN" value="+504">+504</option>
+                                        <option data-countryCode="HK" value="+852">+852</option>
+                                        <option data-countryCode="HU" value="+36">+36</option>
+                                        <option data-countryCode="IS" value="+354">+354</option>
+                                        <option data-countryCode="IN" value="+91" selected>+91</option>
+                                        <option data-countryCode="ID" value="+62">+62</option>
+                                        <option data-countryCode="IR" value="+98">+98</option>
+                                        <option data-countryCode="IQ" value="+964">+964</option>
+                                        <option data-countryCode="IE" value="+353">+353</option>
+                                        <option data-countryCode="IL" value="+972">+972</option>
+                                        <option data-countryCode="IT" value="+39">+39</option>
+                                        <option data-countryCode="JM" value="+1876">+1876</option>
+                                        <option data-countryCode="JP" value="+81">+81</option>
+                                        <option data-countryCode="JO" value="+962">+962</option>
+                                        <option data-countryCode="KZ" value="+7">+7</option>
+                                        <option data-countryCode="KE" value="+254">+254</option>
+                                        <option data-countryCode="KI" value="+686">+686</option>
+                                        <option data-countryCode="KP" value="+850">+850</option>
+                                        <option data-countryCode="KR" value="+82"> +82</option>
+                                        <option data-countryCode="KW" value="+965">+965</option>
+                                        <option data-countryCode="KG" value="+996">+996</option>
+                                        <option data-countryCode="LA" value="+856">+856</option>
+                                        <option data-countryCode="LV" value="+371">+371</option>
+                                        <option data-countryCode="LB" value="+961">+961</option>
+                                        <option data-countryCode="LS" value="+266">+266</option>
+                                        <option data-countryCode="LR" value="+231">+231</option>
+                                        <option data-countryCode="LY" value="+218">+218</option>
+                                        <option data-countryCode="LI" value="+417">+417</option>
+                                        <option data-countryCode="LT" value="+370">+370</option>
+                                        <option data-countryCode="LU" value="+352">+352</option>
+                                        <option data-countryCode="MO" value="+853">+853</option>
+                                        <option data-countryCode="MK" value="+389">+389</option>
+                                        <option data-countryCode="MG" value="+261">+261</option>
+                                        <option data-countryCode="MW" value="+265">+265</option>
+                                        <option data-countryCode="MY" value="+60">+60</option>
+                                        <option data-countryCode="MV" value="+960">+960</option>
+                                        <option data-countryCode="ML" value="+223">+223</option>
+                                        <option data-countryCode="MT" value="+356">+356</option>
+                                        <option data-countryCode="MH" value="+692">+692</option>
+                                        <option data-countryCode="MQ" value="+596">+596</option>
+                                        <option data-countryCode="MR" value="+222">+222</option>
+                                        <option data-countryCode="YT" value="+269">+269</option>
+                                        <option data-countryCode="MX" value="+52">+52</option>
+                                        <option data-countryCode="FM" value="+691">+691</option>
+                                        <option data-countryCode="MD" value="+373">+373</option>
+                                        <option data-countryCode="MC" value="+377">+377</option>
+                                        <option data-countryCode="MN" value="+976">+976</option>
+                                        <option data-countryCode="MS" value="+1664">+1664</option>
+                                        <option data-countryCode="MA" value="+212">+212</option>
+                                        <option data-countryCode="MZ" value="+258">+258</option>
+                                        <option data-countryCode="MN" value="+95">+95</option>
+                                        <option data-countryCode="NA" value="+264">+264</option>
+                                        <option data-countryCode="NR" value="+674">+674</option>
+                                        <option data-countryCode="NP" value="+977">+977</option>
+                                        <option data-countryCode="NL" value="+31">+31</option>
+                                        <option data-countryCode="NC" value="+687">+687</option>
+                                        <option data-countryCode="NZ" value="+64">+64</option>
+                                        <option data-countryCode="NI" value="+505">+505</option>
+                                        <option data-countryCode="NE" value="+227">+227</option>
+                                        <option data-countryCode="NG" value="+234">+234</option>
+                                        <option data-countryCode="NU" value="+683">+683</option>
+                                        <option data-countryCode="NF" value="+672">+672</option>
+                                        <option data-countryCode="NP" value="+670">+670</option>
+                                        <option data-countryCode="NO" value="+47">+47</option>
+                                        <option data-countryCode="OM" value="+968">+968</option>
+                                        <option data-countryCode="PW" value="+680">+680</option>
+                                        <option data-countryCode="PA" value="+507">+507</option>
+                                        <option data-countryCode="PG" value="+675">+675</option>
+                                        <option data-countryCode="PY" value="+595">+595</option>
+                                        <option data-countryCode="PE" value="+51">+51</option>
+                                        <option data-countryCode="PH" value="+63">+63</option>
+                                        <option data-countryCode="PL" value="+48">+48</option>
+                                        <option data-countryCode="PT" value="+351">+351</option>
+                                        <option data-countryCode="PR" value="+1787">+1787</option>
+                                        <option data-countryCode="QA" value="+974">+974</option>
+                                        <option data-countryCode="RE" value="+262">+262</option>
+                                        <option data-countryCode="RO" value="+40">+40</option>
+                                        <option data-countryCode="RU" value="+7">+7</option>
+                                        <option data-countryCode="RW" value="+250">+250</option>
+                                        <option data-countryCode="SM" value="+378">+378</option>
+                                        <option data-countryCode="ST" value="+239">+239</option>
+                                        <option data-countryCode="SA" value="+966">+966</option>
+                                        <option data-countryCode="SN" value="+221">+221</option>
+                                        <option data-countryCode="CS" value="+381">+381</option>
+                                        <option data-countryCode="SC" value="+248">+248</option>
+                                        <option data-countryCode="SL" value="+232">+232</option>
+                                        <option data-countryCode="SG" value="+65">+65</option>
+                                        <option data-countryCode="SK" value="+421">+421</option>
+                                        <option data-countryCode="SI" value="+386">+386</option>
+                                        <option data-countryCode="SB" value="+677">+677</option>
+                                        <option data-countryCode="SO" value="+252">+252</option>
+                                        <option data-countryCode="ZA" value="+27">+27</option>
+                                        <option data-countryCode="ES" value="+34">+34</option>
+                                        <option data-countryCode="LK" value="+94">+94</option>
+                                        <option data-countryCode="SH" value="+290">+290</option>
+                                        <option data-countryCode="KN" value="+1869">+1869</option>
+                                        <option data-countryCode="SC" value="+1758">+1758</option>
+                                        <option data-countryCode="SD" value="+249">+249</option>
+                                        <option data-countryCode="SR" value="+597">+597</option>
+                                        <option data-countryCode="SZ" value="+268">+268</option>
+                                        <option data-countryCode="SE" value="+46">+46</option>
+                                        <option data-countryCode="CH" value="+41">+41</option>
+                                        <option data-countryCode="SI" value="+963">+963</option>
+                                        <option data-countryCode="TW" value="+886">+886</option>
+                                        <option data-countryCode="TJ" value="+7">+7</option>
+                                        <option data-countryCode="TH" value="+66">+66</option>
+                                        <option data-countryCode="TG" value="+228">+228</option>
+                                        <option data-countryCode="TO" value="+676">+676</option>
+                                        <option data-countryCode="TT" value="+1868">+1868</option>
+                                        <option data-countryCode="TN" value="+216">+216</option>
+                                        <option data-countryCode="TR" value="+90">+90</option>
+                                        <option data-countryCode="TM" value="+7">+7</option>
+                                        <option data-countryCode="TM" value="+993">+993</option>
+                                        <option data-countryCode="TC" value="+1649">+1649</option>
+                                        <option data-countryCode="TV" value="+688">+688</option>
+                                        <option data-countryCode="UG" value="+256">+256</option>
+                                        <option data-countryCode="UA" value="+380">+380</option>
+                                        <option data-countryCode="AE" value="+971">+971</option>
+                                        <option data-countryCode="UY" value="+598">+598</option>
+                                        <option data-countryCode="UZ" value="+7">+7</option>
+                                        <option data-countryCode="VU" value="+678">+678</option>
+                                        <option data-countryCode="VA" value="+379">+379</option>
+                                        <option data-countryCode="VE" value="+58">+58</option>
+                                        <option data-countryCode="VN" value="+84">+84</option>
+                                        <option data-countryCode="VG" value="+84">+1284</option>
+                                        <option data-countryCode="VI" value="+84">+1340</option>
+                                        <option data-countryCode="WF" value="+681">+681</option>
+                                        <option data-countryCode="YE" value="+969">+969</option>
+                                        <option data-countryCode="YE" value="+967">+967</option>
+                                        <option data-countryCode="ZM" value="+260">+260</option>
+                                        <option data-countryCode="ZW" value="+263">+263</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-10">
+                                    <input class="inputField mobileNo" type="text" placeholder="Mobile*" id="mobileNo"
+                                        name="mobileNo" data-mask="0000000000" />
+                                    <label class="error_msg float-right" id="mobile_no_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;"><b>Email</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <input class="inputField widthSetter" type="text" id="orgemailId" placeholder="Email*" maxlength="50"
+                                id="orgemailId" name="orgemailId" onblur="validateEmail('orgemailId',this.value)" />
+                            <label class="error_msg float-right" id="email_id_error"></label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#mobileCode").select2();
+        $("#landLineCode").select2();
+    });
+    function saveDepartment() {
+        var error = 0;
+        var a = document.forms["department_reg"]["department_name"].value;
+        document.getElementById('department_name_error').innerHTML = '';
+        if (a.trim() == null || a.trim() == "") {
+            var error = 1;
+            document.getElementById('department_name_error').innerHTML = 'Please enter department name*';
+            $('#department_name').css("border", "1px solid #db8305");
+        } else {
+            // var res = checkSpecialChar(a);
+            // if (res) {
+            //     var error = 1;
+            //     document.getElementById('department_name_error').innerHTML = 'Department name should not have special character*';
+            //     $('#department_name').css("border", "1px solid #db8305");
+            // } else {
+                $('#department_name').css("border", "1px solid lightgrey");
+            // }
+        }
+        var b1 = document.forms["department_reg"]["phoneCode"].value;
+        var b2 = document.forms["department_reg"]["landLineNo"].value;
+        var b3 = document.forms["department_reg"]["dept_ext"].value;
+        document.getElementById('landline_no_error').innerHTML = '';
+        if (b1 !== null && b1 !== "") {
+            if (b2 == null || b2 == '') {
+                var error = 1;
+                document.getElementById('landline_no_error').innerHTML = 'Please enter landline no.*';
+                $('#landLineCode').css("border", "1px solid #db8305");
+            }else {
+                if (b2.length < 6 || b2.length > 8) {
+                    var error = 1;
+                    document.getElementById('landline_no_error').innerHTML = 'Landline no. should be 6 to 8 digits*';
+                    $('#landLineCode').css("border", "1px solid #db8305");
+                } else {
+                    $('#landLineCode').css("border", "1px solid lightgrey");
+                }
+            }
+        } else {
+            $('#landLineCode').css("border", "1px solid lightgrey");
+        }
+        if (b2 !== null && b2 !== "") {
+            if (b1 == null || b1 == '') {
+                var error = 1;
+                document.getElementById('landline_no_error').innerHTML = 'Please enter landline code*';
+                $('#phoneCode').css("border", "1px solid #db8305");
+            } else {
+                if (b1.length < 2 || b1.length > 4) {
+                    var error = 1;
+                    document.getElementById('landline_no_error').innerHTML = 'Landline code should be 2 to 4 digits*';
+                    $('#phoneCode').css("border", "1px solid #db8305");
+                } else {
+                    $('#phoneCode').css("border", "1px solid lightgrey");
+                }
+            }
+        } else {
+            $('#phoneCode').css("border", "1px solid lightgrey");
+        }
+
+        if (b1 !== null && b1 !== "" && b2 !== null && b2 !== '') {
+      //error++;
+      if (b3 == null || b3 == '') {
+        var error = 1;
+        document.getElementById('landline_no_error').innerHTML = 'Please enter extension*';
+        $('#dept_ext').css("border", "1px solid #db8305");
+      } else {
+        if (b3.length < 3) {
+            var error = 1;
+          document.getElementById('landline_no_error').innerHTML = 'Phone ext should be 3 digits*';
+          $('#dept_ext').css("border", "1px solid #db8305");
+        } else {
+          $('#dept_ext').css("border", "1px solid lightgrey");
+        }
+      }
+    } else {
+      $('#dept_ext').css("border", "1px solid lightgrey");
+    }
+
+        var c = document.forms["department_reg"]["mobileNo"].value;
+        document.getElementById('mobile_no_error').innerHTML = '';
+        if (c == null || c == "") {
+            var error = 1;
+            document.getElementById('mobile_no_error').innerHTML = 'Please enter mobile no.*';
+            $('#mobileNo').css("border", "1px solid #db8305");
+        } else {
+            if (c.length < 10) {
+                var error = 1;
+                document.getElementById('mobile_no_error').innerHTML = 'Mobile no. should be 10 digits*';
+                $('#mobileNo').css("border", "1px solid #db8305");
+            } else {
+                $('#mobileNo').css("border", "1px solid lightgrey");
+            }
+        }
+        var d = document.forms["department_reg"]["orgemailId"].value;
+        document.getElementById('email_id_error').innerHTML = '';
+        if (d == null || d == "") {
+            var error = 1;
+            document.getElementById('email_id_error').innerHTML = 'Please enter email*';
+            $('#orgemailId').css("border", "1px solid #db8305");
+        } else {
+            var isValidated = validateEmail(d);
+            if (!isValidated) {
+                var error = 1;
+                document.getElementById('email_id_error').innerHTML = 'Please enter valid email*';
+                $('#orgemailId').css("border", "1px solid #db8305");
+            }
+            else {
+                $('#orgemailId').css("border", "1px solid lightgrey");
+            }
+        }
+
+        $('.error_msg').css("margin-bottom", "0rem");
+
+        if (error == 0) {
+            $.ajax({
+                url: "{% url 'src:save-department' %}",
+                method: 'POST',
+                data: {
+                    organization_id: $('#organization_id').val(),
+                    department_name: $('#department_name').val(),
+                    landline_no: $('#landLineNo').val(),
+                    land_line_code: $('#landLineCode').val(),
+                    dept_ext: $('#dept_ext').val(),
+                    phone_code: $('#phoneCode').val(),
+                    mobile_code: $('#mobileCode').val(),
+                    mobile_no: $('#mobileNo').val(),
+                    email_id: $('#orgemailId').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function (data) {
+                    if (data.error == false) {
+                        $("#addDeptModal").hide();
+                        $("body").removeClass("modal-open");
+                        $(".modal-backdrop").remove();
+                        openToaster("success", data.message);
+                        var organization_id = $('#organization_id').val();
+                        getOrganizationRecord(organization_id);
+                    } else {
+                        $(".text-danger").html('');
+                        var data = data.message;
+                        $.each(data, function (index, value) {
+                            $('#' + index).html(value);
+                        });
+                    }
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+    }
+</script>

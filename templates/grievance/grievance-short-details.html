@@ -1,0 +1,81 @@
+{% load static %}
+<div class="col-12 p-0 col-md-12 p-md-0">
+    <div class="row">
+        <div class="col-md-2 p-md-0">
+            {% if first_grievance.store_image is None or first_grievance.store_image == 'None'%}
+            <img src="/static/img/png/storePic.png" style="width: 100%; height: 50px;">
+            {% else %}
+            <img src="{{first_grievance.store_image}}" style="width:100%; height: 50px;">
+            {% endif %}
+        </div>
+        <div class="col-9 p-0 col-md-9 p-md-0">
+            <div class="row">
+                <div class="col-9 col-md-9">
+                    <h5 class="m-0"><b style="color: #009cff;">{{ grievance.first_name }} {{ grievance.middle_name }} {{ grievance.last_name }} </b></h5>
+                    <h6 class="m-0">{{first_grievance.store_name}}</h6>
+                </div>
+                
+            </div>
+            
+        </div>
+        <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-4">
+            <div class="row mb-md-2">
+                <div class="col-8 p-0 col-md-8 p-md-0">
+                    <div class="row">
+                        <div class="col-12 p-0 col-md-12 p-md-0 mt-3">
+                            <div class="row">
+                                <div class="col-1 p-0 col-md-1 p-md-0">
+                                    <img src="/static/img/svg/address.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-11 p-0 col-md-11 p-md-0">
+                                    <h6 class="smallText">Reason</h6>
+                                    <h6 class="largeText">{% if first_grievance.reason_name %} {{first_grievance.reason_name}} {% else %} - {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 p-0 col-md-12 p-md-0 mt-3">
+                            <div class="row">
+                                <div class="col-1 p-0 col-md-1 p-md-0">
+                                    <img src="/static/img/svg/address.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-11 p-0 col-md-11 p-md-0">
+                                    <h6 class="smallText">Description</h6>
+                                    <h6 class="largeText"> {% if first_grievance.description %} {{first_grievance.description}} {% else %} - {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 p-0 col-md-12 p-md-0 mt-3">
+                            <div class="row">
+                                <div class="col-1 p-0 col-md-1 p-md-0">
+                                    <img src="/static/img/svg/address.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-11 p-0 col-md-11 p-md-0">
+                                    <h6 class="smallText">Attachment</h6>
+                                    {% if first_grievance.attachment is not None %}
+                                    <img src="{% if first_grievance.attachment is not None %} {{first_grievance.attachment}}{% endif %}" alt="" style="height: 110px;">
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                
+            </div>
+            
+            
+            
+        </div>
+    </div>
+</div>

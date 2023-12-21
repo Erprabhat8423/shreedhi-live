@@ -1,0 +1,328 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+    .primaryContainerBG, .nonprimaryContainerBG, .employeeprimaryContainerBG{
+        padding-top: 0px !important;
+        padding-left: 0px !important;
+    }
+   
+</style> 
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-6 text-left"><b>Last updated at : </b>{{last_row.created_at | date:'d/m/Y H:i'}}</div>
+                        <div class="col-md-6 text-right">
+                            
+                            <button type="button" id="" class="btn iconBox iconExportExcel"  onclick="exportExcel()"></button>
+                            <button type="button" id="editBtn" class="btn iconBox iconModify"  onclick="edit()"></button>
+                            <button class="btn btn-save float-right" id="updateBtn" type="button" style="display: none;" onclick="updateReport()">Save</button>
+                            <button class="btn btn-close float-right" id="cancelBtn" type="button" style="display: none;" onclick="cancel()" >Close</button>
+                        </div>
+                        
+                        <!-- <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_id" id="lock_employee_id" data-id="1"
+                            onclick="toggleFreeze(this.id,'employee_id',1)" />
+                            <label class="mb-0" for="lock_employee_id">Employee Name</label>
+                        </a> -->
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg">
+                    <form id="hoReportForm">
+                        {% csrf_token %}
+                        
+                        <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="employee_id" id="employee_id"> EMPLOYEE NAME </th>
+                                    {% if product_milk_variant_list %}
+                                    {% for product_variant in product_milk_variant_list %}
+                                    <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+                                    {% endfor %}
+                                    {% endif %}
+                                    {% if product_without_milk_variant_list %}
+                                    {% for product_variant in product_without_milk_variant_list %}
+                                    <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <th style="color:#ffff;background-color: #a4b787; text-align:center">AMOUNT</th>
+                                    
+                                </tr>
+                                
+                            </thead>
+                            <tbody>
+                                
+                                {% for user in users %}
+                                <tr>
+                                    <td class="employee_id" id="employee_id">{{user.first_name}} {{user.middle_name}} {{user.last_name}}</td>
+                                    
+                                    {% for product_variant in product_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> 
+                                        <input type="hidden" value="{{product_variant.sp_employee}}">
+                                        <input type="text" value="{% get_ho_report_quantity user.id product_variant.id %}" name="quantity_{{user.id}}_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class=" numeric quantity_field product_quantity_{{product_variant.id}} quantity_{{user.id}}" onkeyup="calculateEmployeeAmount('{{user.id}}')" readonly>  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    {% for product_variant in product_without_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> 
+                                        <input type="hidden" value="{{product_variant.sp_employee}}">
+                                        <input type="text"  value="{% get_ho_report_quantity user.id product_variant.id %}" name="quantity_{{user.id}}_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class=" numeric quantity_field product_quantity_{{product_variant.id}} quantity_{{user.id}}" onkeyup="calculateEmployeeAmount('{{user.id}}')" readonly>  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    <td style="color:#ffff;background-color: #a4b787; text-align:center">
+                                        <input type="text" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="" id="employee_total_{{user.id}}" readonly>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                <tr>
+                                    <td class="employee_id" id="employee_id">TOTAL NO. OF POUCHES / UNITS</td>
+                                    
+                                    {% for product_variant in product_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                        <input type="text"  name="quantity_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="numeric quantity_field" readonly>  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    {% for product_variant in product_without_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                        <input type="text"   name="quantity_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="numeric quantity_field" readonly>  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center">
+                                        <input type="text" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="" id="total_quantity_amount" readonly>
+                                    </td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td class="employee_id" id="employee_id">FOC POUCHES</td>
+                                    
+                                    {% for product_variant in product_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                        <input type="text"  value="{% get_ho_report_foc product_variant.id %}" name="foc_quantity_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="numeric quantity_field foc_quantity" onkeyup="calculateFocQuantity();">  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    {% for product_variant in product_without_milk_variant_list %}
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                        <input type="text"   value="{% get_ho_report_foc product_variant.id %}" name="foc_quantity_{{product_variant.id}}" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="numeric quantity_field foc_quantity" onkeyup="calculateFocQuantity();">  
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    <td style="color:#ffff;background-color: #892cdc; text-align:center">
+                                        <input type="text" size="2" style="text-align: center; border: transparent; border-radius: 0.6rem; padding: 0.3rem 0.3rem 0.3rem 0.3rem; background: none; color: #ffff;" class="" id="foc_total_quantity"  readonly>
+                                    </td>
+                                    
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    $(document).ready(function(){
+        calculateProductVariantQty();
+        calculateTotalQuantityAmount();
+        calculateFocQuantity();
+    });
+    
+    $(document).ready(function(){
+        {% for current_user in users %}
+        calculateEmployeeAmount("{{current_user.id}}")
+        {% endfor %}
+    });
+    
+    function calculateProductVariantQty(){
+        {% for product_variant in product_variants %}
+        var total_{{product_variant.id}} = 0;
+        $(".product_quantity_{{product_variant.id}}").each(function(){
+            
+            if($(this).val() > 0){
+                total_{{product_variant.id}} = total_{{product_variant.id}} + parseInt($(this).val());
+            }
+            
+        });
+        $("[name='quantity_{{product_variant.id}}']").val(total_{{product_variant.id}});
+        {% endfor %}
+    }
+    
+    
+    function calculateEmployeeAmount(employee_id){
+        total = 0;
+        $('.quantity_'+employee_id).each(function(){
+            if($(this).val() > 0){
+                if($(this).prev().val() > 0){
+                    total = total + parseFloat(parseInt($(this).val()) * parseFloat($(this).prev().val()));
+                }
+            }
+        });
+        $('#employee_total_'+employee_id).val(total.toFixed(2));
+        calculateProductVariantQty();
+        calculateTotalQuantityAmount();
+    }
+    
+    function calculateTotalQuantityAmount(){
+        total = 0;
+        {% for current_user in users %}
+        if($('#employee_total_{{current_user.id}}').val() > 0){
+            total = total + parseFloat($('#employee_total_{{current_user.id}}').val());
+        }
+        {% endfor %}
+        $('#total_quantity_amount').val(total.toFixed(2));
+    }
+    
+    function calculateFocQuantity(){
+        total = 0;
+        $('.foc_quantity').each(function(){
+            if($(this).val() > 0){
+                total = total + parseInt($(this).val());
+            }
+        });
+        $('#foc_total_quantity').val(total);
+    }
+    
+    
+    function exportExcel(){
+        window.location.href = "{% url 'src:export-ho-report' %}";
+    }
+    function edit(){
+        $('#editBtn').hide();
+        $('#updateBtn').show();
+        $('#cancelBtn').show();
+        $('.quantity_field').css('border','1px solid lightgrey');
+        $('.quantity_field').css('background','#fff');
+        $('.quantity_field').css('border-radius','0.6rem');
+        $('.quantity_field').css('padding',' 0.3rem 0.3rem 0.3rem 0.3rem');
+        $('.quantity_field').css('color','#00000');
+        $('.quantity_field').removeAttr('readonly')
+        
+    }
+    function cancel(){
+        $('#updateBtn').hide();
+        $('#cancelBtn').hide();
+        $('#editBtn').show();
+        $('.quantity_field').css('border','transparent');
+        $('.quantity_field').css('background','none');
+        $('.quantity_field').css('border-radius','0.6rem');
+        $('.quantity_field').css('padding',' 0.3rem 0.3rem 0.3rem 0.3rem');
+        $('.quantity_field').css('color','#ffff');
+        $('.quantity_field').attr('readonly','readonly')
+    }
+    function updateReport(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-ho-report' %}",
+            method: 'POST',
+            data: $('#hoReportForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        $('#updateBtn').hide();
+                        $('#cancelBtn').hide();
+                        $('#editBtn').show();
+                        $('.quantity_field').css('border','transparent');
+                        $('.quantity_field').css('background','none');
+                        $('.quantity_field').css('border-radius','0.6rem');
+                        $('.quantity_field').css('padding',' 0.3rem 0.3rem 0.3rem 0.3rem');
+                        $('.quantity_field').css('color','#ffff');
+                        $('.quantity_field').attr('readonly','readonly')
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+    };
+    
+    $(document).ready(function () {
+        $('#employee_id').addClass("frezedCell").addClass("sorter-false");
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                // resizable_widths: ["30px","14.5%", "13.5%", "10.5%", "11.5%", "13.5%", "12%", "16%", "13%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        $(".deptRow").click(function () {
+            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+        });
+        
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        colNo = 1;
+        colid = 'employee_id';
+        // $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+        });
+        $("#addOrgTable thead tr").each(function (index) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("sorter-false");
+            $("#employee_id").addClass("frezedCell");
+            $("#employee_id").addClass("sorter-false");
+        });
+        
+        $('#' + colid + ' #freeze').show();
+        $('#' + colid + ' #unfreeze').hide();
+        
+        
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+</script>
+{% endblock %}

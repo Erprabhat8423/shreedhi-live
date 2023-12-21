@@ -1,0 +1,830 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+    .table td, .table th{
+        padding:0.65rem!important;
+    }
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-3 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-9 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <input class="search searchTable" style="width: 30%;" placeholder="Search" type="search" name="search" id="order_search" data-column="all" >
+                            <button type="button" class="btn iconBox iconAddvehicle" onclick="addVehicle()" ></button>
+                            <!--<div class="dropdown" style="display: inline-block;">-->
+                            <!--    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"-->
+                            <!--    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>-->
+                            <!--    <div class="dropdown-menu dropdown-menu-right logoutContainer"-->
+                            <!--    aria-labelledby="dropdownMenuButton">-->
+                                
+                            <!--    <input type="hidden" name="show_columns" id="show_columns" value="" >-->
+                            <!--    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img-->
+                            <!--        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>-->
+                            <!--        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                            <!--            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                            <!--        </div>-->
+                            <!--    </div>-->
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="registration_number" id="registration_number" data-id="1"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="registration_number">Registration no.</label>
+                                    </a>
+                                    
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="assigned_driver" id="assigned_driver" data-id="4"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="assigned_driver">Assigned Driver</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="assigned_route" id="assigned_route" data-id="4"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="assigned_route">Route</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="standard_mileage" id="standard_mileage" data-id="4"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="standard_mileage">Statndard Mileage</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="registration_number" id="lock_registration_number" data-id="1"
+                                    onclick="toggleFreeze(this.id,'registration_number',1)" />
+                                    <label class="mb-0" for="lock_registration_number">Registration no.</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="assigned_driver" id="lock_assigned_driver" data-id="4"
+                                    onclick="toggleFreeze(this.id,'assigned_driver',7)" />
+                                    <label class="mb-0" for="lock_assigned_driver">Assigned Driver</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="assigned_route" id="lock_assigned_route" data-id="4"
+                                    onclick="toggleFreeze(this.id,'assigned_route',7)" />
+                                    <label class="mb-0" for="lock_assigned_route">Route</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="standard_mileage" id="lock_standard_mileage" data-id="4"
+                                    onclick="toggleFreeze(this.id,'standard_mileage',7)" />
+                                    <label class="mb-0" for="lock_standard_mileage">Standard Mileage</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="registration_number" id="registration_number">
+                            Registration no.
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                        <th class="assigned_driver" id="assigned_driver">Assigned Driver<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                        <th class="standard_mileage" id="standard_mileage">Contact <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            Number
+                        </th>
+
+                        <th class="assigned_route" id="assigned_route">Route<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                        
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                
+                <tbody id="tablebody">
+                    {% if vehicles %}
+                    {% for vehicle in vehicles %}
+                    <tr {% if forloop.first %} class="odd selected" {% endif %}>
+                        <td class="registration_number" onclick="getVehicleDetails('{{ vehicle.id }}')">{% if vehicle.registration_number is not None %}{{vehicle.registration_number}} {%endif%}<br>{% if vehicle.maker_classification is not None %}{{vehicle.color}} {%endif%}</td>
+                        <td class="assigned_driver" onclick="getVehicleDetails('{{ vehicle.id }}')">{%if vehicle.driver_name is not None %}{{ vehicle.driver_name }}{% else %}-{% endif %}</td>
+                        <td class="contact_number" onclick="getVehicleDetails('{{ vehicle.id }}')">{%if vehicle.contact_number is not None %}{{ vehicle.contact_number }}{% else %}-{% endif %}</td>
+                        <td class="route_name" onclick="getVehicleDetails('{{ vehicle.id }}')">{%if vehicle.route_name is not None %}{{ vehicle.route_name }}{% else %}-{% endif %}</td>
+                        <td>
+                            <div class="row">
+                                
+                                <div class="col-md-12" style="display: inherit;">
+
+
+
+                                   <!--<a href="javascript:void(0)"-->
+                                   <!-- onclick="RegistrationList('{{ vehicle.id }}')" title="Vehicle Details" >-->
+                                       <!--<img src="{% static 'img/svg/changePassword.svg' %}" />-->
+                                   <!--    <i class="fa fa-gear"></i>-->
+                                   <!--    </a>-->
+                                   <!-- &nbsp; &nbsp;-->
+                                    
+                                    <a href="javascript:void(0)"
+                                    onclick="editVehicleBasic('{{ vehicle.id }}')"  title="Edit Vehicle Details" ><img
+                                    src="{% static 'img/svg/editcopy.svg' %}" /></a>
+                                    &nbsp; &nbsp;
+
+
+                                    <a href="javascript:void(0)"
+                                    onclick="editVehicleRoute('{{ vehicle.id }}')"  title="Edit Route and Driver Details" ><img
+                                    src="{% static 'img/svg/order/route.svg' %}" /></a> 
+                                    &nbsp; &nbsp;
+                                    
+                                    <a href="javascript:void(0)"
+                                    onclick="editVehicleCredential('{{ vehicle.id }}')"  title="Change Password" ><img
+                                    src="{% static 'img/svg/changePassword.svg' %}" /></a>
+                                    &nbsp; &nbsp;
+                                    
+                                    <label class="switch"  title="Change Status" > 
+                                        <input type="checkbox" class="checkbox" name="is_active"
+                                        id="is_active_{{ vehicle.id }}"
+                                        {% if vehicle.status == 1 %} checked="" {% else %}
+                                        {% endif %}
+                                        onclick="updateVehicleStatus('{{ vehicle.id }}', '{{ vehicle.status }}')">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        {% if vehicles %}
+        <div class="col-12 p-0 col-md-12 p-md-0">
+            <div class="row">
+                <div class="col-md-2 p-md-0">
+                    {% if first_vehicle.vehicle_pic is None or first_vehicle.vehicle_pic == 'None' %}
+                    <img src="/static/img/png/default_app_icon.png" style="width: 100%; height: 50px;">
+                    {% else %}
+                    <img src="{{first_vehicle.vehicle_pic}}" style="width:100%; height: 50px;">
+                    {% endif %}
+                </div>
+                <div class="col-9 p-0 col-md-9 p-md-0">
+                    <div class="row">
+                        <div class="col-9 col-md-9">
+                            <h5 class="m-0"><b style="color: #009cff;">{{first_vehicle.registration_number}} </b></h5>
+                            <h6 class="m-0">{% if first_vehicle.maker_classification is not None %}{{first_vehicle.maker_classification}} {%endif%}{% if first_vehicle.maker_classification is not None %}{{first_vehicle.color}} {%endif%}</h6>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-4">
+                    <div class="row mb-md-2">
+                        <div class="col-8 p-0 col-md-8 p-md-0">
+                            <div class="row">
+                                
+                                
+                                <div class="col-12 p-0 col-md-12 p-md-0 mt-0">
+                                    <div class="row">
+                                        <div class="col-1 p-0 col-md-1 p-md-0">
+                                            <img src="/static/img/svg/address.svg" class="profileIconSize">
+                                        </div>
+                                        <div class="col-11 p-0 col-md-11 p-md-0">
+                                            <h6 class="smallText">Registered Address</h6>
+                                            <h6 class="largeText">{% if first_vehicle.registered_address %} {{first_vehicle.registered_address}} {% else %} - {% endif %}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    {% if first_vehicle.ownership_type  == "First Hand" %}
+                    <div class="row mb-2 row mt-3 mb-md-2 row mt-md-3">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/org.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Ownership Type</h6>
+                                    <h6 class="largeText">{% if first_vehicle.ownership_type %} {{first_vehicle.ownership_type}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/depart_no.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Dealer Name</h6>
+                                    <h6 class="largeText">{% if first_vehicle.dealer_name %} {{first_vehicle.dealer_name}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-md-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Dealer Contact No.</h6>
+                                    <h6 class="largeText">{% if first_vehicle.dealer_contact_no %} {{first_vehicle.dealer_contact_no}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Dealer Address</h6>
+                                    <h6 class="largeText">{% if first_vehicle.dealer_address %} {{first_vehicle.dealer_address}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    
+                    
+                    <div class="row mb-2 row mt-3 mb-md-2 row mt-md-3">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/org.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Ownership Type</h6>
+                                    <h6 class="largeText">{% if first_vehicle.ownership_type %} {{first_vehicle.ownership_type}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/depart_no.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Dealer Name</h6>
+                                    <h6 class="largeText">{% if first_vehicle.owner_name %} {{first_vehicle.owner_name}} {% else %} - {% endif %} </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-md-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Owner Contact No.</h6>
+                                    <h6 class="largeText">{% if first_vehicle.owner_contact_no %} {{first_vehicle.owner_contact_no}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Dealer Address</h6>
+                                    <h6 class="largeText">{% if first_vehicle.owner_address %} {{first_vehicle.owner_address}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    
+                    <div class="row mb-md-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Fuel Type</h6>
+                                    <h6 class="largeText">{% if first_vehicle.vehicle_fuel_type %} {{first_vehicle.vehicle_fuel_type}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Vehicle type</h6>
+                                    <h6 class="largeText">{% if first_vehicle.vehicle_type %} {{first_vehicle.vehicle_type}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row mb-md-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/route.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Route</h6>
+                                    <h6 class="largeText">{% if first_vehicle.route_name %} {{first_vehicle.route_name}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="/static/img/svg/role.svg" class="profileIconSize">
+                                </div>
+                                <div class="col-6 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Driver</h6>
+                                    <h6 class="largeText">{% if first_vehicle.driver_name %} {{first_vehicle.driver_name}} {% else %} - {% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: red;">No Record Found...</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" style="display: none;">
+    
+</div>
+
+
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+
+<script>
+    
+    
+    function addVehicle() {
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-vehicle-basic' %}",
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editVehicleBasic(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-vehicle-basic' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editVehicleRoute(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-vehicle-route' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editVehicleCredential(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-vehicle-credential' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+    function RegistrationList(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:vehicle-registration-list' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    
+    function editVehicleRegistration(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-vehicle-registration' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editVehicleOther(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-vehicle-other' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    
+    
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["20%","20%","20%","15%","25%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["order_id","distributor_ss","shift","route","amount","status","order_date"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked"));              
+    });
+    //deselect "checked all", if one of the listed checkbox product is unchecked amd select "checked all" if all of the listed checkbox product is checked
+    $('.checkbox').change(function(){ //".checkbox" change 
+    if($('.checkbox:checked').length == $('.checkbox').length){
+        $('.checked_all').prop('checked',true);
+    }else{
+        $('.checked_all').prop('checked',false);
+    }
+    console.log($('.checkbox:checked').length);
+});
+
+
+function updateVehicleStatus(id, active_status) {
+    if ($('#is_active_' + id).prop("checked") == true) {
+        is_active = 1;
+        status = 'Unblock';
+    } else {
+        is_active = 0;  
+        status = 'Block';
+    }
+    
+    $.ajax({
+        url: "{% url 'src:update-vehicle-status' %}",
+        method: 'POST',
+        data: {
+            id: id,
+            is_active: is_active,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (data) {
+            if (data.error == false) {
+                hideLoader();
+                openToaster("success", data.message);
+            }
+        },
+        error: function (err) {
+            console.log(err)
+        }
+    });
+}
+
+
+function getVehicleDetails(id) {
+    $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+        //showLoader();
+        url = "{% url 'src:vehicle-short-details' '1' %}";
+        url = url.replace('1',id)
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                $('#detailsBox').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+
+    function viewUserDetails(user_id){
+        showLoader();
+        var url = "{% url 'src:user-details' 1 %}";
+        url = url.replace(1,user_id);
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $('#viewUserModal').html(data);
+                $('#viewUserModal').show();
+                
+                var mch = $(".modal-ViewEmployee").height() - $("#headerViewEmployee").outerHeight();
+                $("#viewEmpModalBody").height(mch);
+                changeInfoTab('basic')
+                
+                
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        });
+    }
+    
+    
+</script>
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

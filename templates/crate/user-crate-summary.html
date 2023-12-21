@@ -1,0 +1,173 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="inputField selectField" name="user_id" id="user_id" onchange="getCratesReport()">
+                                        {% if user_list %}
+                                        {% for user in user_list %}
+                                        <option value="{{ user.id }}">{{ user.emp_sap_id }}({{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}/{{ user.store_name }})</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option value="">Select SAP ID</option>
+                                        {% endif %}
+                                        
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="inputField selectField" name="crate_type" id="crate_type" onchange="getCratesReport()">
+                                        <option value="normal" selected>Normal</option>
+                                        <option value="jumbo">Jumbo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input class="inputField" placeholder="Order Date" name="crate_date" id="crate_date_picker" value="{{ today_date }}" onchange="getCratesReport()" readonly>
+                                </div>
+                                <div class="col-md-3">
+                                    <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;"> Sr. No. </th>
+                                <th style="text-align: center;"> Date  </th>
+                                <th style="text-align: center;"> Dispatched from Plant  </th>
+                                <th style="text-align: center;"> Return to Vehicle  </th>
+                                <th style="text-align: center;"> Deposit in Plant  </th>
+                                <th style="text-align: center;"> Difference with Vehicle  </th>
+                                <th style="text-align: center;"> Difference with Party  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center; font-weight: bold">Opening</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center; font-weight: bold">{{ opening_crates }}</td>
+                            </tr>
+                            {% if crate_lists %}
+                            {% for crate in crate_lists %}
+                            <tr>
+                                <td style="text-align: center;">{{forloop.counter}}.</td>
+                                <td style="text-align: center;">{{ crate.month_date }}</td>
+                                <td style="text-align: center;">{{ crate.dispatch }}</td>
+                                <td style="text-align: center;">{{ crate.return_to_plant }}</td>
+                                <td style="text-align: center;">{{ crate.plant }}</td>
+                                <td style="text-align: center;">{{ crate.difference_with_vehicle }}</td>
+                                <td style="text-align: center;">{{ crate.crate_difference }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <th style="text-align: center;"></th>
+                                <th style="text-align: center;">Total</th>
+                                <th style="text-align: center;">{{ total_dispatch }}</th>
+                                <th style="text-align: center;">{{ total_return_to_plant }}</th>
+                                <th style="text-align: center;">{{ total_plant }}</th>
+                                <th style="text-align: center;">{{ total_difference_with_vehicle }}</th>
+                                <th style="text-align: center;">{{ last_opening_balance }}</th>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script>
+    function generateIndentReport(id){
+        $.ajax({
+            url: "{% url 'src:generate-indent-report' %}",
+            method: 'GET',
+            data: { id:id },
+            success: function (data) {
+                console.log(data)
+                if(data.error == true){
+                    openToaster(data.error_type, data.message);
+                }else{
+                    openToaster(data.error_type, data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            },
+            error: function (err) {
+                err = JSON.parse(err);
+                console.log(err.message);
+                window.location.reload();
+            }
+        });
+    };
+    function getCratesReport(){
+        var crate_date      = $('#crate_date_picker').val();
+        var crate_type      = $('#crate_type').val();
+        var user_id         = $('#user_id').val();
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-user-crate-summary' %}",
+                method: 'GET',
+                data: { crate_date:crate_date, crate_type:crate_type, user_id:user_id },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $("#crate_date_picker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                dateFormat: 'mm/yy' 
+            });
+        });
+        function exportsInExcel(){
+            var crate_date      = $('#crate_date_picker').val();
+            var crate_type      = $('#crate_type').val();
+            var user_id         = $('#user_id').val();
+            if(crate_date){ 
+                crate_date = crate_date.split('/');
+                crate_date = crate_date[0]+'-'+crate_date[1]
+            }else{ crate_date = '0' }
+            var url = "{% url 'src:export-user-crate-summary' 'crate_date' 'crate_type'  'user_id' %}";
+            url = url.replace('crate_date',crate_date).replace('crate_type',crate_type).replace('user_id',user_id);
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

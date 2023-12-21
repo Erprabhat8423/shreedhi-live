@@ -1,0 +1,59 @@
+{% load static %}
+{% if employee_users %}
+{% for user in employee_users %}
+<tr class="odd">
+    <td class="employee_name" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.first_name %} {{ user.first_name }} {% if user.middle_name %} {{ user.middle_name }} {% endif %} {% if user.last_name %} {{ user.last_name }} {% endif %} {% else %} - {% endif %}</td>
+    <td class="employee_role" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.role_name %} {{ user.role_name }} {% else %} - {% endif %}</td>
+    <td class="employee_dep_org" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.department_name %} {{ user.department_name }} {% else %} - {% endif %}/{% if user.organization_name %} {{ user.organization_name }} {% else %} - {% endif %}</td>
+    <!-- <td class="employee_platform" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.last_login is not None %}{% if user.device_id is None %}Web{% else %}App{% endif %}{% else %}-{% endif %}</td> -->
+    <td class="employee_last_sign_in" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.last_login %} {{ user.last_login }} {% else %} - {% endif %}{% if user.last_login is not None %}{% if user.device_id is None %}(Web){% else %}(App){% endif %}{% else %}{% endif %}</td>
+    <td width="20%">
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" onclick="editEmployeeBasicDetail('{{user.id}}')" />
+                <a href="javascript:void(0)"onclick="resetUserPassword('{{ user.id }}')" style="margin-right: 9px;">
+                    <img src="{% static 'img/svg/changePassword.svg' %}" />
+                </a>
+                <a href="javascript:void(0)" onclick="userTracking('{{ user.id }}')" title="User Tracking">
+                    <img src="{% static 'img/svg/order/route.svg' %}" /></a> 
+                    &nbsp; &nbsp;
+                <div class="labelContainerOP">
+                    <label class="switch" title="{% if user.status == 1 %} Enabled {% else %} Disabled
+                    {% endif %}">
+                        <input type="checkbox" class="checkbox" name="is_active"
+                        id="is_active_{{ user.id }}"
+                        {% if user.status == 1 %} checked="" {% else %}
+                        {% endif %}
+                        onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'employee')">
+                        <span class="slider round"></span>
+                    </label>
+                    &nbsp; &nbsp;    
+                    <label class="switch" title="Purchase milk from Jaipure">
+                        <input type="checkbox" class="checkbox" name="is_active"
+                        id="is_user_active_{{ user.id }}" 
+                        {% if user.purchase_milk_from_org == 1 %} checked="" {% else %}
+                        {% endif %}
+                        onclick="updateUserStatus('{{ user.id }}', '{{ user.purchase_milk_from_org }}', 'employee')">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+{% if page_loading_type == '1' %}
+<tr id="employee_loading" style="display: none;">
+    <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+    </td>
+</tr>
+{% endif %}
+{% else %}
+<tr>
+    <td colspan="5" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+<script>
+    $('#employee_total_pages').val('{{employee_total_pages}}');
+</script>

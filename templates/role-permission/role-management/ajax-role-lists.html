@@ -1,0 +1,36 @@
+{% load static %}
+{% for organization in organizations %}
+    <tr onclick="getOrganizationRecord({{ organization.id }})" >
+        <td class="org_name">{{ organization.organization_name }}</td>
+        <td class="landline_no">
+            {% if organization.land_line_code %}{{ organization.land_line_code }}{% endif %}
+            {% if organization.phone_code %}{{ organization.phone_code }}{% endif %}
+            {% if organization.landline_no %}{{ organization.landline_no }}
+            {% else %} - {% endif %}</td>
+        <td class="mobile_no">
+            {% if organization.mobile_code %}{{ organization.mobile_code }}{% endif %}
+            {% if organization.mobile_no %}{{ organization.mobile_no }}
+            {% else %} - {% endif %}</td>
+        <td class="email_id">{% if organization.email_id %}{{ organization.email_id }}
+            {% else %} - {% endif %}</td>
+        <td>
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="javascript:void(0)"
+                        onclick="editOrganization({{ organization.id }})" data-toggle="modal"
+                        data-target="#addOrganisationModal"><img
+                            src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                <div class="col-md-5">
+                    <label class="switch">
+                        <input type="checkbox" class="checkbox" name="is_active"
+                            id="is_active_{{ organization.id }}"
+                            {% if organization.is_active == 1 %} checked="" {% else %}
+                            {% endif %}
+                            onclick="updateOrganizationStatus({{ organization.id }}, {{ organization.is_active }})">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}

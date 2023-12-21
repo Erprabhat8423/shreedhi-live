@@ -1,0 +1,16 @@
+<table>
+    <thead>
+        <tr>
+            <th>More than</th>
+            <th>Incentive amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bifurcation in bifurcations %}
+        <tr>
+            <td>{{bifurcation.above_upto_quantity}}</td>
+            <td>{{bifurcation.incentive_amount}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

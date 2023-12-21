@@ -1,0 +1,2383 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/roles&permission.css' %}">
+
+<style>
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    
+</style>
+
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-2 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                    <h6 style="margin-top:5%;" id = "distributor_count"><b>Total Distributor&nbsp;:&nbsp;<b id="total_count">{{usercount}}</b> </b></h6>
+                </div>
+                <div class="col-md-10 p-md-0">
+                    <div class="row">
+                        <div class="col-md-10 offset-md-2 p-md-0">
+                            <ul class="tabBar pull-right p-0 marginTop1rem" id="userTabBar">
+                                <li class="customisedTab3 activeTab" id="operational" onclick="handleUserTabChange(this,'operationalBlock','operationalTable', 'operational')">Operational</li>
+                                <li class="customisedTab3" id="nonoperational" onclick="handleUserTabChange(this,'nonoperationalBlock','nonOperationalTable', 'nonoperational')">Non-operational </li>
+                                <li class="customisedTab3" id="employees" onclick="handleUserTabChange(this,'employeesBlock','employeeTable', 'employees')">Employees</li>
+                            </ul> 
+                        </div>
+                    </div>
+                    <div class="row mb-2 mt-2 action_section " id="operationalBlock"> 
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField" style="width: 34% !important; padding: 0.3rem;height:2.4rem;" placeholder="Search" type="text" name="operational_search" id="operational_search" onkeyup="ajaxOperationalUserList('1')">
+                            <select class="inputField selectField" style="width: 30% !important; padding: 0.3rem;height:2.4rem; text-align:left !important;" name="Organisation" id="Organisation" onchange="ajaxOperationalUserList(1)">
+                                <option value="" style="text-align:left !important;">Select Organization&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                {% for oganization in oganizations %}
+                                <option value="{{oganization.id}}">{{oganization.organization_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn iconBox iconAddUser" onclick="addUser()" style="height:2.4rem;"></button>
+
+                            <a onclick="locateUsersOnMap()" href="javascript:void(0)">
+								<img src="{% static 'img/svg/locateUser.svg' %}" style="height: 25px;"> 
+							</a>
+                            
+                            <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exportsOperational('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <!--<a class="dropdown-item logoutItem" onclick="exportsOperational('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                                    <!--    src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                                    </div>
+                                </div>
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="sap_id" id="sap_id" data-id="1"
+                                        onclick="showHideColumns('operationalBlock', this.id,1)"
+                                        />
+                                        <label class="mb-0" for="sap_id">SAP ID</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="store_name" id="store_name" data-id="2"
+                                        onclick="showHideColumns('operationalBlock', this.id,2)"
+                                        />
+                                        <label class="mb-0" for="store_name">Store Name</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="role" id="role" data-id="3"
+                                        onclick="showHideColumns('operationalBlock', this.id, 3)"
+                                        />
+                                        <label class="mb-0" for="role">Role</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="contact_person" id="contact_person" data-id="4"
+                                        onclick="showHideColumns('operationalBlock', this.id, 4)"
+                                        />
+                                        <label class="mb-0" for="contact_person">Contact Person</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="contact_no" id="contact_no" data-id="5"
+                                        onclick="showHideColumns('operationalBlock', this.id, 5)"
+                                        />
+                                        <label class="mb-0" for="contact_no">Contact No.</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="outstanding_amount" id="outstanding_amount" data-id="6"
+                                        onclick="showHideColumns('operationalBlock', this.id, 6)"
+                                        />
+                                        <label class="mb-0" for="outstanding_amount">Outstanding Amt.</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="sap_id" id="lock_sap_id" data-id="1"
+                                    onclick="toggleFreeze('addOrgTable', this.id,'sap_id',1)" />
+                                    <label class="mb-0" for="lock_sap_id">SAP ID</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="store_name" id="lock_store_name" data-id="2"
+                                    onclick="toggleFreeze('addOrgTable', this.id,'store_name',2)" />
+                                    <label class="mb-0" for="lock_store_name">Store Name</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="role"
+                                    id="lock_role" data-id="3" 
+                                    onclick="toggleFreeze('addOrgTable', this.id,'role',3)" />
+                                    <label class="mb-0" for="lock_role">Role.</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="contact_person"
+                                    id="lock_contact_person" data-id="4"  
+                                    onclick="toggleFreeze('addOrgTable', this.id,'contact_person',4)" />
+                                    <label class="mb-0" for="lock_contact_person">Contact Person.</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="contact_no" id="lock_contact_no" data-id="5"
+                                    onclick="toggleFreeze('addOrgTable', this.id,'contact_no',5)" />
+                                    <label class="mb-0" for="lock_contact_no">Contact No.</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="outstanding_amount" id="lock_outstanding_amount" data-id="6"
+                                    onclick="toggleFreeze('addOrgTable', this.id,'outstanding_amount',6)" />
+                                    <label class="mb-0" for="lock_outstanding_amount">Outstanding Amount</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-2 mt-2 action_section " id="nonoperationalBlock" style="display: none;"> 
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="inputField" style="width: 40% !important; padding: 0.3rem;" placeholder="Search" type="text" name="non_operational_search" id="non_operational_search" onkeyup="ajaxNonOperationalUserList('1')">
+                        
+                        <div class="dropdown" style="display: inline-block;">
+                            <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <input type="hidden" name="non_show_columns" id="non_show_columns" value="" >
+                            <a class="dropdown-item logoutItem" onclick="exportsNonOperational('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                <a class="dropdown-item logoutItem" onclick="exportsNonOperational('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                </div>
+                            </div>
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="non_store_name" id="non_store_name" data-id="1"
+                                    onclick="showHideColumns('nonoperationalBlock', this.id, 1)"
+                                    />
+                                    <label class="mb-0" for="non_store_name">Store Name</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="non_role" id="non_role" data-id="2"
+                                    onclick="showHideColumns('nonoperationalBlock', this.id, 2)"
+                                    />
+                                    <label class="mb-0" for="non_role">Role</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="non_contact_person" id="non_contact_person" data-id="3"
+                                    onclick="showHideColumns('nonoperationalBlock', this.id, 3)"
+                                    />
+                                    <label class="mb-0" for="non_contact_person">Contact Person</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="non_contact_no" id="non_contact_no" data-id="4"
+                                    onclick="showHideColumns('nonoperationalBlock', this.id, 4)"
+                                    />
+                                    <label class="mb-0" for="non_contact_no">Contact No.</label>
+                                </a>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="non_store_name" id="lock_non_store_name" data-id="1"
+                                onclick="toggleFreeze('addNonOperationalTable', this.id,'non_store_name',1)" />
+                                <label class="mb-0" for="lock_non_store_name">Store Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="non_role"
+                                id="lock_non_role" data-id="2" 
+                                onclick="toggleFreeze('addNonOperationalTable', this.id,'non_role',2)" />
+                                <label class="mb-0" for="lock_non_role">Role</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="non_contact_person"
+                                id="lock_non_contact_person" data-id="3"  
+                                onclick="toggleFreeze('addNonOperationalTable', this.id,'non_contact_person',3)" />
+                                <label class="mb-0" for="lock_non_contact_person">Contact Person.</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="non_contact_no" id="lock_non_contact_no" data-id="4"
+                                onclick="toggleFreeze('addNonOperationalTable', this.id,'non_contact_no',4)" />
+                                <label class="mb-0" for="lock_non_contact_no">Contact No.</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-2 mt-2 action_section " id="employeesBlock" style="display: none;"> 
+                <div class="col-md-12 p-md-0">
+                    <input class="inputField" style="width: 47% !important; padding: 0.3rem;height:2.4rem;" placeholder="Search" type="text" name="employee_search" id="employee_search" onkeyup="ajaxEmployeeList('1')">
+                    <select class="inputField selectField" style="width: 20% !important; padding: 0.3rem;height:2.4rem;" name="role_id" id="role_id" onchange="ajaxEmployeeList('1')">
+                        <option value="">Select Role</option>
+                        {% for role in ho_roles %}
+                        <option value="{{role.id}}">{{role.role_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn iconBox iconAddEmployee"  onclick="addEmployee()" style="height:2.4rem;"></button>
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        
+                        <input type="hidden" name="employee_show_columns" id="employee_show_columns" value="" >
+                        <a class="dropdown-item logoutItem" onclick="exportsEmployeeOperational('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                            src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                            <a class="dropdown-item logoutItem" onclick="exportsEmployeeOperational('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                            </div>
+                        </div>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_name" id="employee_name" data-id="1"
+                                onclick="showHideColumns('employeesBlock', this.id, 1)"
+                                />
+                                <label class="mb-0" for="employee_name">Name</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_role" id="employee_role" data-id="2"
+                                onclick="showHideColumns('employeesBlock', this.id, 2)"
+                                />
+                                <label class="mb-0" for="employee_role">Role</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_dep_org" id="employee_dep_org" data-id="3"
+                                onclick="showHideColumns('employeesBlock', this.id, 3)"
+                                />
+                                <label class="mb-0" for="employee_dep_org">Dept./Org.</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_platform" id="employee_platform" data-id="4"
+                                onclick="showHideColumns('employeesBlock', this.id, 4)"
+                                />
+                                <label class="mb-0" for="employee_platform">Platform(web/mobile)</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_last_sign_in" id="employee_last_sign_in" data-id="4"
+                                onclick="showHideColumns('employeesBlock', this.id, 5)"
+                                />
+                                <label class="mb-0" for="employee_last_sign_in">Last Login</label>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_name" id="lock_employee_name" data-id="1"
+                            onclick="toggleFreeze('addEmployeeTable', this.id,'employee_name',1)" />
+                            <label class="mb-0" for="lock_employee_name">Name</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_role"
+                            id="lock_employee_role" data-id="2" 
+                            onclick="toggleFreeze('addEmployeeTable', this.id,'employee_role',2)" />
+                            <label class="mb-0" for="lock_employee_role">Role</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_dep_org"
+                            id="lock_employee_dep_org" data-id="3"  
+                            onclick="toggleFreeze('addEmployeeTable', this.id,'employee_dep_org',3)" />
+                            <label class="mb-0" for="lock_employee_dep_org">Dept./Org.</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_platform" id="lock_employee_platform" data-id="4"
+                            onclick="toggleFreeze('addEmployeeTable', this.id,'employee_platform',4)" />
+                            <label class="mb-0" for="lock_employee_platform">Platform(web/mobile)</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="employee_last_sign_in" id="lock_employee_last_sign_in" data-id="4"
+                            onclick="toggleFreeze('addEmployeeTable', this.id,'employee_last_sign_in',5)" />
+                            <label class="mb-0" for="lock_employee_last_sign_in">Last Login</label>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+</div>
+<div class="row userTable tableBox" id="operationalTable">
+    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+        <input type="hidden" name="page" id="page" value="2" />
+        <input type="hidden" name="page_status" id="page_status" value="0" />
+        <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+        <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="sap_id" id="sap_id">
+                    SAP ID
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="store_name" id="store_name">
+                    Store Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="role" id="role">Role<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="contact_person" id="contact_person">Contact Person<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="contact_no" id="contact_no">Contact No.<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="outstanding_amount" id="outstanding_amount">Outstanding Amt.<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th width="20%">Action</th>
+            </tr>
+        </thead>
+        <tbody id="tablebody">
+            {% if users %}
+            {% for user in users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+                <td class="sap_id" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.emp_sap_id %}{{user.emp_sap_id}}{% endif %}</td>
+                <td class="store_name" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.store_name %} {{ user.store_name|capfirst }} {% else %} - {% endif %}</td>
+                <td class="role" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.role_name %} {{ user.role_name|capfirst }} {% else %} - {% endif %}</td>
+                <td class="contact_person" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.first_name %} {{ user.first_name|capfirst }} {% if user.middle_name %} {{ user.middle_name|capfirst }} {% endif %} {% if user.last_name %} {{ user.last_name|capfirst }} {% endif %} {% else %} - {% endif %}</td>
+                <td class="contact_no" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.primary_contact_number %} {{ user.primary_contact_number }} {% else %} - {% endif %}</td>
+                <td class="outstanding_amount" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.outstanding_amount.outstanding_amount %} {{ user.outstanding_amount.outstanding_amount }} {% else %} - {% endif %}</td>
+                <td width="20%">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            {% if user.is_tagged == 1 %}
+                            <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}')"><img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" /></a>
+                            {% else %}
+                            <img src="{% static 'img/svg/viewonmapgray.svg' %}" class="tableRowIcon" />
+                            {% endif %}
+                            <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                            <a href="javascript:void(0)"onclick="resetUserPassword('{{ user.id }}')" >
+                                <img src="{% static 'img/svg/changePassword.svg' %}" />
+                            </a>
+                            <a href="javascript:void(0)" onclick="perviousPage('{{ user.id }}', '1')"><img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" /></a>
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ user.id }}"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'operational')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="operational_loading" style="display: none;">
+                <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+<div class="row userTable tableBox" id="nonOperationalTable" style="display:none">
+    <div class="col-md-12 nonprimaryContainerBG h-100 p-0 commonNonOperationalTableBg" id="ajax-div">
+        <input type="hidden" name="non_page" id="non_page" value="2" />
+        <input type="hidden" name="non_page_status" id="non_page_status" value="0" />
+        <input type="hidden" name="non_total_pages" id="non_total_pages" value="{{ non_operational_total_pages }}" />
+        <table id="addNonOperationalTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="non_store_name" id="non_store_name">
+                    Store Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="non_role" id="non_role">Role<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="non_contact_person" id="non_contact_person">Contact Person<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="non_contact_no" id="non_contact_no">Contact No.<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th width="20%">Action</th>
+            </tr>
+        </thead>
+        <tbody id="nonoperational_tablebody">
+            {% if non_operational_users %}
+            {% for user in non_operational_users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+                <td class="non_store_name" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.store_name %} {{ user.store_name }} {% else %} - {% endif %}</td>
+                <td class="non_role" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.role_name %} {{ user.role_name }} {% else %} - {% endif %}</td>
+                <td class="non_contact_person" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.first_name %} {{ user.first_name }} {% if user.middle_name %} {{ user.middle_name }} {% endif %} {% if user.last_name %} {{ user.last_name }} {% endif %} {% else %} - {% endif %}</td>
+                <td class="non_contact_no" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.primary_contact_number %} {{ user.primary_contact_number }} {% else %} - {% endif %}</td>
+                <td width="20%">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            {% if user.is_tagged == 1 %}
+                            <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}')"><img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" /></a>
+                            {% else %}
+                            <img src="{% static 'img/svg/viewonmapgray.svg' %}" class="tableRowIcon" />
+                            {% endif %}
+                            <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ user.id }}"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'nonoperational')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="nonoperational_loading" style="display: none;">
+                <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+<div class="row userTable tableBox" id="employeeTable" style="display:none">
+    <div class="col-md-12 employeeprimaryContainerBG h-100 p-0 commonEmployeeTableBg" id="employee-ajax-div">
+        <input type="hidden" name="employee_page" id="employee_page" value="2" />
+        <input type="hidden" name="employee_page_status" id="employee_page_status" value="0" />
+        <input type="hidden" name="employee_total_pages" id="employee_total_pages" value="{{ employee_total_pages }}" />
+        <table id="addEmployeeTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="employee_name" id="employee_name">
+                    Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="employee_role" id="employee_role">Role<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="employee_dep_org" id="employee_dep_org">Dept./Org.<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <!-- <th class="employee_platform" id="employee_platform">Platform(web/mobile)<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th> -->
+                <th class="employee_last_sign_in" id="employee_last_sign_in">Last Login<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th width="20%">Action</th>
+            </tr>
+        </thead>
+        <tbody id="employee_tablebody">
+            {% if employee_users %}
+            {% for user in employee_users %}
+            <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                <td class="employee_name" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.first_name %} {{ user.first_name|capfirst }} {% if user.middle_name %} {{ user.middle_name|capfirst }} {% endif %} {% if user.last_name %} {{ user.last_name|capfirst }} {% endif %} {% else %} - {% endif %}</td>
+                <td class="employee_role" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.role_name %} {{ user.role_name|capfirst }} {% else %} - {% endif %}</td>
+                <td class="employee_dep_org" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.department_name %} {{ user.department_name|capfirst }} {% else %} - {% endif %}/{% if user.organization_name %} {{ user.organization_name|capfirst }} {% else %} - {% endif %}</td>
+                <!-- <td class="employee_platform" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.last_login is not None %}{% if user.device_id is None %}Web{% else %}App{% endif %}{% else %}-{% endif %}</td> -->
+                <td class="employee_last_sign_in" onclick="getEmpShortDetails('{{ user.id }}')">{% if user.last_login %} {{ user.last_login }} {% else %} - {% endif %}{% if user.last_login is not None %}{% if user.device_id is None %}(Web){% else %}(App){% endif %}{% else %}{% endif %}</td>
+                <td width="20%">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                            <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" onclick="editEmployeeBasicDetail('{{user.id}}')" />
+                            <a href="javascript:void(0)"onclick="resetUserPassword('{{ user.id }}')" style="margin-right: 9px;">
+                                <img src="{% static 'img/svg/changePassword.svg' %}" />
+                            </a>
+							<a href="javascript:void(0)" onclick="userTracking('{{ user.id }}')" title="User Tracking">
+								<img src="{% static 'img/svg/order/route.svg' %}" /></a> 
+                                &nbsp; &nbsp;
+                            <div class="labelContainerOP">
+                                <label class="switch" title="{% if user.status == 1 %} Enabled {% else %} Disabled
+                                {% endif %}">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ user.id }}"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'employee')">
+                                    <span class="slider round"></span>
+                                </label>
+                                &nbsp; &nbsp;    
+                                <label class="switch" title="Purchase milk from Jaipure">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_user_active_{{ user.id }}" 
+                                    {% if user.purchase_milk_from_org == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateUserStatus('{{ user.id }}', '{{ user.purchase_milk_from_org }}', 'employee')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="employee_loading" style="display: none;">
+                <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+</div>
+</div>
+
+
+<div class="col-12 mt-3 mb-3 col-md-4 mt-md-0 mb-md-0 h-100" id="">
+    <div class="primaryContainerBG h-100 operationalBlock short-details" id="ajaxUserShortDetail">
+        <div class="row" id="graphBox">
+            <div class="col-12 p-0 col-md-12 p-md-0">
+                <h6><b>Strength </b></h6>
+            </div>
+            <div class="col-12 p-0 mt-3 col-md-12 p-md-0 mt-md-3">
+                <div class="row mb-2 mb-md-2">
+                    <div id="container" class="barGraphLeft"></div>
+                </div>
+                <div class="dropdown-divider w-100"></div>
+                <div class="col-12 p-0 col-md-12 p-md-0">
+                    <div class="row mb-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <h6 class="m-0 mt-2 m-md-0 mt-md-2"><b>User Stats</b></h6>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-9 col-md-9">
+                            <div class="row mt-3">
+                                <div class="col-12 p-0 col-sm-12 p-md-0">
+                                    <div class="squareBlue"></div>
+                                    &nbsp;&nbsp; Distributers
+                                </div>
+                                <div class="col-12 p-0 col-sm-12 p-md-0">
+                                    <div class="squareOrange"></div>
+                                    &nbsp;&nbsp; Super stockist
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <svg viewBox="0 0 36 36" class="circular-chart orange">
+                                <path class="circle-bg" d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="orangepercent" class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="14" y="21.35" class="percentageBlue">{{total_distributor}}/</text><text x="24" y="22.35"
+                                class="percentageOrange">{{total_super_stockist}}</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <h6 class="m-md-0 mt-md-2"><b>Distributer/Superstockist</b></h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-9 col-md-9">
+                            <div class="row mt-3 mt-md-3">
+                                <div class="col-12 col-sm-12 p-0">
+                                    <div class="squareBlue"></div>
+                                    &nbsp;&nbsp; Tagged
+                                </div>
+                                <div class="col-12 col-sm-12 p-0">
+                                    <div class="squareGrey"></div>
+                                    &nbsp;&nbsp; Untagged
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-3">
+                            <svg viewBox="0 0 36 36" class="circular-chart grey">
+                                <path class="circle-bg" d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="greypercent" class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="14" y="21.35" class="percentageBlue">
+                                    {% sum total_tagged_distributor total_tagged_super_stockist as total_op_tagged %}
+                                    {% sum total_distributor total_super_stockist as total_op %}
+                                    {{ total_op_tagged }}
+                                    /</text><text x="24" y="22.35"
+                                    class="percentageGrey"> {% subtract total_op total_op_tagged %}</text>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+        
+        
+        <div class="nonprimaryContainerBG h-100 nonoperationalBlock short-details" id="ajaxNonOperationalUserShortDetail">
+            <div class="row">
+                <div class="col-md-12 p-md-0">
+                    <h6><b>Strength </b></h6>
+                </div>
+                <div class="col-md-12 p-md-0 mt-md-3">
+                    <div class="row mb-md-2">
+                        <div id="nonOperationalContainer" class="barGraphLeft"></div>
+                    </div>
+                    <div class="dropdown-divider w-100"></div>
+                    <div class="col-md-12 p-md-0">
+                        <div class="row mb-2">
+                            <div class="col-md-6 p-md-0">
+                                <h6 class="m-md-0 mt-md-2"><b>User Stats</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row mt-3">
+                                    <div class="col-sm-12 p-0">
+                                        <div class="squareBlue"></div>
+                                        &nbsp;&nbsp; Distributers
+                                    </div>
+                                    <div class="col-sm-12 p-0">
+                                        <div class="squareOrange"></div>
+                                        &nbsp;&nbsp; Retailers
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <svg viewBox="0 0 36 36" class="circular-chart orange">
+                                    <path class="circle-bg" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="14" y="21.35" class="percentageBlue">{{total_distributor}}/</text><text x="24" y="22.35"
+                                    class="percentageOrange">{{total_retailer}}</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6 p-md-0">
+                                <h6 class="m-md-0 mt-md-2"><b>Distributer/Superstockist</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row mt-3">
+                                    <div class="col-sm-12 p-0">
+                                        <div class="squareBlue"></div>
+                                        &nbsp;&nbsp; Tagged
+                                    </div>
+                                    <div class="col-sm-12 p-0">
+                                        <div class="squareGrey"></div>
+                                        &nbsp;&nbsp; Untagged
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <svg viewBox="0 0 36 36" class="circular-chart grey">
+                                    <path class="circle-bg" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="14" y="21.35" class="percentageBlue">{% sum total_tagged_distributor total_tagged_super_stockist as total_op_tagged %}
+                                        {% sum total_distributor total_super_stockist as total_op %}
+                                        {{ total_op_tagged }}
+                                        /</text><text x="24" y="22.35"
+                                        class="percentageGrey"> {% subtract total_op total_op_tagged %}</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="employeeprimaryContainerBG h-100 employeesBlock short-details" id="ajaxEmpShortDetails">
+                {% if first_employee %}
+                <div class="row" style="height: 85%;">
+                    <div class="col-md-12 p-0">
+                        <div class="row">
+                            <div class="col-md-2 p-md-0">
+                                {% if first_employee.profile_image and first_employee.profile_image != 'None' %}
+                                <img src="{{ first_employee.profile_image }}" style="width: 100%;">
+                                {% else %}
+                                <img src="{% static 'img/svg/profile.svg' %}" style="width: 100%; height: 60%;">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6><b>{{first_employee.first_name}} {{first_employee.middle_name}} {{first_employee.last_name}} </b></h6>
+                                        <h6 class="smallText"><span style="color: #0052a0;">{{first_employee.first_name}}</span> | {{first_employee.role_name | capfirst}}</h6>
+                                    </div>
+                                    <div class="col-md-4 p-md-0 text-right">
+                                        <h5>
+                                            {% if first_employee.device_id is None %}
+                                            WEB&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}">
+                                            {% else %}
+                                            APP&nbsp;&nbsp;<img src="{% static 'img/svg/mobile_no.svg' %}">
+                                            {% endif %}
+                                        </h5>
+                                        {% if first_employee.last_ip %}{{first_employee.last_ip}}{% endif %}
+                                    </div>
+                                </div>
+                                <br clear="all">
+                                <div class="row">
+                                    <div class="col-md-1 p-md-0">
+                                        <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-6 p-md-0">
+                                        <h6 class="smallText">Contact No.</h6>
+                                        <h6 class="largeText"> {{first_employee.primary_contact_number}}</h6>
+                                    </div>
+                                    <div class="col-md-5 p-md-0">
+                                        <h6 class="smallText">Employee Id</h6>
+                                        <h6 class="largeText"> {{first_employee.emp_sap_id}}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 p-md-0 mt-md-3">
+                                <div class="row mb-md-2">
+                                    <div class="col-md-3 p-md-0">
+                                        <div class="row">
+                                            <div class="col-md-2 p-md-0">
+                                                <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-10">
+                                                <h6 class="smallText">Gender</h6>
+                                                <h6 class="largeText">{{first_employee.gender | capfirst }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Email ID(Official)</h6>
+                                                <h6 class="largeText">{{ first_employee.official_email }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Blood Group</h6>
+                                                <h6 class="largeText">{% if first_employee.blood_group %}{{first_employee.blood_group}}{% else %}-{% endif %}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-md-2">
+                                    <div class="col-md-12 p-md-0">
+                                        <div class="row">
+                                            <div class="col-1 p-0">
+                                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-11 p-md-0">
+                                                <h6 class="smallText">Correspondance Address</h6>
+                                                <h6 class="largeText">{% if first_employee.address_line_1 %} {{first_employee.address_line_1}},{% endif %} {% if first_employee.address_line_2 %} {{first_employee.address_line_2}},{% endif %} {{first_employee.state_name}}, {{first_employee.country_name}},{{first_employee.pincode}}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-md-2">
+                                    <div class="col-md-12 p-md-0">
+                                        <div class="row">
+                                            <div class="col-1 p-0">
+                                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-11 p-md-0">
+                                                <h6 class="smallText">Permanent Address</h6>
+                                                <h6 class="largeText">{% if first_employee_permanent_address.address_line_1 %} {{first_employee_permanent_address.address_line_1}},{% endif %} {% if first_employee_permanent_address.address_line_2 %} {{first_employee_permanent_address.address_line_2}},{% endif %} {{first_employee_permanent_address.state_name}}, {{first_employee_permanent_address.country_name}},{{first_employee_permanent_address.pincode}}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="row mb-md-2">
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Organisation</h6>
+                                                <h6 class="largeText">{{first_employee.organization_name }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Department</h6>
+                                                <h6 class="largeText">{{first_employee.department_name }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-md-2">
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Roles</h6>
+                                                <h6 class="largeText">{{first_employee.role_name }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Father Name</h6>
+                                                <h6 class="largeText">{{first_employee.father_name }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Mother Name</h6>
+                                                <h6 class="largeText">{{first_employee.mother_name }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 p-md-0">
+                                        <div class="row">
+                                            <div class="col-2 p-0">
+                                                <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                                            </div>
+                                            <div class="col-md-10 p-md-0">
+                                                <h6 class="smallText">Date Of Birth</h6>
+                                                <h6 class="largeText">{{first_employee.date_of_birth }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="dropdown-divider w-100"></div>
+                    <div class="col-sm-12 text-center p-0">
+                        <h6 class="m-0" onclick="viewEmployeeDetails('{{first_employee.id }}')" style="cursor: pointer;">
+                            <u>More Info</u></h6>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p style="text-align: center;">No Record Found...</p>
+                    {% endif %}
+                </div>
+                
+            </div>
+            
+            
+        </div>
+        
+        <!-- *************************************Modal********************************** -->
+        <div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+            
+        </div>
+        
+        
+        <div class="overlayModal" id="viewEmployeeModal">
+            
+        </div>
+        <div class="overlayModal" id="viewUserModal" style="display: none;">
+            
+        </div>
+        
+        
+        <div class="overlayModal" id="workflowModal" style="display: none;">
+            
+        </div>
+        
+        <div class="overlayModal" id="viewWorkflowModal" style="display: none;">
+            
+        </div>
+        
+        <!-- *************************************Modal********************************** -->
+        {% endblock content %}
+        {% block script %}
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/variable-pie.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+        
+        <script type="text/javascript">
+            function updateStatus(id, active_status, user_type) {
+                if ($('#is_active_' + id).prop("checked") == true) {
+                    is_active = 1;
+                    status = 'Unblock';
+                } else {
+                    is_active = 0;  
+                    status = 'Block';
+                }
+                
+                //showLoader();
+                $.ajax({
+                    url: "{% url 'src:update-user-status' %}",
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        is_active: is_active,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                            if(user_type == 'employee'){
+                                ajaxEmployeeList('1');
+                            }else{
+                                window.location.reload();
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+
+            function updateUserStatus(id, active_status, user_type) {
+                if ($('#is_user_active_' + id).prop("checked") == true) {
+                    is_active = 1;
+                    status = 'Yes';
+                } else {
+                    is_active = 0;  
+                    status = 'No';
+                }
+                
+                //showLoader();
+                $.ajax({
+                    url: "{% url 'src:update-users-status' %}",
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        is_active: is_active,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                            if(user_type == 'employee'){
+                                ajaxEmployeeList('1');
+                            }else{
+                                window.location.reload();
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+
+            function getUserShortDetails(user_id, id){
+                showLoader();
+                var url = "{% url 'src:user-short-details' 1 %}";
+                url = url.replace(1,user_id);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $('#'+id).html(data);
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function getEmpShortDetails(employee_id){
+                showLoader();
+                var url = "{% url 'src:employee-short-details' 1 %}";
+                url = url.replace(1,employee_id);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $('#ajaxEmpShortDetails').html(data);
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function viewUserDetails(user_id){
+                showLoader();
+                var url = "{% url 'src:user-details' 1 %}";
+                url = url.replace(1,user_id);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $('#viewUserModal').html(data);
+                        $('#viewUserModal').show();
+                        
+                        var mch = $(".modal-ViewEmployee").height() - $("#headerViewEmployee").outerHeight();
+                        $("#viewEmpModalBody").height(mch);
+                        changeInfoTab('basic')
+                        
+                        
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function viewEmployeeDetails(employee_id){
+                $('#viewEmployeeModal').html('');
+                showLoader();
+                var url = "{% url 'src:employee-details' 1 %}";
+                url = url.replace(1,employee_id);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $('#viewEmployeeModal').html(data);
+                        $('#viewEmployeeModal').show();
+                        
+                        var mch = $(".modal-ViewEmployee").height() - $("#headerViewEmployee").outerHeight();
+                        $("#viewEmpModalBody").height(mch);
+                        changeInfoTab('basic')
+                        
+                        
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function ajaxEmployeeList(employee_page) {
+                $('#employee_tablebody').html('<tr id="employee_loading"> <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i></td> </tr>');
+                var role_id = $('#role_id').val();
+                var employee_search = $('#employee_search').val();
+                $.ajax({
+                    url: "{% url 'src:ajax-employee-users-list' %}",
+                    method: 'GET',
+                    data: { employee_page:employee_page, role_id:role_id, page_loading_type:'1', employee_search:employee_search },
+                    success: function (data) {
+                        hideLoader();
+                        $('#employee_tablebody').html(data);
+                        $('#employee_page').val(parseInt(employee_page)+1);
+                        $('#employee_loading').hide();
+                        $('#employee_page_status').val('0');
+                        $('#addEmployeeTable').trigger('update');
+                        
+                        $('#addEmployeeTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["15.5%", "10.5%", "16.5%", "23.5%", "15%"],
+                                stickyHeaders_attachTo: ".employeeprimaryContainerBG",
+                                filter_external: '.search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addEmployeeTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        $(".deptRow").click(function () {
+                            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                        });
+                        $(".employeeprimaryContainerBG").scroll(function () {
+                            var divTable = $(".employeeprimaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                        window.location.reload();
+                    }
+                });
+            };
+
+            function ajaxOperationalUserList(employee_page) {
+                $('#tablebody').html('<tr id="employee_loading"> <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i></td> </tr>');
+                // var role_id = $('#role_id').val();
+                var employee_search = $('#operational_search').val();
+                var Organisation = $('#Organisation').val();
+                $.ajax({
+                    url: "{% url 'src:ajax-operational-users-list' %}",
+                    method: 'GET',
+                    data: { employee_page:employee_page, page_loading_type:'1', employee_search:employee_search,Organisation:Organisation},
+                    success: function (data) {
+                        hideLoader();
+                        $('#tablebody').html(data);
+                        $('#page').val(parseInt(employee_page)+1);
+                        $('#operational_loading').hide();
+                        $('#page_status').val('0');
+                        $('#addOrgTable').trigger('update');
+                        
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["15.5%", "10.5%", "18.5%", "15.5%", "22%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        $(".deptRow").click(function () {
+                            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                        });
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                        window.location.reload();
+                    }
+                });
+            };
+
+            function ajaxNonOperationalUserList(employee_page) {
+                $('#nonoperational_tablebody').html('<tr id="employee_loading"> <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i></td> </tr>');
+                // var role_id = $('#role_id').val();
+                var employee_search = $('#non_operational_search').val();
+                $.ajax({
+                    url: "{% url 'src:ajax-non-operational-users-list' %}",
+                    method: 'GET',
+                    data: { employee_page:employee_page, page_loading_type:'1', employee_search:employee_search },
+                    success: function (data) {
+                        hideLoader();
+                        $('#nonoperational_tablebody').html(data);
+                        $('#non_page').val(parseInt(employee_page)+1);
+                        $('#nonoperational_loading').hide();
+                        $('#non_page_status').val('0');
+                        $('#addNonOperationalTable').trigger('update');
+
+                        $('#addNonOperationalTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["15.5%", "15.5%", "18.5%", "15.5%"],
+                                stickyHeaders_attachTo: ".nonprimaryContainerBG",
+                                filter_external: '.search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addNonOperationalTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        $(".deptRow").click(function () {
+                            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                        });
+                        $(".nonprimaryContainerBG").scroll(function () {
+                            var divTable = $(".nonprimaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                        window.location.reload();
+                    }
+                });
+            }
+            
+            $(document).ready(function () {
+                
+                var prevTop = 0;
+                
+                
+                $('.commonTableBg').on('scroll', function () {
+                    var page = parseInt($('#page').val());
+                    var totalPages = parseInt($('#total_pages').val());
+                    var employee_search = $('#operational_search').val();
+                    var Organisation = $('#Organisation').val();
+
+                    var currentTop = $(this).scrollTop();
+                    if (prevTop !== currentTop) {
+                        prevTop = currentTop;
+                        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                            page_status = parseInt($('#page_status').val());
+                            if(page_status == 0 && page  <= totalPages){
+                                $('#operational_loading').show(); 
+                                $('#page_status').val('1');
+                                $.ajax({
+                                    url: "{% url 'src:ajax-operational-users-list' %}",
+                                    method: 'GET',
+                                    data: { page:page, employee_search:employee_search, page_loading_type:'2',Organisation:Organisation },
+                                    success: function (data) {
+                                        setTimeout(() => {
+                                            $('#tablebody').find('tr:last').prev().after(data);
+                                            $('#page').val(parseInt(page)+1);
+                                            $('#operational_loading').hide();
+                                            $('#page_status').val('0');
+                                            $('#addOrgTable').trigger('update');
+                                        }, 2000);
+                                    },
+                                    error: function (err) {
+                                        alert(err.message);
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                
+                var non_prevTop = 0;
+                $('.commonNonOperationalTableBg').on('scroll', function () {
+                    
+                    var non_page = parseInt($('#non_page').val());
+                    var non_totalPages = parseInt($('#non_total_pages').val());
+                    var employee_search = $('#non_operational_search').val();
+
+                    var currentTop = $(this).scrollTop();
+                    if (non_prevTop !== currentTop) {
+                        non_prevTop = currentTop;
+                        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                            non_page_status = parseInt($('#non_page_status').val());
+                            if(non_page_status == 0 && non_page  <= non_totalPages){
+                                $('#nonoperational_loading').show(); 
+                                $('#non_page_status').val('1');
+                                $.ajax({
+                                    url: "{% url 'src:ajax-non-operational-users-list' %}",
+                                    method: 'GET',
+                                    data: { non_page:non_page, employee_search:employee_search, page_loading_type:'2' },
+                                    success: function (data) {
+                                        setTimeout(() => {
+                                            $('#nonoperational_tablebody').find('tr:last').prev().after(data);
+                                            $('#non_page').val(parseInt(non_page)+1);
+                                            $('#nonoperational_loading').hide();
+                                            $('#non_page_status').val('0');
+                                            $('#addNonOperationalTable').trigger('update');
+                                        }, 2000);
+                                    },
+                                    error: function (err) {
+                                        alert(err.message);
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                
+                var employee_prevTop = 0;
+                $('.commonEmployeeTableBg').on('scroll', function () {
+                    
+                    var employee_page = parseInt($('#employee_page').val());
+                    var employee_totalPages = parseInt($('#employee_total_pages').val());
+                    var role_id = $('#role_id').val();
+                    var employee_search = $('#employee_search').val();
+
+                    var currentTop = $(this).scrollTop();
+                    if (employee_prevTop !== currentTop) {
+                        employee_prevTop = currentTop;
+                        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                            employee_page_status = parseInt($('#employee_page_status').val());
+                            if(employee_page_status == 0 && employee_page  <= employee_totalPages){
+                                $('#employee_loading').show(); 
+                                $('#employee_page_status').val('1');
+                                $.ajax({
+                                    url: "{% url 'src:ajax-employee-users-list' %}",
+                                    method: 'GET',
+                                    data: { employee_page:employee_page, role_id:role_id, page_loading_type:'2', employee_search:employee_search },
+                                    success: function (data) {
+                                        setTimeout(() => {
+                                            $('#employee_tablebody').find('tr:last').prev().after(data);
+                                            $('#employee_page').val(parseInt(employee_page)+1);
+                                            $('#employee_loading').hide();
+                                            $('#employee_page_status').val('0');
+                                            $('#addEmployeeTable').trigger('update');
+                                        }, 2000);
+                                    },
+                                    error: function (err) {
+                                        alert(err.message);
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                })
+                
+            });
+        </script>
+        <script>
+            
+            function exportsOperational(type){
+                var columns = $('#operationalBlock,#show_columns').val();
+                var Organisation = $('#Organisation').val();
+                if(Organisation){
+                    Organisation = Organisation
+                }else{
+                    Organisation ='0'
+                }
+                if(columns == ''){
+                    openToaster("danger", "Please select at-least one column");
+                } else {
+                    if(type == 'excel'){
+                        var url = "{% url 'src:export-operational-user-to-xlsx' 'columns' 'Organisation' %}";
+                        url = url.replace('columns',columns).replace('Organisation',Organisation);
+                        window.location.href = url;
+                    } else {
+                        var url = "{% url 'src:export-operational-user-to-pdf' 'columns' 'Organisation' %}";
+                        url = url.replace('columns',columns).replace('Organisation',Organisation);
+                        window.location.href = url;
+                    }
+                }
+                
+            }
+            
+            function exportsNonOperational(type){
+                var columns = $('#nonoperationalBlock,#non_show_columns').val();
+                if(columns == ''){
+                    openToaster("danger", "Please select at-least one column");
+                } else {
+                    if(type == 'excel'){
+                        var url = "{% url 'src:export-non-operational-user-to-xlsx' 'columns' %}";
+                        url = url.replace('columns',columns);
+                        window.location.href = url;
+                    } else {
+                        var url = "{% url 'src:export-non-operational-user-to-pdf' 'columns' %}";
+                        url = url.replace('columns',columns);
+                        window.location.href = url;
+                    }
+                }
+                
+            }
+            
+            function exportsEmployeeOperational(type){
+                var columns = $('#employeesBlock,#employee_show_columns').val();
+                if(columns == ''){
+                    openToaster("danger", "Please select at-least one column");
+                } else {
+                    if(type == 'excel'){
+                        var url = "{% url 'src:export-employee-to-xlsx' 'columns' %}";
+                        url = url.replace('columns',columns);
+                        window.location.href = url;
+                    } else {
+                        var url = "{% url 'src:export-employee-to-pdf' 'columns' %}";
+                        url = url.replace('columns',columns);
+                        window.location.href = url;
+                    }
+                }
+                
+            }
+            
+            function freezeColumn(id, colNo) {
+                $('#' + id).addClass("frezedIcon frezedCell");
+                $("#addOrgTable tbody tr").each(function (index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+                });
+                $('#' + id + ' #freeze').show();
+                $('#' + id + ' #unfreeze').hide();
+            }
+            
+            function unfreezeColumn(id, colNo) {
+                $('#' + id).removeClass("frezedIcon frezedCell");
+                $("#addOrgTable tbody tr").each(function (index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+                });
+                $('#' + id + ' #unfreeze').show();
+                $('#' + id + ' #freeze').hide();
+            }
+            
+            function toggleFreeze(divid, inputid, colid, colNo) {
+                var checkbox = document.getElementById(inputid);
+                
+                if (checkbox.checked == true) {
+                    $("#"+divid+" thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+                    $("#"+divid+" tbody tr").each(function (index) {
+                        $("#"+divid+" tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                        $("#"+divid+" tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+                    });
+                    $('#' + colid + ' #freeze').show();
+                    $('#' + colid + ' #unfreeze').hide();
+                } else {
+                    $("#"+divid+" thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+                    $("#"+divid+" tbody tr").each(function (index) {
+                        $("#"+divid+" tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                        $("#"+divid+" tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+                    });
+                    $('#' + colid + ' #unfreeze').show();
+                    $('#' + colid + ' #freeze').hide();
+                }
+            }
+            
+            function showHideColumns(divid, inputid, colNo) {
+                var checkbox_val = [];
+                var checkbox = document.getElementById(inputid);
+                if (checkbox.checked == true) {
+                    $('.'+inputid).hide();
+                }else{
+                    $('.'+inputid).show();
+                }
+                $("#"+divid+" input:checkbox[class=colCheck]").each(function () {
+                    if(!$(this).is(':checked')){
+                        checkbox_val.push($(this).attr("id"))
+                    }
+                });
+                checkbox_str = checkbox_val.join(',');
+                if(divid == 'operationalBlock'){
+                    $('#'+divid+',#show_columns').val(checkbox_str);
+                }else if(divid == 'nonoperationalBlock'){
+                    $('#'+divid+',#non_show_columns').val(checkbox_str);
+                }else{
+                    $('#'+divid+',#employee_show_columns').val(checkbox_str);
+                }
+                
+            }
+            
+            
+            function addUser() {
+                $('#addUserModal').html('');
+                showLoader();
+                $.ajax({
+                    url: "{% url 'src:add-user-basic-detail' %}",
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function closeUserModal() {
+        		$("#addUserModal").hide();
+        	}
+
+        	function closeModal() {
+        		$("#addUserModal").hide();
+        	}
+
+
+        	function locateUsersOnMap(){
+        		$('#addUserModal').html('');
+        		showLoader();
+        		$.ajax({
+        			url: "{% url 'src:locate-users-on-map' %}",
+        			method: 'GET',
+        			data: {},
+        			success: function (data) {
+        				hideLoader();
+        				$("#addUserModal").show();
+        				$('#addUserModal').html(data);
+        			},
+        			error: function (err) {
+        				console.log(err)
+        			}
+        		});
+        	}
+            
+            function getGeoTaggedMap(id) {
+                $('#addUserModal').html('');
+                showLoader();
+                $.ajax({
+                    url: "{% url 'src:user-geo-tagged' %}",
+                    method: 'GET',
+                    data: {id:id},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function closeUserModal() {
+                $("#addUserModal").hide();
+            }
+            
+            function perviousPage(last_user_id, page) {
+                $('#addUserModal').html('');
+                showLoader();
+                if(page == 1){
+                    var url = "{% url 'src:edit-user-basic-detail' %}";
+                } else if(page == 2){
+                    var url = "{% url 'src:edit-user-offical-detail' %}";
+                } else {
+                    var url = "{% url 'src:edit-user-product-detail' %}";
+                }
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {last_user_id, last_user_id},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function proceedTostep(current, next) {
+                if (next == 0) {
+                    $("#addUserModal").hide();
+                    return;
+                }
+            }
+            
+            function addEmployee() {
+                $('#addUserModal').html('');
+                showLoader();
+                $.ajax({
+                    url: "{% url 'src:add-employee-basic-detail' %}",
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            function editEmployeeBasicDetail(employee_id){
+                $('#addUserModal').html('');
+                showLoader();
+                url =  "{% url 'src:edit-employee-basic-detail' 1 %}";
+                url = url.replace(1,employee_id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+            }
+            
+            function editEmployeeOfficialDetail(employee_id){
+                console.log(employee_id);
+                $('#addUserModal').html('');
+                showLoader();
+                url =  "{% url 'src:edit-employee-official-detail' 1 %}";
+                url = url.replace(1,employee_id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+            }
+            
+            function editEmployeeAttendanceDetail(employee_id){
+                console.log(employee_id);
+                $('#addUserModal').html('');
+                showLoader();
+                url =  "{% url 'src:edit-employee-attendance-detail' 1 %}";
+                url = url.replace(1,employee_id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+            }
+            
+            function editEmployeeDocumentDetail(employee_id){
+                console.log(employee_id);
+                $('#addUserModal').html('');
+                showLoader();
+                url =  "{% url 'src:edit-employee-document-detail' 1 %}";
+                url = url.replace(1,employee_id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();
+                        
+                        $("#date_of_birth").datepicker({  
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0"
+                            ,maxDate: 0,
+                            dateFormat: 'dd/mm/yy' 
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+            }
+            
+            
+            function viewUserRolePermission(user_id){
+                $('#addUserModal').html('');
+                showLoader();
+                url =  "{% url 'src:view-user-role-permission' 1 %}";
+                url = url.replace(1,user_id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+
+            
+            function userTracking(id) {
+                $('#addUserModal').html('');
+                showLoader();
+                url = "{% url 'src:user-tracking' 'id' %}";
+                url = url.replace('id',id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            
+            function resetUserPassword(id) {
+                $('#addUserModal').html('');
+                showLoader();
+                url = "{% url 'src:reset-user-credential' '1' %}";
+                url = url.replace('1',id)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        $("#addUserModal").show();
+                        $('#addUserModal').html(data);
+                        $('.selectField').select2();
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            
+            function openImageSelector(fileUploadID) {
+                $("#" + fileUploadID).click();
+            }
+            
+            $(document).ready(function () {
+                setHeightWidth();
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "10.5%", "18.5%", "15.5%", "22%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $('#addNonOperationalTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "15.5%", "18.5%", "15.5%"],
+                        stickyHeaders_attachTo: ".nonprimaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addNonOperationalTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $('#addEmployeeTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "10.5%", "16.5%", "23.5%", "15%"],
+                        stickyHeaders_attachTo: ".employeeprimaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addEmployeeTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".deptRow").click(function () {
+                    $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                });
+                
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".nonprimaryContainerBG").scroll(function () {
+                    var divTable = $(".nonprimaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".employeeprimaryContainerBG").scroll(function () {
+                    var divTable = $(".employeeprimaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".mobileCode").mask("+00");
+                $(".phoneCode").mask("000");
+                $(".landLineNo").mask("000000");
+                $(".mobileNo").mask("0000000000");
+                $(".pincode").mask("000000");
+            });
+            
+            $(document).ready(function () {
+                var checkbox_val = ["store_name","role","contact_person","contact_no","outstanding_amount"];
+                checkbox_str = checkbox_val.join(',');
+                $('#operationalBlock,#show_columns').val(checkbox_str);
+                
+                $("#operationalBlock .colCheck").change(function () {
+                    if ($("#operationalBlock .colCheck:not(:checked)").length == $("#operationalBlock .colCheck").length) {
+                        //do something
+                        $("#operationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#operationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                $("#operationalBlock .colFreezeCheck").change(function () {
+                    if ($("#operationalBlock .colFreezeCheck:not(:checked)").length == $("#operationalBlock .colFreezeCheck").length) {
+                        //do something
+                        $("#operationalBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                    } else {
+                        $("#operationalBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                    }
+                });
+                
+                var checkbox_val = ["non_store_name","non_role","non_contact_person","non_contact_no"];
+                checkbox_str = checkbox_val.join(',');
+                $('#nonoperationalBlock,#non_show_columns').val(checkbox_str);
+                
+                $("#nonoperationalBlock .colCheck").change(function () {
+                    if ($("#nonoperationalBlock .colCheck:not(:checked)").length == $("#nonoperationalBlock .colCheck").length) {
+                        //do something
+                        $("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                $("#nonoperationalBlock .colFreezeCheck").change(function () {
+                    if ($("#nonoperationalBlock .colFreezeCheck:not(:checked)").length == $("#nonoperationalBlock .colFreezeCheck").length) {
+                        //do something
+                        $("#nonoperationalBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                    } else {
+                        $("#nonoperationalBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                    }
+                });
+                
+                var checkbox_val = ["employee_name","employee_role","employee_dep_org","employee_platform", "employee_last_sign_in"];
+                checkbox_str = checkbox_val.join(',');
+                $('#employeesBlock,#employee_show_columns').val(checkbox_str);
+                
+                $("#employeesBlock .colCheck").change(function () {
+                    if ($("#employeesBlock .colCheck:not(:checked)").length == $("#employeesBlock .colCheck").length) {
+                        //do something
+                        $("#employeesBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#employeesBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                $("#employeesBlock .colFreezeCheck").change(function () {
+                    if ($("#employeesBlock .colFreezeCheck:not(:checked)").length == $("#employeesBlock .colFreezeCheck").length) {
+                        //do something
+                        $("#employeesBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                    } else {
+                        $("#employeesBlock .iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                    }
+                });
+                
+                
+                $(window).resize(function () {
+                    setHeightWidth();
+                });
+                
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "10.5%", "18.5%", "15.5%", "22%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $('#addNonOperationalTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "15.5%", "18.5%", "15.5%"],
+                        stickyHeaders_attachTo: ".nonprimaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addNonOperationalTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $('#addEmployeeTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15.5%", "10.5%", "16.5%", "23.5%", "15%"],
+                        stickyHeaders_attachTo: ".employeeprimaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addEmployeeTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                $(".deptRow").click(function () {
+                    $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                });
+                
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".nonprimaryContainerBG").scroll(function () {
+                    var divTable = $(".nonprimaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".employeeprimaryContainerBG").scroll(function () {
+                    var divTable = $(".employeeprimaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $(".mobileCode").mask("+00");
+                $(".phoneCode").mask("000");
+                $(".landLineNo").mask("000000");
+                $(".mobileNo").mask("0000000000");
+                $(".pincode").mask("000000");
+            });
+            
+            $(document).ready(function () {
+                var checkbox_val = ["SAP_ID","store_name","role","contact_person","contact_no","outstanding_amount"];
+                checkbox_str = checkbox_val.join(',');
+                $('#operationalBlock,#show_columns').val(checkbox_str);
+                
+                $("#operationalBlock .colCheck").change(function () {
+                    if ($("#operationalBlock .colCheck:not(:checked)").length == $("#operationalBlock .colCheck").length) {
+                        //do something
+                        $("#operationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#operationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                var checkbox_val = ["non_store_name","non_role","non_contact_person","non_contact_no"];
+                checkbox_str = checkbox_val.join(',');
+                $('#nonoperationalBlock,#non_show_columns').val(checkbox_str);
+                
+                $("#nonoperationalBlock .colCheck").change(function () {
+                    if ($("#nonoperationalBlock .colCheck:not(:checked)").length == $("#nonoperationalBlock .colCheck").length) {
+                        //do something
+                        $("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                var checkbox_val = ["employee_name","employee_role","employee_dep_org","employee_platform", "employee_last_sign_in"];
+                checkbox_str = checkbox_val.join(',');
+                $('#employeesBlock,#employee_show_columns').val(checkbox_str);
+                
+                $("#employeesBlock .colCheck").change(function () {
+                    if ($("#employeesBlock .colCheck:not(:checked)").length == $("#employeesBlock .colCheck").length) {
+                        //do something
+                        $("#employeesBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $("#employeesBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+            });
+            
+            function handleUserTabChange(element,target,table_target, id){
+                if (id == 'operational'){
+                    $('#distributor_count').show()
+                }else{
+                    $('#distributor_count').hide()
+                }
+                $('.short-details').hide();
+                $('.userTable').hide();
+                $('#userTabBar li').removeClass('activeTab');
+                $('#'+table_target).show();
+                $('.'+target).show();
+                $('.action_section').hide();
+                $('#'+target).show();
+                console.log(id);    
+                $('#'+id).addClass('activeTab');
+            }
+            $(document).ready(function(){
+                
+                
+                Highcharts.chart("container", {
+                    chart: {
+                        type: "column",
+                    },
+                    exporting: { enabled: false },
+                    title: {
+                        text: null,
+                    },
+                    credits: {
+                        enabled: false,
+                    },
+                    xAxis: {
+                        categories: [
+                        {% for town in towns %}
+                        "{{town.town}}",
+                        {% endfor %}
+                        ],
+                        crosshair: true,
+                        title: {
+                            text: 'Towns',
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: null,
+                        },
+                    },
+                    tooltip: {
+                        headerFormat:
+                        '<span style="font-size:10px">{point.key}</span><table>',
+                            pointFormat:
+                            '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                                footerFormat: "</table>",
+                                shared: true,
+                                useHTML: true,
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0,
+                                    borderRadius: 2,
+                                },
+                            },
+                            series: [
+                            {
+                                name: "Distributer",
+                                data: [ 
+                                {% for town in towns %}
+                                {{town.distributor_count}},
+                                {% endfor %}
+                                ],
+                                color: "#108bff",
+                            },
+                            {
+                                name: "Super Stockist",
+                                data: [ 
+                                {% for town in towns %}
+                                {{town.super_stockist_count}},
+                                {% endfor %}
+                                ],
+                                color: "#ffd97f"
+                            },
+                            ],
+                        });
+                        
+                        Highcharts.chart("nonOperationalContainer", {
+                            chart: {
+                                type: "column",
+                            },
+                            exporting: { enabled: false },
+                            title: {
+                                text: null,
+                            },
+                            credits: {
+                                enabled: false,
+                            },
+                            xAxis: {
+                                categories: [
+                                {% for town in towns %}
+                                "{{ town.town }}",
+                                {% endfor %}
+                                ],
+                                crosshair: true,
+                                title: {
+                                    text: 'Towns',
+                                }
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: null,
+                                },
+                            },
+                            tooltip: {
+                                headerFormat:
+                                '<span style="font-size:10px">{point.key}</span><table>',
+                                    pointFormat:
+                                    '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                        '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                                        footerFormat: "</table>",
+                                        shared: true,
+                                        useHTML: true,
+                                    },
+                                    plotOptions: {
+                                        column: {
+                                            pointPadding: 0.2,
+                                            borderWidth: 0,
+                                            borderRadius: 2,
+                                        },
+                                    },
+                                    series: [
+                                    {
+                                        name: "Distributer",
+                                        data: [ 
+                                        {% for town in towns %}
+                                        {{town.distributor_count}},
+                                        {% endfor %}
+                                        ],
+                                        color: "#108bff",
+                                    },
+                                    {
+                                        name: "Retailers",
+                                        data: [ 
+                                        {% for town in towns %}
+                                        {{town.retailers_count}},
+                                        {% endfor %}
+                                        ],
+                                        color: "#ffd97f"
+                                    },
+                                    ],
+                                });
+                            })
+                        </script>
+                        {% endblock %}

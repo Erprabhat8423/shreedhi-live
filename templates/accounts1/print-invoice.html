@@ -1,0 +1,110 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+    #addOrgTable thead th{
+        border:1px solid #e7e7e7!important;
+    }
+    #addOrgTable td{
+        border:1px solid #e7e7e7!important;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <a href="{% url 'src:print-invoice-template' invoice_id %}" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div" >
+                    {% if user_list %}
+                    {% for user in user_list %}
+                    <div class="col-md-12" style="padding: 25px; border: 1px solid #cccccc;">
+                        <div class="col-md-12" style="text-align: center; font-size:20px; text-decoration: underline;">Stock Transfer/Delivery Challan</div>
+                        <table id="addOrgTable" class="table table-bordered mt-0" style="width: 30%; float: left;">
+                            <thead>
+                                <tr><th>Shipment: </th><td>{{ forloop.counter }}</td></tr>
+                                <tr><th>Buyer Name: </th><td>{{ user.store_name }}</td></tr>
+                                <tr><th>Address: </th><td>{{ user.address }}</td></tr>
+                                
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <table id="addOrgTable" class="table table-bordered mt-0" style="width: 30%; float: right;">
+                            <thead>
+                                <tr><th>Date: </th><td colspan="3">{{ today_date }}</td></tr>
+                                <tr><th>Route Name: </th><td colspan="3">{{ user.route_name }}</td></tr>
+                                <tr><th>GST No.: </th><td colspan="3">{{ user.gstin }}</td></tr>
+                                <tr><th>CIN No.: </th><td colspan="3">{{ user.cin }}</td></tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        
+                        
+                        <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+                            <thead>
+                                <tr>
+                                    <th>Sr. No. </th>
+                                    <th>HSN Code </th>
+                                    <th>Material Description </th>
+                                    <th>Qunatity(IN CRATE) </th>
+                                    <th>Qunatity(IN EA)</th>
+                                    <th>Price/Crate</th>
+                                    <th>SS Margin</th>
+                                    <th>Transport Cost</th>
+                                    <th>Net Price/Crate</th>
+                                    <th>Billing Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in user.orders %}
+                                <tr>
+                                    <td align="center">{{ forloop.counter }}.</td>
+                                    <td>{{ order.hsn_code }}</td>
+                                    <td>{{ order.product_variant_name }} </td>
+                                    <td>{{ order.quantity }} </td>
+                                    <td>{{ order.no_of_pouches }}</td>
+                                    <td>{{ order.rate }}</td>
+                                    <td>0.00</td>
+                                    <td>0.00</td>
+                                    <td>{{ order.rate }}</td>
+                                    <td>{{ order.amount }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <br clear="all">
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    
+    {% endblock content %}
+    {% block script %}
+    
+    {% endblock %}

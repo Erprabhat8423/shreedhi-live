@@ -1,0 +1,187 @@
+<style>
+    .header-title h2,
+    .header-title h3 {
+        display: inline-block;
+    }
+    h3 {
+        font-size: 18px;
+        text-align: center;
+        padding: 5px 0px -5px 0px;
+        margin: 0px;
+    }
+    
+    table {
+        width: 750px;
+        border-collapse: collapse;
+        margin: 0px auto;
+    }
+    
+    /* Zebra striping */
+    {% comment %} tr:nth-of-type(odd) {
+        background: #eee;
+    } {% endcomment %}
+    
+    th {
+        {% comment %} background: #3498db; {% endcomment %}
+        color: #000000;
+        font-weight: bold;
+    }
+    
+    th {
+        padding: 0px;
+        padding-top:4px ;
+        border: 1px solid #ccc;
+        text-align: center;
+        font-size: 9px;
+    }
+    
+    td {
+        padding: 0px;
+        padding-top:4px ;
+        border: 1px solid #ccc;
+        text-align: center;
+        font-size: 9px;
+    }
+    
+    @page {
+        size: letter portrait;
+        margin: 1cm 1cm 1cm 1cm;
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 200pt; width: 512pt; top: 772pt; height: 20pt;
+            
+        }
+    }
+    .header tr th{
+        border: none;
+    }
+    .header tr td{
+        border: none;
+    }
+    .header1{
+        color: #3498db;
+        
+    }
+    p{
+      padding-top: -5px;  
+    }
+</style>
+  {% for gatePass in gatePassList %}
+    <table>
+      <thead>
+        <tr style="border-bottom:none; border-top: 1px solid gray;border-left: 1px solid gray;border-right: 1px solid gray;">
+            <td style="border: none;"><img src="{{ url }}/static/img/png/pawanshree.jpg" style="height:50px; width:80px" class="dashboardLogo" /></td>
+            <td colspan="3" style="border: none; color: #3498db; text-align:center"><h3> Delivery Challan</h3></td>
+            <td style="border: none;">E-mail :- {{organization.email}}</td>
+        </tr>
+        <tr style="border-top: none; border-bottom: none;border-left: 1px solid gray;border-right: 1px solid gray;">
+            <td style="border: none;">CIN No  :- {{cin}}</td>
+            <td colspan="3" style="border: none;"><h3>{{organization.organization_name}}</h3></td>
+            <td style="border: none;">Landline :- +91-{{organization.landline_state_code}}-{{organization.landline_number}}</td>
+        </tr>
+        <tr style="border-top: none; border-left: 1px solid gray;border-right: 1px solid gray;">
+        <td style="border: none;">FSSAI No :- {{fssai}}</td>
+        <td colspan="3" style="border: none;"><b>{{organization.address}}</b></td>
+        <td style="border: none;">Mobile No :- +91-{{organization.mobile_number}}</td>
+            
+        </tr>
+        <tr>
+            <td>Date:-</td>
+            <td >{{gatePass.order_date}}</td>
+            <td colspan="2" style="font-size:1.2em;">Challan No. :- {{challan_no}}</td>
+            <td>Location:- {{gatePass.city_name}}</td>
+        </tr>
+        
+        <tr>
+            <td>Distributer Name</td>
+            <td colspan="3">{{gatePass.store_name}} ({{gatePass.distributor_name}}/{{gatePass.emp_sap_id}})</td>
+            <td>Vehicle number:{{vehicle__number}} </td>
+        </tr>
+        <tr>
+            <td>Catogory</td>
+            <td width="30%">Item Name</td>
+            <td>UoM</td>
+            <td>Total Demand</td>
+            <!-- <th>Amount</th> -->
+            <td>SCHEME</td>
+          </tr>
+      </thead>
+      <tbody>
+        {% for products in gatePass.allProducts %}
+        <tr>
+          <td>{{products.product_name}}</td>
+          <td width="30%">{{products.variant_name}}</td>
+          <td {% if products.uom == 'Total' %}  style="font-weight: 600;"{%endif%}>{{products.uom}}</td>
+          <td {% if products.uom == 'Total' %}  style="font-weight: 600;"{%endif%}>{{products.quantity|floatformat:1}}</td>
+          <td>{% if products.scheme %}{{products.scheme}}{% endif %}</td>
+        </tr>
+        {% endfor %}
+
+        {% for key, crates_total in gatePass.crates_total_values.items %}
+        {% if crates_total %}
+        <tr>
+            <td colspan="3" style="font-size:1.2em;"><b>Total:- {{key}}</b></td>
+            {% if key == 'CRATE' %}
+                {% if gatePass.schemecrate == 0 %}
+                    <td colspan="2"  style="font-size:1.2em;"><b>{{crates_total|floatformat:'0'}}</b></td>
+                {% else %}
+                <td colspan="2"  style="font-size:1.2em;"><b>{{crates_total|floatformat:'0'}}+{{gatePass.schemecrate}}={{crates_total|floatformat:'0'|add:gatePass.schemecrate}}</b></td>
+                {% endif %}
+            {% else %}
+                <td colspan="2"  style="font-size:1.2em;"><b>{{crates_total|floatformat:'0'}}</b></td>
+            {% endif %}
+        </tr>
+
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <td colspan="3" >Crate Detail</td>  
+            <td>Normal</td>  
+            <td>Jumbo</td>  
+        </tr>
+        <tr>
+            <td colspan="3" >Dispatch</td>  
+            <td>{{dis}}</td>  
+            {% comment %} <th>{% if dis %}{{dis.jumbo_debit}}{% else %}0{% endif %}</th>     {% endcomment %}
+            <td>0</td>    
+        </tr>
+        <tr>
+            <td colspan="3" >Receive</td>  
+            <td>{{rec}} </td> 
+            <td>0</td>  
+            {% comment %} <th>{% if rec %}{{rec.jumbo_credit}}{% else %}0{% endif %} </th>    {% endcomment %}
+        </tr>
+        </tbody>
+         <table>
+          <tr>
+
+            <td style="border: none;text-align: left;padding-left: 7px;padding-bottom: 40px; font-size:12px; border:1px solid;vertical-align: top;" colspan="1">Crate Return</td>
+            <td style="border: none;text-align: left;padding-left: 7px;padding-bottom: 40px; font-size:12px; border:1px solid;vertical-align: top;" colspan="1">Party Signature</td>
+            <td colspan="3">
+                <table style="float: right; border: none;" class="header">
+                    <tr><td style="vertical-align: top; text-align:center;">Company Bank Details </td></tr>
+                    <tr><td style="vertical-align: top; text-align:center;">Bank A/c No. </td><td style="vertical-align: top;">{{organization.org_bank_account_no}}  </td>
+                        <td style="vertical-align: top; text-align:center;">Bank Name </td><td style="vertical-align: top;"> {{organization.org_bank_name}}  </td></tr>
+                    <tr><td style="vertical-align: top; text-align:center;">Branch Name </td><td style="vertical-align: top;">{{organization.org_bank_branch_name}}  </td>
+                        <td style="vertical-align: top; text-align:center;">IFSC Code </td><td style="vertical-align: top;"> {{organization.org_bank_ifsc}}   </td></tr>
+                        
+                    <tr><td style="vertical-align: top; text-align: center;" colspan="4">For : {{ organization.organization_name }}</td></tr>
+                    <tr><td style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</td></tr>
+                    <tr><td style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</td></tr>
+                    <tr><td style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</td></tr>
+                    <tr><td style="vertical-align: top; text-align: center; font-size:12px;" colspan="4">Authorised Signatory</td></tr>
+                </table>
+            </td>
+        </tr>   
+        
+
+      </tbody>
+    </table>
+    <div>
+        <pdf:nextpage />  
+    </div>
+{% endfor %}
+
+       
+  
+  

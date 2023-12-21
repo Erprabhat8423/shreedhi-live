@@ -1,0 +1,171 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+    #addOrgTable thead th {
+        border: 1px solid #e7e7e7 !important;
+    }
+
+    #addOrgTable td {
+        border: 1px solid #e7e7e7 !important;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-7 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span
+                            class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}"
+                            onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-5 p-md-0">
+                    <div class="col-md-12 offset-md-0 p-md-0">
+                        <div class="col-md-3 p-md-2" style="float: left;">
+                            <select class="inputField selectField" style="width: 96% !important; padding: 0.3rem;"
+                                name="organization_id" id="organization_id" onchange="getInvoiceList()">
+                                <option value="">Select Organization</option>
+                                {% for organization in organizations %}
+                                <option value="{{ organization.id }}">{{ organization.organization_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 p-md-2" style="float: left;">
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker"
+                                value="{{ today_date }}" onchange="getInvoiceList()" readonly>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if today_order_status > 0 %}
+                    <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">Sr.No.</th>
+                                <th>Party Name/Routes(Vehicle No.)</th>
+                                <th>Challans</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for user in users_list %}
+                            <tr>
+                                <th style="text-align: center;">{{forloop.counter}}.</th>
+                                <th>{{user.store_name}}({{ user.name }}/{{user.user_sap_id}})</th>
+                                <td>
+                                </td>
+                            </tr>
+                            {% for vehicles in user.vehicle_detail %}
+                    
+                             <tr>
+                                <td>
+                                </td>
+                                <td>
+                                   {{vehicles.route_name}}<span style="color: #3498db;">({{vehicles.registration_number}})</span> 
+                                </td>
+                                <td>   
+                                {% if vehicles.challan_invoice_pdf %}
+                                <a href="{{vehicles.challan_invoice_pdf }}"download>Download Challan</a>
+                                {% else %}
+                                <span id="CHALLAN_{{ user.user_id }}_{{ user.order_date }}_{{vehicles.vehicle_id}}"><a href="javascript:void(0)"
+                                onclick="downloadGatepassChallan('{{ user.user_id }}', '{{ user.order_date }}','{{user.production_unit_id}}','{{vehicles.vehicle_id}}','challan', 'CHALLAN')">Generate Challan</a>
+                                </span>
+                                {% endif %}   
+                                </td>
+                            </tr> 
+                            {% endfor %}
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p
+                        style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+                        No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    function getInvoiceList() {
+        var order_date = $('#order_datepicker').val();
+        var organization_id = $('#organization_id').val();
+
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+        $.ajax({
+            url: "{% url 'src:ajax-challan' %}",
+            method: 'GET',
+            data: { order_date: order_date, organization_id: organization_id },
+            success: function (data) {
+                $('#ajax-div').html(data);
+            },
+            error: function (err) {
+           
+            }
+        });
+    }
+    function downloadGatepassChallan(user_id ,order_date,production_unit_id,vehicle_id,invoice_type, id) {
+        var order_date = $('#order_datepicker').val();
+        if (order_date) {
+            order_date = order_date.split('/');
+            order_date = order_date[2] + '-' + order_date[1] + '-' + order_date[0]
+        } else { order_date = '0' }
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:print-challan-template' %}",
+            method: 'POST',
+            data: { user_id:user_id,order_date: order_date,production_unit_id:production_unit_id,vehicle_id,invoice_type:invoice_type,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function (data) {
+                hideLoader();
+                if (data.message == 'success') {
+                   
+                    val = id + '_' + user_id +'_'+order_date+'_'+vehicle_id;
+                    if (id == 'CHALLAN') {
+                        var url = data.baseurl + '/media/challan_pdf/' + data.filename + '.pdf';
+                        id='challan'
+                    } else {
+
+                    }
+                    console.log(val);
+                    $('#' + val).html('<a href="' + url + '" download>Download ' + id + '</a>');
+                    openToaster("success", '' + id + ' generated successfully.');
+                } else {
+                    openToaster("danger", 'Failed to download the challan.');
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    $(document).ready(function () {
+        $("#order_datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
+            , maxDate: 0,
+            dateFormat: 'dd/mm/yy'
+        });
+    });
+
+
+</script>
+{% endblock %}

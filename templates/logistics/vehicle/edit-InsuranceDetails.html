@@ -1,0 +1,389 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 550%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-500" />
+                    <h4 class="modalColHead">Edit Insurance Details</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="editInsuranceDetail" method="POST" autocomplete="off"  action="" aria-label="Product">
+                    {% csrf_token %}
+                     <input type="hidden" name="insurance_id" value="{{insurance.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b> Insurance Details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="editInsuranceDetails('{{insurance.id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"}
+                            onclick="RegistrationList('{{ insurance.vehicle_id }}')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Insurer Name*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Insurer Name*" name="name_of_insurer" id="name_of_insurer" maxlength="50" value="{{insurance.name_of_insurer}}"/>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Date of Insurance*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Insurance Date*" name="date_of_insurance" id="date_of_insurance" maxlength="50" value="{{insurance.date_of_insurance|date:'d/m/Y'}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Premium Amount*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Premium Amount*" name="premium_amount" id="premium_amount" onkeypress="return validateFloatKeyPress(this,event);" maxlength="50" value="{{insurance.premium_amount}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+
+
+                 
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Validity*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Validity*" name="valid_till" id="valid_till" maxlength="50" value="{{insurance.valid_till|date:'d/m/Y'}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Total Sum Insured*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Total Sum Insured*" name="total_sum_insured" id="total_sum_insured" maxlength="50" onkeypress="return validateFloatKeyPress(this,event);"s value="{{insurance.total_sum_insured}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Insurance Copy</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input type="file" class="inputField" type="text" placeholder="Insurance Copy*" name="insurance_copy" id="insurance_copy" maxlength="50" value="{{insurance.insurance_copy}}" /><a target="_blank" href="{{insurance.insurance_copy}}">Click Here For Image</a>
+                        <label class="error_msg float-right" id=""></label>                                       
+                    </div>
+                </div>
+            
+                <div id="newRow">
+                    
+                </div>
+               
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+    
+    function editInsuranceDetails() {
+        if(validateZoneForm()){
+            hideLoader();
+            return false;
+        }else{
+            var vehicle_id="{{vehicle.id}}";
+            $form = $(this)
+            var formData = new FormData(document.getElementById("editInsuranceDetail"));
+            $.ajax({
+                url:'{% url 'src:edit-InsuranceDetails' '1' %}',
+                url:url.replace('1',vehicle_id),
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    
+                    if(data.flag){
+                        RegistrationList('{{ insurance.vehicle_id}}')
+                    }
+                    else{
+                        openToaster('success',data.message)
+                        window.location= ""
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+        }
+    }
+    
+    
+    
+    function validateZoneForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        if($('#name_of_insurer').val() == ""){
+            $('#name_of_insurer').parent().find('.error_msg').text('Please Fill Insurer Name');
+            $('#name_of_insurer').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        var a = document.getElementById("name_of_insurer").value;
+        
+        if(a.length > 50){
+            $('#name_of_insurer').parent().find('.error_msg').text('Length should be less than 50');
+            $('#name_of_insurer').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#name_of_insurer").val()).length;
+        if(length == 0){
+            $('#name_of_insurer').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#name_of_insurer').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+
+
+        if($('#date_of_insurance').val() == ""){
+            $('#date_of_insurance').parent().find('.error_msg').text('Please Give Insurance Date');
+            $('#date_of_insurance').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("date_of_insurance").value;
+        
+        if(a.length > 50){
+            $('#date_of_insurance').parent().find('.error_msg').text('Length should be less than 50');
+            $('#date_of_insurance').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#date_of_insurance").val()).length;
+        if(length == 0){
+            $('#date_of_insurance').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#date_of_insurance').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if($('#premium_amount').val() == ""){
+            $('#premium_amount').parent().find('.error_msg').text('Please Give Premium Amount');
+            $('#premium_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("premium_amount").value;
+        
+        if(a.length > 50){
+            $('#premium_amount').parent().find('.error_msg').text('Length should be less than 50');
+            $('#premium_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#premium_amount").val()).length;
+        if(length == 0){
+            $('#premium_amount').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#premium_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if($('#valid_till').val() == ""){
+            $('#valid_till').parent().find('.error_msg').text('Please Give Validity');
+            $('#valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("valid_till").value;
+        
+        if(a.length > 50){
+            $('#valid_till').parent().find('.error_msg').text('Length should be less than 50');
+            $('#valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#valid_till").val()).length;
+        if(length == 0){
+            $('#valid_till').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+
+        if($('#total_sum_insured').val() == ""){
+            $('#total_sum_insured').parent().find('.error_msg').text('Please Fill Insured Amount');
+            $('#total_sum_insured').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("total_sum_insured").value;
+        
+        if(a.length > 50){
+            $('#total_sum_insured').parent().find('.error_msg').text('Length should be less than 50');
+            $('#total_sum_insured').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+          
+        var length = $.trim($("#total_sum_insured").val()).length;
+        if(length == 0){
+            $('#total_sum_insured').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#total_sum_insured').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if($('#insurance_copy').val() != ""){
+            var ext = $('#insurance_copy').val().split('.').pop().toLowerCase();
+            var oFile = document.getElementById("insurance_copy").files[0]; 
+            if($.inArray(ext, ['png','jpg','jpeg']) == -1 ) {
+                $('#insurance_copy').parent().find('.error_msg').text('Only PNG and JPEG are allowed.');
+                $('#insurance_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            if (oFile.size > 5242880) 
+            {
+                $('#insurance_copy').parent().find('.error_msg').text(' Image file should not be more than 5 MB ');
+                $('#insurance_copy').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            
+        }
+        
+        
+      
+        
+        
+      
+       
+
+
+
+
+       
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function validateDateRange(){
+        if($("#valid_till").val() != "" && $("#date_of_insurance").val() != ""){
+                date_of_insurance = new Date(getDateFormat($("#date_of_insurance").val()));
+                valid_till = new Date(getDateFormat($("#valid_till").val()));
+                $('.error_msg').text('');
+                $('[name="date_of_insurance"]').css("border", "");
+                $('[name="valid_till"]').css("border", "");
+    
+                if(date_of_insurance > valid_till){
+                    $('[name="valid_till"]').parent().find('.error_msg').text('Date Should Be More Than Registration Date');
+                    $('[name="valid_till"]').css("border", "1px solid #db8305");
+                    $("#valid_till").val('')
+                    return false;
+                }
+                }
+    }
+
+
+    function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+    
+    
+    
+    
+    $("#date_of_insurance").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+    });
+    
+    $("#valid_till").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+        
+    });
+
+
+
+    
+    
+</script>

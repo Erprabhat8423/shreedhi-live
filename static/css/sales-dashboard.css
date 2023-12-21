@@ -1,0 +1,360 @@
+.card-ht{
+
+    /* height: calc(100% - 35px) !important;  */
+
+    padding: 0 6px 16px 6px;
+
+}
+
+.card-monthlysale {
+
+    box-shadow: 3.993px 3.009px 18px 0px rgba(0, 0, 0, 0.09);
+
+    overflow-y: hidden;  padding: 12px 8px 20px 8px;
+
+}
+
+.card-monthly-box{
+
+    border-radius: 10px;
+
+    box-shadow: 3.993px 3.009px 18px 0px rgba(0, 0, 0, 0.09);
+
+}
+
+.grph-bar-day{
+
+    width: 100%;
+
+    height: 20px;
+
+    display: block;
+
+}
+
+.grph-percent-vlu-icon{
+
+    width: 16px;
+
+    height: 16px;
+
+    color: #ffffff;
+
+    border-radius: 50%;
+
+    text-align: center;
+
+}
+
+.grph-percent-green{
+
+    background-color: #4d9105;
+
+}
+
+.grph-percent-red{
+
+    background-color: #da4143;
+
+}
+
+.grph-percent-grey{
+
+    background-color: #b1b1b1;
+
+}
+
+.light-yellow-bg{
+
+    background-color: #ffeab5;
+
+}
+
+.grph-percent-vlu-green{
+
+    color: #4d9105;
+
+    vertical-align: middle;
+
+    margin-left: 6px;
+
+}
+
+.grph-percent-vlu-red{
+
+    color: #da4143;
+
+    vertical-align: middle;
+
+    margin-left: 6px;
+
+}
+
+.grph-percent-vlu-grey{
+
+    color: #b1b1b1;
+
+    vertical-align: middle;
+
+    margin-left: 2px;
+
+}
+
+.monthly-sale-vlu{
+
+    text-align: center;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    padding: 4px 6px;
+
+    border-radius: 0 0 10px 10px;
+
+}
+
+.secnd-percnt-vlu-box{
+
+    width: 29px;
+
+    height: 29px;
+
+    font-size: 26px;
+
+}
+
+
+
+.day-chart-shades{
+
+    width: 12px;
+
+    height: 6px;
+
+    border-radius: 4px;
+
+    margin-right: 2px;
+
+    
+
+}
+
+.day-piechart-totalsale{
+
+    color: #ffffff;
+
+    text-align: center;
+
+    background-color: #216eff;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    line-height: 24px;
+
+    height: 24px;
+
+    width: 100%;
+
+    display: block;
+
+    margin-top: -4px;
+
+    padding: 0px 6px;
+
+}
+
+
+
+.pie-btn-show{
+
+    background-color: #216eff;
+
+    color: #ffffff;
+
+    border: 1px solid;
+
+    padding: 5px 6px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    line-height: 12px;
+
+    border-radius: 6px;
+
+}
+
+.table-btn-show{
+
+    background-color: #ffffff;
+
+    border: 1px solid #216eff;
+
+    color: #216eff;
+
+    padding: 4px 6px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    line-height: 12px;
+
+    border-radius: 6px;
+
+    box-shadow: 3.993px 3.009px 18px 0px rgba(0, 0, 0, 0.09);
+
+}
+
+.pie-btn-show:focus {
+
+    outline: 0px  !important;
+
+}
+
+.table-btn-show:hover{
+
+    border: 1px solid #216eff;
+
+}
+
+.pie-btn-show:hover{
+
+    border: 1px solid #ffffff;
+
+}
+
+button:focus {
+
+    outline: 0px dotted !important;
+
+    outline: 0px auto -webkit-focus-ring-color !important;
+
+}
+
+
+
+
+
+.hidden-version{
+
+    width: 97px;
+
+    height: 11px;
+
+    position: absolute;
+
+    bottom: 0;
+
+    z-index: 1;
+
+    background: #ffffff;
+
+    right: 0;
+
+
+
+}
+/* .hidden-tittle-barchart{
+width: 240px;
+height: 30px;
+position: absolute;
+z-index: 1;
+top: 0;
+left: 50%;
+background: #fff;
+transform: translate(-50%, 0%);
+-ms-transform: translate(-50%, 0%);
+} */
+#borchartMonthlySale{
+    height: 300px; width: 100%;
+}
+#ButterchartMonthlySale{
+    height: 300px; width: 100%; position: relative;
+}
+#DahichartMonthlySale{
+    height: 300px; width: 100%; position: relative;
+}
+
+.bar-chart-monthly-sale{
+
+    width: 100%;
+
+    position: relative;
+
+    height: 100%;
+
+}
+
+.canvasjs-chart-credit{
+
+    color: #ffffff !important; display: none;
+
+}
+
+
+
+
+
+/*pie-chart */
+
+#dayvisesales {
+
+    width: 106%;
+
+    height: 85%;
+
+}
+
+#dayvisesales div{ font-size:12px; font-weight: 600;}
+
+.blank{  
+
+    background: #ffffff;
+
+    width: 67px;
+
+    height: 19px;
+
+    z-index: 1;
+
+    position: absolute;
+
+    bottom: 0;
+
+}
+
+
+
+#dayvisesales tspan{
+
+    color: green;
+
+}
+
+
+
+.table-striped-bar-table tbody tr:nth-of-type(even) {
+
+    background-color: #f7f7f7;
+
+}
+
+.table-striped-bar-table tbody tr:nth-of-type(odd) {
+
+    background-color: #ffffff;
+
+}
+
+.table-striped-bar-table td{
+
+    border-top: 0;
+
+    padding: 4px 18px;
+
+}
+

@@ -1,0 +1,56 @@
+{% load static %}
+
+
+    <table class="table  table-hover w-100 quertely-sales">
+        <thead>
+            <tr>
+                <th><span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>/<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span></th>
+                {% for financial_month in financial_months %}
+                <th id="month_name_{{financial_month.month}}">{{financial_month.month_name}}</th>
+                {% endfor %}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody >
+            {% for zone in zones %}
+            <tr class="zone-title-layer-tr">
+                <td class="zone-title-layer"colspan="14">{{zone.zone}}</td>
+            </tr>
+            {% for town in zone.towns %}
+            <tr>
+                <td>{{town.town}}</td>
+                {% for financial_month in financial_months %}
+                <td>
+                    <div> 
+                        <input type="text" name="quantity_{{town.id}}_{{financial_month.month}}" id="month_value_{{town.id}}_{{financial_month.month}}" data-zone = "{{zone.id}}" data-month="{{financial_month.month}}" class="inputField vlaue_ofsale month_value_{{zone.id}}_{{financial_month.month}}" onkeyup="showCopyButton(this);calculateMonthlyRowTotal(this);calculateMonthlyColumnTotal('{{zone.id}}','{{financial_month.month}}');" onkeypress="return validateFloatKeyPress(this,event);"> 
+                        <div class="copy" onclick="copyValues(this)" style="display: none;">copy<i class="fa fa-angle-right ml-2"></i></div>
+                        {% if forloop.last %}
+                        <div class="clear" onclick="clearValues(this)" style="display: none;"><i class="fa fa-angle-left mr-2"></i>clear</div>
+                        {% endif %}
+                    </div>
+                </td>
+                {% endfor %}
+                
+                <td> <div class="total-value-vrt">0<span class="d-inline-block float-right" onclick="clearValues(this,'all')"><i class="fas fa-times-circle "></i></span></div></td>
+            </tr>
+            {% endfor %}
+            
+            <tr class="total">
+                <td class="total-value-vrt">Total</td>
+                {% for financial_month in financial_months %}
+                <td id="column_total_{{zone.id}}_{{financial_month.month}}" class="total-value-vrt total_month_value_{{zone.id}}">0</td>
+                {% endfor %}
+                <td class="final_total_{{zone.id}} total-value-vrt">0</td>
+            </tr>
+            
+            {% endfor %}
+            
+            
+            
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="14"><button class="btn-2blue float-right" type="button" onclick="saveSalesPlan()"> Save & Proceed</button></td>
+            </tr>
+        </tfoot>
+        </table>

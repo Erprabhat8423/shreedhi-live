@@ -1,0 +1,94 @@
+{% load helper_tags %}
+{% load static %}
+
+{% if today_order_status > 0 %}
+{% if user_list %}
+<table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+    <thead>
+        <tr>
+            <th >Sr. No. </th>
+            <th style="width: 130px;">Date </th>
+            <th>Store Name(Distributor/SS Name) </th>
+            <th>Order Code </th>
+            <th>Order Amount </th>
+            <th>Invoice Amount</th>
+            <th>Download Invoice</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if user_list %}
+        {% for user in user_list %}
+        <tr>
+            <td text-align="center">{{ forloop.counter }}.</td>
+            <td >{{ user.order_date }}</td>
+            <td>{{ user.store_name }}({{ user.user_name }}/{{user.emp_sap_id}})</td>
+            <td>{{ user.order_code }}</td>
+            <td>{{ user.order_amount|floatformat:2}} </td>
+            <td>{{ user.invoice_amount|floatformat:2 }}</td>
+            <td>
+                {% if user.withoutgst == 1 %}
+                {% if user.bill_invoice_pdf %}
+                <a href="{{user.bill_invoice_pdf}}"download>Download BOS </a>
+                {% else %}
+                <span id="BOS_{{ user.user_id }}_{{ user.order_date }}"><a href="javascript:void(0)"
+                onclick="genrateInvoice('{{user.user_id}}','{{user.production_unit_id}}','bill', 'BOS')">Generate BOS </a>
+                </span>
+                {% endif %}
+                {% else %}
+                {% endif %}
+                {% if user.withgst == 1 and user.withoutgst == 1 %}
+                <span> | </span>
+                {% endif %}
+                {% if user.withgst == 1 %}
+                {% if user.tax_invoice_pdf %}
+                <a href="{{user.tax_invoice_pdf}}"download>Download TI </a>
+                {% else %}
+                <span id="TI_{{ user.user_id }}_{{ user.order_date }}"><a href="javascript:void(0)"
+                onclick="genrateInvoice('{{user.user_id}}','{{user.production_unit_id}}','tax', 'TI')">Generate TI</a>
+                </span>
+                {% endif %}
+                {% else %}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+<script>
+    $('.iconExport').show();
+    {% if all_bill_invoice_pdf %}
+    $('#BOS_ALL').html('<a class="dropdown-item logoutItem" href="{{ all_bill_invoice_pdf }}" download>Download All BOS  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+    {% else %}
+    $('#BOS_ALL').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllInvoice(`bill`, `BOS`,0)">Generate All BOS &nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+    {% endif %}
+    {% if all_tax_invoice_pdf %}
+    $('#TI_ALL').html('<a class="dropdown-item logoutItem" href="{{ all_tax_invoice_pdf }}" download>Download All TI  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+    {% else %}
+    $('#TI_ALL').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllInvoice(`tax`, `TI`,0)">Generate All TI &nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+    {% endif %}
+    {% for production_all_invoices_pdfs in production_all_invoices_pdf %}
+    {% if production_all_invoices_pdfs.BOS_ALL_url %}
+    $('#BOS_ALL_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem" href="{{ production_all_invoices_pdfs.BOS_ALL_url }}" download>Download {{production_all_invoices_pdfs.organization_name}} BOS  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+    {% else %}
+    $('#BOS_ALL_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllInvoice(`bill`, `BOS`,{{production_all_invoices_pdfs.id}})">Generate {{production_all_invoices_pdfs.organization_name}} BOS&nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+    {% endif %}
+    {% if production_all_invoices_pdfs.TI_ALL_url %}
+    $('#TI_ALL_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem" href="{{ production_all_invoices_pdfs.TI_ALL_url }}" download>Download {{production_all_invoices_pdfs.organization_name}} TI  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+    {% else %}
+    $('#TI_ALL_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllInvoice(`tax`, `TI`,{{production_all_invoices_pdfs.id}})">Generate {{production_all_invoices_pdfs.organization_name}} TI&nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+    {% endif %}
+{% endfor %}
+</script>
+{% else %}
+<script>
+    $('.iconExport').hide();
+</script>
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+{% else %}
+<script>
+    $('.iconExport').hide();
+</script>
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}

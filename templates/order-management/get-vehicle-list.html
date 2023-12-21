@@ -1,0 +1,5 @@
+<option style="width: 20px;" value="" > Select Vehicle</option>
+{% for vehicle in vehicle %}
+    <option style="width: 20px;" value="{{ vehicle.id }}" {% if vehicle.id == selects_vehicle_id.id %} selected {% endif %}>
+    {{ vehicle.registration_number }}({{vehicle.route_name}})</option>
+{% endfor %}

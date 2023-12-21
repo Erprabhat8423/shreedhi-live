@@ -1,0 +1,124 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0 modalOrgBG">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit Leave Status</h4>
+                </div>
+            </div>
+
+            <div class="col-md-9 p-md-4">
+                <form name="leave_status" method="POST" autocomplete="off" action="" aria-label="Organisation">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Leave details for {{ leaveData.user_name }} on {% if leaveData.leave_on_date %}{{leaveData.leave_on_date | date:'d/m/Y'}}{% endif %}</b> </h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button"
+                                onclick="updateLeaveStatus('{{ leaveData.id }}')">
+                                Update
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                                onclick="manipulateModal('leaveModal','close')">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;"><b>Leave Status</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <div class="col-md-6 p-md-0">
+                                <select class="inputField selectField widthSetter" style="width: 100%;" name="leave_approval" id="leave_approval">
+                                    <option value="">Select</option>
+                                    <option value="0">Cancel</option>
+                                    <option value="2">Approve</option>
+                                </select>
+                                <label class="error_msg float-right" id="leave_approval_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;"><b>Remark</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <div class="row widthSetter">
+                                <div class="col-md-12 p-md-0">
+                                    <textarea class="inputField" placeholder="Remark" name="remark" id="leave_remark" maxlength="250"></textarea>
+                                    <label class="error_msg float-right" id="address_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#mobileCode").select2();
+        $("#landLineCode").select2();
+    });
+    function updateLeaveStatus(id) {
+        var error = 0;
+        var a = document.forms["leave_status"]["leave_approval"].value;
+        document.getElementById('leave_approval_error').innerHTML = '';
+        if (a.trim() == null || a.trim() == "") {
+            var error = 1;
+            document.getElementById('leave_approval_error').innerHTML = 'Please select leave status*';
+            $('#leave_approval').css("border", "1px solid #db8305");
+        }
+        $('.error_msg').css("margin-bottom", "0rem");
+        if (error == 0) {
+            $.ajax({
+                url: "{% url 'src:update-leave-status' %}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    leave_approval: $('#leave_approval').val(),
+                    remark: $('#leave_remark').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function (data) {
+                    if (data.error == false) {
+                        $("#leaveModal").hide();
+                        $("body").removeClass("modal-open");
+                        $(".modal-backdrop").remove();
+                        openToaster("success", data.message);
+                        setTimeout( function(){window.location.reload();},1000);
+                        //ajaxOrganizationList();
+                    } else {
+                        $(".text-danger").html('');
+                        var data = data.message;
+                        $.each(data, function (index, value) {
+                            $('#' + index).html(value);
+                        });
+                    }
+                },
+                error: function (err) {
+                    alert(err.message);
+                    console.log(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+</script>

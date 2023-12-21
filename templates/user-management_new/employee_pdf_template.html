@@ -1,0 +1,72 @@
+<style>
+  .header-title h2,
+  .header-title h3 {
+    display: inline-block;
+  }
+  h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
+  }
+  
+  table {
+    width: 750px;
+    border-collapse: collapse;
+    margin: 0px auto;
+  }
+  
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+  
+  th {
+    background: #3498db;
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  td,
+  th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 12px;
+  }
+</style>
+
+<div class="col-md-12">
+  <div class="col-12" style="margin-bottom: 15px;">
+    <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th colspan="{{ columns_length }}">
+          <h3> Employees List </h3>
+        </th>
+      </tr>
+      <tr>
+        <th class="employee_name" {% if 'employee_name' not in columns %} style="display: none;" {% endif %}>Employee Name</th>
+        <th class="employee_role" {% if 'employee_role' not in columns %} style="display: none;" {% endif %}>Role</th>
+        <th class="employee_dep_org" {% if 'employee_dep_org' not in columns %} style="display: none;" {% endif %}>Dept./Org.</th>
+        <th class="employee_platform" {% if 'employee_platform' not in columns %} style="display: none;" {% endif %}>Platform(web/mobile)</th>
+        <th class="employee_last_sign_in" {% if 'employee_last_sign_in' not in columns %} style="display: none;" {% endif %}>Last Login</th>
+        <!-- <th class="address">Address</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td class="employee_name" {% if 'employee_name' not in columns %} style="display: none;" {% endif %}>{% if user.first_name %}{{ user.first_name }}{% endif %} {% if user.middle_name %}{{ user.middle_name }} {% else %} - {% endif %} {% if user.last_name %}{{ user.last_name }} {% else %} - {% endif %}</td>
+        <td class="employee_role" {% if 'employee_role' not in columns %} style="display: none;" {% endif %}>{{ user.role_name }}</td>
+        <td class="employee_dep_org" {% if 'employee_dep_org' not in columns %} style="display: none;" {% endif %}> {% if user.department_name %}{{ user.department_name }} {% else %} - {% endif %}/{% if user.organization_name %}{{ user.organization_name }} {% else %} - {% endif %} </td>
+        <td class="employee_platform" {% if 'employee_platform' not in columns %} style="display: none;" {% endif %}>{% if user.last_login is not None %}{% if user.auth_token is None %}Web{% else %}App{% endif %}{% else %}-{% endif %}</td>
+        <td class="employee_last_sign_in" {% if 'employee_last_sign_in' not in columns %} style="display: none;" {% endif %}> {% if user.last_login %}{{ user.last_login }} {% else %} - {% endif %} </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

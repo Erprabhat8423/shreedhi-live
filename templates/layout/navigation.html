@@ -1,0 +1,86 @@
+{% load static %}
+
+<nav class="navbar sticky-top" id="header" data-aos="fade-down">
+  <div class="row w-100 pt-md-3">
+    <div class="col-12 p-0 col-md-7">
+      <a href="/"><img src="{% static 'img/png/dashboardLogo.png' %}" class="dashboardLogo" /></a>
+    </div>
+    <div class="col-12 p-0 col-md-5">
+      <div class="row">
+        
+        <div class="col-2 offset-8 p-0 col-md-1 offset-md-0 pr-md-0 text-center dropdown addFav">
+          <button class="btn p-0" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-star fa-starDropdown checked"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right addFavContainer" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item logoutItem" href="#">Add Favourites &nbsp;&nbsp;<span
+            class="fa fa-star checked"></span></a>
+            <div class="dropdown-divider"></div>
+            <ul id="ajaxFavorite">
+              {% for favorite in request.session.favorites %}
+              <li class="dropdown-item logoutItem" onclick="openLink('{{favorite.link}}')"> {{favorite.favorite}} &nbsp;&bull;</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        
+        <div class="col-12 p-0 m-2 col-md-8 pr-md-2 m-md-0">
+          <div class="input-group">
+            <input
+            type="text"
+            id="search"
+            class="form-control searchInput"
+            placeholder="Search"
+            />
+            <div class="input-group-append dropdown">
+              <span
+              id="mainMenu"
+              class="input-group-text menuIconContainer"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              >
+              <img class="menuIcon" src="{% static 'img/png/menu.png' %}"
+              /></span>
+              <div
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="dropdownMenuButton"
+              >
+              <div class="top-arrow"></div>
+              <div class="row">
+                {% for module in request.session.modules %}
+                <div class="col-md-4 p-0">
+                  <span class="dropdown-head mt-2" href="#"
+                  >{{module.menu}}</span
+                  >
+                  {% for submenu in module.submenus %}
+                  <a class="dropdown-item" href="{% url submenu.link %}">{{submenu.sub_menu}}</a>
+                  {% endfor %}
+                </div>
+                {% endfor %}
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+      class="col-2 offset-8 p-0 col-md-1 offset-md-0 pr-md-0 text-center"
+      >
+      <!-- <i class="fa fa-bell"><span class="badge">01</span></i>    -->
+    </div>
+    <div class="col-2 p-0 col-md-2 pl-md-1 text-center dropdown">
+      <button class="btn btn-logout" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-angle-down angleDown"></i>
+        <img class="signout" src="{% static 'img/png/signout.png' %}" />
+      </button>
+      <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+        <!-- <a class="dropdown-item logoutItem" href="#">User Profile&nbsp;&nbsp;<img src="{% static 'img/svg/user.svg' %}" class="logoutIcons"></a> -->
+        <a class="dropdown-item logoutItem" href="javascript:;" onclick="changePassword();">Change Password&nbsp;&nbsp;<img src="{% static 'img/svg/changePassword.svg' %}" class="logoutIcons"></a>
+        <a class="dropdown-item logoutItem" href="{% url 'logout' %}" style="color: #0052a0;">Logout&nbsp;&nbsp;<img src="{% static 'img/svg/Logout.svg' %}" class="logoutIcons"></a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</nav>

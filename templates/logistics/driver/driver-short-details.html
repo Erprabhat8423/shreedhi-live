@@ -1,0 +1,152 @@
+{% load static %}
+
+            {% if first_driver %}
+            <div class="row" style="height: 85%;">
+                <div class="col-md-12 p-0">
+                    <div class="row">
+                        <div class="col-md-2 p-md-0">
+                            {% if first_driver.profile_image and first_driver.profile_image != 'None' %}
+                            <img src="{{ first_driver.profile_image }}" style="width: 100%;">
+                            {% else %}
+                            <img src="{% static 'img/svg/profile.svg' %}" style="width: 100%; height: 60%;">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10 p-md-0">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6><b>{{first_driver.first_name}} {{first_driver.middle_name}} {{first_driver.last_name}} </b></h6>
+                                    <h6 class="smallText"><span style="color: #0052a0;">{{first_driver.first_name}}</span> | {{first_driver.role_name | capfirst}}</h6>
+                                </div>
+                                <div class="col-md-4 p-md-0 text-right">
+                                    <h5>{% if user.last_login is not None %}{% if user.auth_token is None %}WEB{% else %}APP{% endif %}{% endif %}&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}"></h5>
+                                    {% if first_driver.last_ip %}{{first_driver.last_ip}}{% endif %}
+                                </div>
+                            </div>
+                            <br clear="all">
+                            <div class="row">
+                                <div class="col-md-1 p-md-0">
+                                    <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-md-6 p-md-0">
+                                    <h6 class="smallText">Contact No.</h6>
+                                    <h6 class="largeText"> {{first_driver.primary_contact_number}}</h6>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0 mt-md-3">
+                            <div class="row mb-md-2">
+                                <div class="col-md-3 p-md-0">
+                                    <div class="row">
+                                        <div class="col-md-2 p-md-0">
+                                            <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-10">
+                                            <h6 class="smallText">Gender</h6>
+                                            <h6 class="largeText">{% if first_driver.gender %}{{first_driver.gender | capfirst }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Email ID(Personal)</h6>
+                                            <h6 class="largeText">{{ first_driver.personal_email }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Blood Group</h6>
+                                            <h6 class="largeText">{% if first_driver.blood_group %}{{first_driver.blood_group}}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-md-2">
+                                <div class="col-md-12 p-md-0">
+                                    <div class="row">
+                                        <div class="col-1 p-0">
+                                            <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-11 p-md-0">
+                                            <h6 class="smallText">Correspondance Address</h6>
+                                            <h6 class="largeText">{% if first_driver.address_line_1 %}{% if first_driver.address_line_1 %} {{first_driver.address_line_1}},{% endif %} {% if first_driver.address_line_2 %} {{first_driver.address_line_2}},{% endif %} {{first_driver.state_name}}, {{first_driver.country_name}},{{first_driver.pincode}}{% else %}-{% endif %}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-md-2">
+                                <div class="col-md-12 p-md-0">
+                                    <div class="row">
+                                        <div class="col-1 p-0">
+                                            <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-11 p-md-0">
+                                            <h6 class="smallText">Permanent Address</h6>
+                                            <h6 class="largeText">{% if first_driver.address_line_1 %}{% if first_driver.address_line_1 %} {{first_driver.address_line_1}},{% endif %} {% if first_driver.address_line_2 %} {{first_driver.address_line_2}},{% endif %} {{first_driver.state_name}}, {{first_driver.country_name}},{{first_driver.pincode}}{% else %}-{% endif %}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="row mb-md-2">
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Father Name</h6>
+                                            <h6 class="largeText">{% if first_driver.father_name %}{{first_driver.father_name }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+            
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Mother Name</h6>
+                                            <h6 class="largeText">{% if first_driver.mother_name %}{{first_driver.mother_name }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Date Of Birth</h6>
+                                            <h6 class="largeText">{% if first_driver.date_of_birth %}{{first_driver.date_of_birth }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="dropdown-divider w-100"></div>
+                <!-- <div class="col-sm-12 text-center p-0">
+                    <h6 class="m-0" onclick="viewEmployeeDetails('{{first_driver.id }}')" style="cursor: pointer;">
+                        <u>More Info</u></h6>
+                    </div>
+                </div> -->
+                {% else %}
+                <p style="text-align: center;">No Record Found...</p>
+                {% endif %}

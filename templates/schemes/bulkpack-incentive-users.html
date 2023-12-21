@@ -1,0 +1,81 @@
+{% load static %}
+
+<table id="bulkpackIncentiveSchemeUserTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="bulkpack_distributor_name" id="bulkpack_distributor_name">
+                    Dis./SS Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bulkpack_town" id="bulkpack_town">Town<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bulkpack_state" id="bulkpack_state">State<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+               
+                <th class="bulkpack_unit" id="bulkpack_unit">Unit<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+               
+
+                <th class="bulkpack_created_date" id="bulkpack_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="bonus_scheme_tablebody">
+            {% if users %}
+            {% for user in users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+                <td class="bulkpack_distributor_name">
+                    {{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+                <br>
+                <b>{{user.route_name}}</b>
+                </td>
+                <td class="bulkpack_town">{{user.town_name}}</td>
+                <td class="bulkpack_state">{{user.state_name}}</td>
+                <td class="bulkpack_unit">{{user.unit_name}}
+                    <a href="javascript:;" onclick="viewBifurcation('bulkpack', '{{user.user_id}}','{{user.scheme_id}}')"><i class="fa fa-sitemap"></i></a>
+                </td>
+
+                <td class="bulkpack_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+                <td>
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="hidden" id="user_bulkpack_incentive_is_active_{{ user.user_id }}" value="{{ user.status }}">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateUserSchemeStatus('{{ user.id }}', this, 'bulkpack_incentive')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="nonoperational_loading" style="display: none;">
+                <td class="text-center" colspan="9"></td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>

@@ -1,0 +1,77 @@
+{% load static %}
+
+<div class="md-modal centered">
+    <form name="updateLeaveRemark" id="updateLeaveRemark" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Add Remark &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="button" onclick="validateBasicForm()" >
+                            Update
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="closeModel('addUserModal')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/changePassword.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Remark
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <textarea class="inputField" name="remark" id="remark" placeholder="Remark" cols="5" rows="3" maxlength="200"></textarea>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        function closeModel(modalId){
+            $("#" + modalId).hide();
+            $(".modal-backdrop").css("display", "none"); 
+            return;
+        }
+    </script>
+    <script>
+            
+            function validateBasicForm(){
+                error = 0;
+                $('.error_msg').text('');
+                $('textarea#remark').css("border", "");
+                if($('textarea#remark').val() == ""){
+                    $('textarea#remark').parent().find('.error_msg').text("Please enter remark*");
+                    $('textarea#remark').css("border", "1px solid #db8305");
+                    error = error + 1;
+                }
+                if(error > 0){
+                    return true;
+                }else{
+                    var remark = $('textarea#remark').val();
+                    updateLeaveStatus('{{level_id}}', '{{leave_status}}', remark);
+                }
+            }
+    </script>
+    
+    
+    
+    

@@ -1,0 +1,391 @@
+{% load static %}
+<style>
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+</style>
+
+<div class="modal-AddUser centered" style="width: 65%!important; height:85%!important; margin-bottom: 400px;">
+    <div class="modal-header" id="headerStep1">
+        
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-8">
+                    <h5 class="mt-md-2"><strong>Receive Payment</strong></h5>
+
+                </div>
+                <div class="col-4">
+                    
+                        
+                    <button class="btn btn-close float-right" type="button"
+                        onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto; ">
+        <form name="creditLedgerForms" id="creditLedgerForms" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12 p-0 h-100 w-100">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Credit Date*
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="datepicker inputField" placeholder="Enter Date " name="credit_date" id="credit_date"
+                                    value="{{today | date:'d/m/Y'}}" readonly>
+                    
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 ">
+                        
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Organization*
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField"
+                                    style="width: 100%!important; margin-right: 2px; padding: 0.3rem; text-align: left;" name="organization_id"
+                                    id="organization_id" onchange="getOrganizationToUser(); getBank();">
+                                    <option value="">Select Organization</option>
+                                    {% for organization in organizations %}
+                                    <option style="width: 20px;" value="{{ organization.id }}">{{ organization.organization_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right" id="organization_id_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-1">
+                    <div class="col-md-4 ">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/Bank.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Bank*
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField"
+                                    style="width: 100%!important; margin-right: 2px; padding: 0.3rem; text-align: left;" name="bank_id"
+                                    id="bank_id">
+                                    <option value="">Select Bank</option>
+                                </select>
+                                <label class="error_msg float-right" id="bank_id_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 ">
+                        
+                    </div>
+                    <div class="col-md-4 ">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Party Name*
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField"
+                                    style="width: 100%!important; margin-right: 2px; padding: 0.3rem; text-align: left;" name="user_ids"
+                                    id="user_ids">
+                                    <option value="">Select Party</option>
+                                    {% for user in users %}
+                                    <option style="width: 20px;" value="{{ user.id }}">{{ user.store_name }}({{user.emp_sap_id}})</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right" id="user_ids_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-12 p-md-0 text-left">
+                        <div class="row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mode_of_payment_.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Mode Of Payment*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField"
+                                            style="width: 100%!important; margin-right: 2px; padding: 0.3rem; text-align: left;" name="payment_mode" id="payment_mode">
+                                            <option value="">Select Payment Mode</option>
+                                            {% for mode_of_payment in mode_of_payments %}
+                                            <option style="width: 20px;" value="{{ mode_of_payment.id }}">{{ mode_of_payment.mode_of_payment }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="payment_mode_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Amount*
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField numeric" type="text" placeholder="Amount*" name="amount" id="amount" />
+                                <label class="error_msg float-right" id="amount_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/remark.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Remark
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <textarea class="inputField" type="text" placeholder="Remark" name="remark" id="remark" /></textarea>
+                                <label class="error_msg float-right" id="remark_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/attachment.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Attechment
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField" type="file" placeholder="Amount*" name="Attechment" id="Attechment" onchange="uploadImages(this.id)" />
+                                <label class="variant_image_error_msg" id="variant_image_error_msg" style="color: red; font-size: 11px;"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-1">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 mt-4">
+                        <button class="btn btn-save float-right" type="button" onclick="confirmation();">
+                            Receive Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+            $("#credit_date").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                changeDate: true,
+                yearRange: "-100:+0",
+                maxDate: 0,
+                dateFormat: 'dd/mm/yy'
+            });
+        });
+
+function confirmation(){
+            var error = 0;
+            var a = document.forms["creditLedgerForms"]["user_ids"].value;
+            document.getElementById('user_ids_error').innerHTML = '';
+            $('#user_ids').siblings(".select2-container").css("border","");
+            if (a == null || a == "") {
+                var error = 1;
+                document.getElementById('user_ids_error').innerHTML = 'Please select Party*';
+                $('#user_ids').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            }
+            var b = document.forms["creditLedgerForms"]["payment_mode"].value;
+            document.getElementById('payment_mode_error').innerHTML = '';
+            $('#payment_mode').siblings(".select2-container").css("border","");
+            if (b == null || b == "") {
+                var error = 1;
+                document.getElementById('payment_mode_error').innerHTML = 'Please select Payment*';
+                $('#payment_mode').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            }
+
+            var b = document.forms["creditLedgerForms"]["organization_id"].value;
+            document.getElementById('organization_id_error').innerHTML = '';
+            $('#organization_id').siblings(".select2-container").css("border","");
+            if (b == null || b == "") {
+                var error = 1;
+                document.getElementById('organization_id_error').innerHTML = 'Please select Organisation*';
+                $('#organization_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            }
+
+            var b = document.forms["creditLedgerForms"]["bank_id"].value;
+            document.getElementById('bank_id_error').innerHTML = '';
+            $('#bank_id').siblings(".select2-container").css("border","");
+            if (b == null || b == "") {
+                var error = 1;
+                document.getElementById('bank_id_error').innerHTML = 'Please select bank*';
+                $('#bank_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            }
+
+            var c = document.forms["creditLedgerForms"]["amount"].value;
+            document.getElementById('amount_error').innerHTML = '';
+            $('#amount').css("border","");
+            if (c == null || c == "") {
+                var error = 1;
+                document.getElementById('amount_error').innerHTML = 'Please Enter Amount*';
+               $('#amount').css("border", "1px solid #db8305");
+            }
+            if (error == 0) {
+                $.confirm({
+                        title: 'Confirm!',
+                        theme:'material',
+                        content: 'Do you want to save ?',
+                        buttons: {
+                            confirm: {
+                                btnClass: 'btn-blue',
+                                action: function(){
+                                    $('#creditLedgerForms').submit();
+                                }
+                            },
+                            cancel: {
+                                btnClass: 'btn-red',
+                                action: function(){
+                                    
+                                }
+                            },
+                            
+                            
+                        }
+                    });
+
+            }else {
+                return false;
+            }
+
+}
+
+        $('#creditLedgerForms').submit(function (e) {
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            $.ajax({
+                url: "{% url 'src:save-credit-ledger' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    hideLoader();
+                    if(response.flag == 0){
+                        openToaster("success", response.message);
+                        setTimeout(function(){ window.location.reload(); }, 500);
+                    }else{
+                        openToaster("danger", response.message);
+                    }
+                    
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            
+            });
+                
+            
+        });
+
+
+
+        function uploadImages(id) {
+        
+        for (var i = 0; i < $("#"+id).get(0).files.length; i++) {
+            var current_file = $("#"+id).get(0).files[i];
+            var current_file_name = $("#"+id).get(0).files[i].name;
+            var error = 0;
+            if(current_file_name){
+                var ext = current_file_name.split('.').pop().toLowerCase();
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG']) !== -1){
+                    error = 0;
+                    if(current_file_name){
+                        console.log('test3');
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>5120){
+                            error = 1;
+                            document.getElementById('variant_image_error_msg').innerHTML = 'Image should be upto 5MB*';
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                            document.getElementById('variant_image_error_msg').innerHTML = '';
+                        }
+                    }
+        
+                } else {
+                    error = 1;
+                    document.getElementById('variant_image_error_msg').innerHTML = 'Image should be jpg and png*';
+                    $("#"+id).val('');
+                }
+                
+                
+            }
+        }
+        
+    }
+
+    function getOrganizationToUser(){
+        organization_id = $('#organization_id').val()
+   
+        $.ajax({
+            url: "{% url 'src:get-organization-to-users' %}",
+                type: 'GET',
+                data: {organization_id:organization_id},
+                success: function (response) {
+                 
+                    $('#user_ids').html(response.options)
+                    
+                },
+        })
+    }
+
+    function getBank(){
+        organization_id = $('#organization_id').val()
+   
+        $.ajax({
+            url: "{% url 'src:get-bank' %}",
+                type: 'GET',
+                data: {organization_id:organization_id},
+                success: function (response) {
+                 
+                    $('#bank_id').html(response.options)
+                    
+                },
+        })
+    }
+</script>

@@ -1,0 +1,289 @@
+{% load static %}
+
+<form name="addDocumentDetailsForms" id="addDocumentDetailsForms" method="POST" autocomplete="off" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="last_user_id" id="last_user_id" value="{{ last_user_id }}" >
+    <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" onclick="perviousPage('{{last_user_id}}','3')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline"> &nbsp;&nbsp; Upload Documents
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                
+                
+                <div class="col-md-12 p-0 fullWidth fulHeight" id="step1">
+                    
+                    <div class="row">
+                        <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                            <h5>Aadhar Card</h5>
+                            <div class="card">
+                            {% if user_documents.aadhaar_card %}
+                            <img id="previewAadhar" src="{{ user_documents.aadhaar_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                            {% else %}
+                            <img id="previewAadhar" src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                            {% endif %}
+                            <input type="hidden" name="previous_aadhaar_card" id="previous_aadhaar_card" value="{% if user_documents.aadhaar_card %}{{ user_documents.aadhaar_card }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="aadhar_card_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_Aadhar" name="aadhaar_card" type="file" accept="image/*"
+                                    style="display: none;" onchange="fileUploader(this.id,'previewAadhar', 'Aadhaar Card', 'aadhar_card_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_Aadhar')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                            <h5>PAN Card</h5>
+                            <div class="card">
+                                {% if user_documents.pan_card %}
+                                <img id="previewPAN" src="{{ user_documents.pan_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewPAN" src="{% static 'img/svg/PANGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_pan_card" id="previous_pan_card" value="{% if user_documents.pan_card %}{{ user_documents.pan_card }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="pan_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_PAN" name="pan_card" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploader(this.id,'previewPAN', 'PAN', 'pan_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_PAN')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                            <h5>CIN</h5>
+                            <div class="card">
+                                {% if user_documents.cin %}
+                                <img id="previewCIN" src="{{ user_documents.cin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewCIN" src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_cin" id="previous_cin" value="{% if user_documents.cin %}{{ user_documents.cin }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="cin_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_CIN" name="cin" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploader(this.id,'previewCIN', 'CIN', 'cin_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_CIN')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                            <h5>GSTIN</h5>
+                            <div class="card">
+                                {% if user_documents.gstin %}
+                                <img id="previewGSTIN" src="{{ user_documents.gstin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewGSTIN" src="{% static 'img/svg/GSTNGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_gstin" id="previous_gstin" value="{% if user_documents.gstin %}{{ user_documents.gstin }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="gstin_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_GSTIN" name="gstin" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploader(this.id,'previewGSTIN', 'GSTIN', 'gstin_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_GSTIN')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                            <h5>FSSAI</h5>
+                            <div class="card">
+                                {% if user_documents.fssai %}
+                                <img id="previewFSSAI" src="{{ user_documents.fssai }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewFSSAI" src="{% static 'img/svg/GSTNGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_fssai" id="previous_fssai" value="{% if user_documents.fssai %}{{ user_documents.fssai }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="fssai_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_FSSAI" name="fssai" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploader(this.id,'previewFSSAI', 'FSSAI', 'fssai_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_FSSAI')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-3 offset-9 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li2" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li3" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn3">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li4" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn4">
+                            &#10004;
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</form>
+
+<script>
+    $('#addDocumentDetailsForms').submit(function(e){
+        showLoader();
+        $('#addUserModal').html('');
+        e.preventDefault();
+        $form = $(this)
+        var formData = new FormData(this);
+        
+        $.ajax({
+            url: "{% url 'src:add-user-document-detail' %}",
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                $('.error').remove();
+                console.log(response)
+                if(response.error){
+                    $.each(response.errors, function(name, error){
+                        alert(error);
+                        window.location.reload();
+                    })
+                } else {
+                    hideLoader();
+                    openToaster("success", response.message);
+                    window.location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+    
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function fileUploader(id, previewId, fileType, error_id) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            document.getElementById(error_id).innerHTML = '';
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    document.getElementById(error_id).innerHTML = ''+fileType+' should be jpg or png*';
+                    
+                    $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            
+                            document.getElementById(error_id).innerHTML = ''+fileType+' should be upto 2MB*';
+                            
+                            $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+</script>

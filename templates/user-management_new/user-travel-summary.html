@@ -1,0 +1,181 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-2">
+                            <select class="inputField selectField" name="time_period" id="time_period" onchange="checTimePeriod()">
+                                <option value="1">Daily</option>
+                                <option value="2">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="inputField selectField" name="user_id" id="user_id" onchange="getUserSummaryReport()">
+                                <option value="">Select Employee</option>
+                                {% for user in users %}
+                                <option value="{{ user.user_id }}">{{ user.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 p-md-0">
+                            <input class="inputField" placeholder="Date" name="travel_date" id="travel_datepicker" value="{{ today_date }}" onchange="getUserSummaryReport()" readonly>
+                            <input class="inputField" placeholder="Month" name="travel_month" id="travel_month_picker" value="{{ month_date }}" style="display: none;" onchange="getUserSummaryReport()" readonly>
+                        </div>
+                        <div class="col-md-2 p-md-0">
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:1.1rem!important;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 2%; text-align: center;">Sr No.</th>
+                                <th style="width: 10%; text-align: center;"> Employee Name  </th>
+                                <th style="width: 10%; text-align: center;"> Distance Travelled in Kilometer  </th>
+                                <th style="width: 10%; text-align: center;"> Charges  </th>
+                                <th style="width: 10%; text-align: center;"> Total Charges  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if user_tracking_details %}
+                            {% for user_tracking in user_tracking_details %}
+                            <tr>
+                                <td style="text-align: center;">{{ forloop.counter }}.</td>
+                                <td style="text-align: center;">{{ user_tracking.user_name  }}</td>
+                                <td style="text-align: center;">{{ user_tracking.distance_travelled }}</td>
+                                <td style="text-align: center;">{{ user_tracking.charges  }}</td>
+                                <td style="text-align: center;">{{ user_tracking.total_charges  }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <th style="text-align: center;" colspan="5">No Record Found...</th>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    function getUserList(){
+        $('[name="user_id"]').html('<option value="">Select Employee</option>');
+        var travel_date      = $('#travel_datepicker').val();
+        $.ajax({
+                url: "{% url 'src:get-travel-user-list' %}",
+                method: 'GET',
+                data: { travel_date:travel_date },
+                success: function (data) {
+                    $('[name="user_id"]').html(data.options)
+                    $(".selectField").select2();
+                    getUserSummaryReport();
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+    };
+    function checTimePeriod(){
+        var time_period     = $('#time_period option:selected').val();
+        if(time_period == '2'){
+            getUserList(time_period)
+            $('#travel_month_picker').show();
+            $('#travel_datepicker').hide();
+        }else{
+            $('#travel_month_picker').hide();
+            $('#travel_datepicker').show();
+            getUserSummaryReport()
+        }     
+    };
+    function getUserSummaryReport(){
+        var travel_date             = $('#travel_datepicker').val();
+        var user_id                 = $('#user_id option:selected').val();
+        var time_period             = $('#time_period option:selected').val(); 
+        var travel_month_picker     = $('#travel_month_picker').val();     
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-user-travel-summary-report' %}",
+                method: 'GET',
+                data: { travel_date:travel_date, user_id:user_id, time_period:time_period, travel_month_picker:travel_month_picker },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $("#travel_datepicker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+
+            $("#travel_month_picker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                dateFormat: 'mm/yy' 
+            });
+        });
+        function exportsInExcel(){
+            var travel_date             = $('#travel_datepicker').val();
+            var time_period             = $('#time_period option:selected').val(); 
+            var travel_month_picker     = $('#travel_month_picker').val();     
+            if(travel_date){ 
+                travel_date = travel_date.split('/');
+                travel_date = travel_date[2]+'-'+travel_date[1]+'-'+travel_date[0]
+            }else{ travel_date = '0' }
+            var user_id          = $('#user_id option:selected').val();
+            if(user_id){
+                user_id = user_id
+            }else{
+                user_id = 0
+            }
+            if(travel_month_picker){ 
+                travel_month_picker = travel_month_picker.split('/');
+                travel_month_picker = travel_month_picker[0]+'-'+travel_month_picker[1]
+            }else{ travel_month_picker = '0' }
+            if(time_period){
+                time_period = time_period
+            }else{
+                time_period = 0
+            }
+            var url = "{% url 'src:export-user-travel-summary' 'travel_date' 'user_id' 'travel_month_picker' 'time_period' %}";
+            url = url.replace('travel_date',travel_date).replace('user_id',user_id).replace('travel_month_picker',travel_month_picker).replace('time_period',time_period);
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

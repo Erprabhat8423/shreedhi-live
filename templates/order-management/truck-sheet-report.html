@@ -1,0 +1,314 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="inputField selectField" name="user_id" id="user_id" onchange="getSummaryReport()">
+                                        {% if users %}
+                                        {% for user in users %}
+                                        <option value="{{ user.id }}" {% if user.id == current_user.id|add:"0" %}selected{% endif %}>{{ user.emp_sap_id }}({{ user.name }}/{{ user.store_name }})</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option value="">Select SAP ID</option>
+                                        {% endif %}
+                                        
+                                    </select>
+                                </div>
+                                <div class="col-md-4"> 
+                                    <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="" onchange="getUserList(); getSummaryReport();" readonly>
+                                </div>
+                                <div class="col-md-4" export>
+                                    
+                                </div>
+                            </div>
+                            
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if first_order %}
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <table border="1">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 33%; text-align: center;">Route Name</th>
+                                            <th style="width: 33%; text-align: center;">Dis./SS. Name</th>
+                                            <th style="width: 33%; text-align: center;">Store Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;">{{current_user.route_name}}</td>
+                                            <td style="text-align: center;">{{current_user.name}}</td>
+                                            <td style="text-align: center;">{{current_user.store_name}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col-md-4 text-right">
+                                <button type="button" id="" class="btn iconBox iconExportExcel" onclick="exportExcel()"></button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="col-md-12" style="margin-top: 10px;">
+                        <table class="table table-bordered table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                
+                                <tr>
+                                    <th style="background-color: #ffffff; color: #000000;"> PARTICULAR </th>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.variant_name}}</th>
+                                    {% endfor %}
+                                    <!-- <th> TOTAL CRATES </th> -->
+                                </tr>
+                                
+                                
+                                
+                            </thead>
+                            
+                            <tbody>
+                                
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> DEMAND </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.demand}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;">{{product_milk_total_crates}}</th> -->
+                                </tr>
+                                
+                                <!-- <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> BONUS SCHEME </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.bonus_scheme}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_total_bonus_scheme}}</th>
+                                </tr> -->
+                                <!-- <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> VARIANT WISE TOTAL CRATES  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.variant_wise_total_crates}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{ product_milk_total_crates|add:product_milk_total_bonus_scheme }}</th>
+                                </tr> -->
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> POUCH PER CRATE  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> FREE POUCHES  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.free_pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+                                </tr>
+                                <!-- <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL POUCH PER CRATE  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #adce74; color: #000000;"></th>
+                                </tr> -->
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL NO. OF POUCHES  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_no_of_pouch}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> SKU SIZE  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.sku_size}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL QTY (LTR / KG)  </td>
+                                    {% for product_milk_variant in product_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_quantity|floatformat:2}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;">{{ product_milk_total_quantity|floatformat:2 }}</th> -->
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        
+                        <table class="table table-bordered table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                
+                                <tr>
+                                    <th style="background-color: #ffffff; color: #000000;"> PARTICULAR </th>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.variant_name}}</th>
+                                    {% endfor %}
+                                    <!-- <th> TOTAL CRATES </th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> DEMAND </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.demand}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_total_crates}}</th> -->
+                                </tr>
+                                
+                                <!-- <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> BONUS SCHEME </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.bonus_scheme}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_total_bonus_scheme}}</th>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> VARIANT WISE TOTAL CRATES  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.variant_wise_total_crates}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{ product_without_milk_total_crates|add:product_without_milk_total_bonus_scheme }}</th>
+                                </tr> -->
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> POUCH PER CRATE  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> FREE POUCHES  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.free_pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+                                </tr>
+                                <!-- <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL POUCH PER CRATE  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_pouch_per_crate}}</th>
+                                    {% endfor %}
+                                    <th style="background-color: #adce74; color: #000000;"></th>
+                                </tr> -->
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL NO. OF POUCHES  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_no_of_pouch}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #ffffff; color: #000000;"> SKU SIZE  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.sku_size}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #adce74; color: #000000;"> TOTAL QTY (LTR / KG)  </td>
+                                    {% for product_without_milk_variant in product_without_milk_variant_list %}
+                                    <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_quantity|floatformat:2}}</th>
+                                    {% endfor %}
+                                    <!-- <th style="background-color: #adce74; color: #000000;">{{ product_without_milk_total_quantity|floatformat:2 }}</th> -->
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    {% else %}
+                    <p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    function getUserList(){
+        $('[name="user_id"]').html('<option value="">Select SAP ID</option>');
+        var order_date      = $('#order_datepicker').val();
+        $.ajax({
+                url: "{% url 'src:get-user-list' %}",
+                method: 'GET',
+                data: { order_date:order_date },
+                success: function (data) {
+                    $('[name="user_id"]').html(data.options)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+    };
+    function getSummaryReport(){
+        var order_date      = $('#order_datepicker').val();
+        var user_id         = $('#user_id option:selected').val()
+        
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:truck-sheet-report' %}",
+                method: 'GET',
+                data: { order_date:order_date,user_id:user_id },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $("#order_datepicker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+        });
+        function exportExcel(){
+            var order_date      = $('#order_datepicker').val();
+            var user_id      = $('#user_id').val();
+            var url = "{% url 'src:truck-sheet-report' %}";
+            url = url + "?order_date="+order_date+"&user_id="+user_id+"&export_action=excel"
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

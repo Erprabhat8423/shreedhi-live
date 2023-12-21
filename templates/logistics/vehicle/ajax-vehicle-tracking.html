@@ -1,0 +1,99 @@
+{% load static %}
+
+
+
+{% if tracks %}
+
+<div id="map" style="height: 650px; margin-top: 20px;"></div>  
+
+<script>
+    
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 20,
+            center: {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} },
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        
+        var flightPlanCoordinates = [
+        {% for track in tracks %}
+        {lat: {{track.latitude}}, lng: {{track.longitude}} },
+        {% endfor %}
+        ];
+        var flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        
+        flightPath.setMap(map);
+        
+        var startLatLng = {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} };
+        var marker = new google.maps.Marker({
+            position: startLatLng,
+            map,
+            icon: "{% static '/img/png/start.png' %}",
+            title: 'Day Started - {{first_track.created_at|date:'H:i:s a'}}'
+        });
+        marker.setMap(map);
+        
+        
+        {% for track in tracks %}
+        {% if not forloop.first and not forloop.last %}
+        var middleLatLng = {lat: {{track.latitude}}, lng: {{track.longitude}}};
+        var marker = new google.maps.Marker({
+            position: middleLatLng,
+            map,
+            icon: "{% static '/img/png/walk.gif' %}",
+            title: 'Poll Time - {{track.created_at|date:'H:i:s a'}}'
+        });
+        marker.setMap(map);
+        {% endif %}
+        {% endfor %}
+        
+        
+        var endLatLng = {lat: {{last_track.latitude}}, lng: {{last_track.longitude}} };
+        var marker = new google.maps.Marker({
+            position: endLatLng,
+            map,
+            icon: "{% static '/img/png/end.png' %}",
+            title: 'Last Location - {{last_track.created_at|date:'H:i:s a'}} '
+        });
+        marker.setMap(map);
+        
+        var latlng = [
+        new google.maps.LatLng({{first_track.latitude}}, {{first_track.longitude}} ),
+        new google.maps.LatLng({{last_track.latitude}}, {{last_track.longitude}} ),
+        
+        {% for track in tracks %}
+        {% if not forloop.first and not forloop.last %}
+        new google.maps.LatLng({{track.latitude}},{{track.longitude}}),
+        {% endif %}
+        {% endfor %}
+        ]; 
+        var latlngbounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < latlng.length; i++) {
+            latlngbounds.extend(latlng[i]);
+        }
+        map.fitBounds(latlngbounds);
+        
+        
+    }
+    
+    
+    
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initMap&libraries=&v=weekly">
+</script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initMap&libraries=&v=weekly"> -->
+<!-- </script> -->
+
+
+{% else %}
+<div class="no_track_section">
+</div>
+
+{% endif %}

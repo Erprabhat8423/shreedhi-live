@@ -1,0 +1,132 @@
+{% load static %}
+{% load helper_tags %}
+{% if today_order_status > 0 %}
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+        <th colspan="2">Route Name	</th>
+        <td colspan="2">{{route_name}}</td>
+        <th style="font-size:24px;text-align:center" colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}">
+        <b>Truck Loading Sheet</b>
+        </th>
+        <th>Date</th>
+        <td>{{today_date}}</td>
+    </tr>
+    <tr>
+        <th colspan="2">Route Code	</th>
+        <td colspan="2">{{route_code}}</td>
+        <th colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}"></b>
+        </th>
+         <th></th> 
+        <td></td>
+    </tr>
+    <tr>
+        <th colspan="2">Type of sheet</th>
+        <th colspan="2">Normal/Free Samples	</th>
+        <th colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}"></b>
+        </th>
+        <th>Vehicle Number</th>
+        <td>{{vehicle_number}}</td>
+    </tr>
+    <tr id="topborder">
+            <th>S.No.	</th>
+            <th>Store Name
+            (Distributor/Sap Code) </th>
+            <th>Mobile Number 1	</th>
+            <th>Mobile Number 2	</th>
+            {% if product_milk_variant_list %}
+            {% for product_variant in product_milk_variant_list %}
+            <th style="text-align:center"> {{product_variant.variant_name}}  </th>
+            {% endfor %}
+            {% endif %}
+            {% if product_without_milk_variant_list %}
+            {% for product_variant in product_without_milk_variant_list %}
+            <th style="text-align:center"> {{product_variant.variant_name}}  </th>
+            {% endfor %}
+            {% endif %}
+        </tr>
+    </thead> 
+    {% if indent_lists %}
+    {% for indent in indent_lists %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{indent.store_name}}({{ indent.first_name }} {{ indent.middle_name }} {{ indent.last_name }}/{{indent.emp_sap_id}})</td>
+        <td>{{ indent.contact_number1 }}</td>
+        <td>{{ indent.contact_number2 }}</td>
+        {% if indent.milk_items %}
+        {% for item in indent.milk_items %}
+        <td style="text-align:center"> {{item.milk_items}}  </td>
+        {% endfor %}
+        {% endif %}
+        {% if indent.without_milk_items %}
+        {% for item in indent.without_milk_items %}
+        <td style="text-align:center"> {{item.without_milk_items}}  </td>
+        {% endfor %}
+        {% endif %}
+        <td></td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    <tr>
+        <td colspan="4" style="text-align: right;">GRAND TOTAL(CRATES)</td>
+        {% if total_milk_crates_qty %}
+        {% for total_milk_crates in total_milk_crates_qty %}
+        <td style="text-align:center">{{total_milk_crates}}</td>
+        {% endfor %}
+        {% endif %}
+        {% if total_without_milk_crates_qty %}
+        {% for total_without_milk_crates in total_without_milk_crates_qty %}
+        <td style="text-align:center">{{total_without_milk_crates}}</td>
+        {% endfor %}
+        {% endif %}
+        <th></th>
+        
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: right;">Scheme in Nos</td>
+        {% if total_free_milk_pouches %}
+        {% for total_milk_pouches in total_free_milk_pouches %}
+        <td style="text-align:center">{{total_milk_pouches}}</td>
+        {% endfor %}
+        {% endif %}
+        {% if total_free_without_milk_pouches_qty %}
+        {% for total_without_milk_pouches in total_free_without_milk_pouches_qty %}
+        <td style="text-align:center">{{total_without_milk_pouches}}</td>
+        {% endfor %}
+        {% endif %}
+        <td></td>
+        
+    </tr>
+    
+</table>
+    
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+
+<script>
+    {% if today_order_status == 0 and order_date != today_date %}
+    $("#order_datepicker").css("margin-right","220px");
+    $('#order_exports').hide();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% else %}
+    $("#order_datepicker").css("margin-right","0");
+    {% if order_date == today_date %}
+    $('#order_exports').hide();
+    {% if today_order_status > 0 and order_regenerate_status > 0 %}
+    $('#order_regenerate').show();
+    {% elif today_order_status == 0 %}
+    $('#order_generate').show();
+    {% elif today_order_status > 0 %}
+    $('#order_export').show();
+    {% endif %}
+    {% else %}
+    $('#order_exports').show();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% endif %}
+    {% endif %}
+</script>

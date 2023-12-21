@@ -1,0 +1,96 @@
+{% load static %}
+<div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" >
+    <input type="hidden" name="page" id="page" value="2" />
+    <input type="hidden" name="page_status" id="page_status" value="0" />
+    <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+    <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+    style="width: 100%;">
+    <thead>
+        <tr>
+            <th class="free_distributor_name" id="free_distributor_name">
+                Distributor Name
+                <i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_town" id="free_town">Town<i
+                class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_state" id="free_state">State<i
+                class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_applied_on" id="free_applied_on">Applied On<i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_on_order_of" id="free_on_order_of">On order of<i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_free_product_variant" id="free_free_product_variant">Free Product Variant<i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_free_quantity" id="free_free_quantity">Free Product Qty<i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th class="free_created_date" id="free_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="tablebody">
+        {% if users %}
+        {% for user in users %}
+        <tr  {% if forloop.first %} class="odd" {% endif %}>
+            <td class="free_distributor_name">
+                {{user.store_name}}({{user.first_name}}{% if user.middle_name %} {{user.middle_name}}{%endif%} {{user.last_name}}/{{user.emp_sap_id}})
+            <br>
+            <b>{% if user.is_route == 0 %}{{user.main_route_name}}{% else %}{% if user.route_name %}{{user.route_name}} {% else %}  {{user.town_name}} {% endif %}{% endif %}</b>
+            </td>
+            <td class="free_town">{{user.town_name}}</td>
+            <td class="free_state">{{user.state_name}}</td>
+            <td class="free_applied_on">{{user.applied_on_variant_name}}</td>
+            <td class="free_on_order_of">{{user.minimum_order_quantity}} {% if user.packaging_type == 0 %} {{user.order_container_name}}{% else %}{{user.order_packaging_name}} {% endif %}</td>
+            <td class="free_free_product_variant">{{user.free_variant_name}}</td>
+            <td class="free_free_quantity">
+                {% if user.container_quantity > 0 %}{{user.container_quantity}} {{user.order_container_name}} {% endif %} 
+                {% if user.pouch_quantity > 0 %}{{user.pouch_quantity}} {{user.order_packaging_name}}{% endif %}
+            </td>
+            <td class="free_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+            <td>
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                        <div class="labelContainerOP">
+                            <label class="switch">
+                                <input type="hidden" id="user_free_scheme_is_active_{{ user.user_id }}" value="{{ user.status }}">
+                                <input type="checkbox" class="checkbox" name="is_active"
+                                {% if user.status == 1 %} checked="" {% else %}
+                                {% endif %}
+                                onclick="updateUserSchemeStatus('{{ user.id }}', this, 'free_scheme')">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr id="operational_loading" style="display: none;">
+            <td class="text-center" colspan="9"></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="9" style="text-align: center;">No Record Found...</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+</div>

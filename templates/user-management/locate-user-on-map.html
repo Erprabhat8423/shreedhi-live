@@ -1,0 +1,131 @@
+{% load static %}
+
+<style type="text/css">
+  .tg  {border-collapse:collapse;border-spacing:0;}
+  .tg td{font-family:Arial, sans-serif;font-size:14px;
+    overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-27m9{background-color:#c0c0c0;border-color:#9b9b9b;
+        font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif !important;;text-align:left;vertical-align:top}
+        .tg .tg-fb1n{background-color:#c0c0c0;border-color:#9b9b9b;text-align:left;vertical-align:top}
+      </style>
+      
+      <style type="text/css">
+
+        #map_canvas {
+          width: 100%;
+          height: 100%;
+        }
+        
+        .img-circle{
+          border-radius: 50%;
+          height: 120px;
+          width: 120px;
+        }
+        .card {
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+          text-align: center;
+          background-color: #444;
+          color: white;
+        }
+      </style>
+      <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+          <div class="col-12 p-0">
+            <div class="row">
+              <div class="col-6">
+                <h5 class="mt-md-2">Users &nbsp;&nbsp;</h5>
+              </div>
+              <div class="col-6">
+                <button class="btn btn-close float-right" type="button" onclick="closeModal()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody">
+          <div id="map_canvas">
+
+          </div>
+        </div>
+      </div>
+      
+      
+      
+      
+      <script type="text/javascript">
+
+        function initialize() {
+          var map;
+          var bounds = new google.maps.LatLngBounds();
+          var mapOptions = {
+            center: new google.maps.LatLng(26.9124, 75.7873),
+            zoom: 10,
+          };
+          var user_icon = '/static/img/gif/userLocation.gif';
+          map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+          
+          var markers = [];
+          var infoWindowContent = [];
+          {% for user in users %}
+          markers.push(['{{user.first_name}}', '{{user.latitude}}', '{{user.longitude}}']);
+          {% if user.profile_image is None %}
+          var img = '/static/img/png/default_app_icon.png';
+          {% else %}
+          var img = "{{user.profile_image}}";
+          {% endif %}
+          infoWindowContent.push([
+            `
+            <table class="tg">
+            <thead>
+            <tr>
+            <th class="tg-0lax" colspan="2" rowspan="4"><img src="`+img+`" height="110" width="100" alt="user Image"/></th>
+            <th class="tg-0lax" colspan="2"><b>{{user.first_name}}({{user.primary_contact_number}})</b></th>
+            </tr>
+            <tr>
+            <td class="tg-0lax" colspan="2"><b>Last Order Placed:</b> {{user.last_order_place_date|date:'d/m/Y H:i'}}</td>
+            </tr>
+            </thead>
+            </table>
+            `
+            ]);
+          
+          {% endfor %}
+          
+          var infoWindow = new google.maps.InfoWindow(), marker, i;
+          
+          for( i = 0; i < markers.length; i++ ) {
+            var position = new google.maps.LatLng(markers[i][1], markers[i][2]);
+            bounds.extend(position);
+            marker = new google.maps.Marker({
+              position: position,
+              map: map,
+              title: markers[i][0],
+              icon: user_icon
+            });
+            
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+                infoWindow.setContent(infoWindowContent[i][0]);
+                infoWindow.open(map, marker);
+              }
+            })(marker, i));
+            
+            map.fitBounds(bounds);
+          }
+          
+          // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+          var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+            this.setZoom(12);
+            google.maps.event.removeListener(boundsListener);
+          });
+          
+        }
+      </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initialize&libraries=&v=weekly">
+      </script>
+      <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initialize&libraries=&v=weekly"> -->
+        <!-- </script> -->

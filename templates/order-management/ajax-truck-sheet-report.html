@@ -1,0 +1,200 @@
+{% if first_order %}
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-8">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th style="width: 33%; text-align: center;">Route Name</th>
+                        <th style="width: 33%; text-align: center;">Dis./SS. Name</th>
+                        <th style="width: 33%; text-align: center;">Store Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center;">{{current_user.route_name}}</td>
+                        <td style="text-align: center;">{{current_user.name}}</td>
+                        <td style="text-align: center;">{{current_user.store_name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="col-md-4 text-right">
+            <button type="button" id="" class="btn iconBox iconExportExcel" onclick="exportExcel()"></button>
+        </div>
+    </div>
+    
+</div>
+
+<div class="col-md-12" style="margin-top: 10px;">
+    <table class="table table-bordered table-hover mt-0" style="width: 100%;">
+        <thead>
+            
+            <tr>
+                <th style="background-color: #ffffff; color: #000000;"> PARTICULAR </th>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.variant_name}}</th>
+                {% endfor %}
+                <!-- <th> TOTAL CRATES </th> -->
+            </tr>
+            
+            
+            
+        </thead>
+        
+        <tbody>
+            
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> DEMAND </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.demand}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;">{{product_milk_total_crates}}</th> -->
+            </tr>
+            
+            <!-- <tr>
+                <td style="background-color: #adce74; color: #000000;"> BONUS SCHEME </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.bonus_scheme}}</th>
+                {% endfor %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_total_bonus_scheme}}</th>
+            </tr> -->
+            <!-- <tr>
+                <td style="background-color: #ffffff; color: #000000;"> VARIANT WISE TOTAL CRATES  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.variant_wise_total_crates}}</th>
+                {% endfor %}
+                <th style="background-color: #ffffff; color: #000000;">{{ product_milk_total_crates|add:product_milk_total_bonus_scheme }}</th>
+            </tr> -->
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> POUCH PER CRATE  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.pouch_per_crate}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> FREE POUCHES  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.free_pouch_per_crate}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+            </tr>
+            <!-- <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL POUCH PER CRATE  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_pouch_per_crate}}</th>
+                {% endfor %}
+                <th style="background-color: #adce74; color: #000000;"></th>
+            </tr> -->
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL NO. OF POUCHES  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_no_of_pouch}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> SKU SIZE  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_milk_variant.sku_size}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL QTY (LTR / KG)  </td>
+                {% for product_milk_variant in product_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_milk_variant.total_quantity|floatformat:2}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;">{{ product_milk_total_quantity|floatformat:2 }}</th> -->
+            </tr>
+            
+        </tbody>
+    </table>
+    
+    <table class="table table-bordered table-hover mt-0" style="width: 100%;">
+        <thead>
+            
+            <tr>
+                <th style="background-color: #ffffff; color: #000000;"> PARTICULAR </th>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.variant_name}}</th>
+                {% endfor %}
+                <!-- <th> TOTAL CRATES </th> -->
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> DEMAND </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.demand}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_total_crates}}</th> -->
+            </tr>
+            
+            <!-- <tr>
+                <td style="background-color: #adce74; color: #000000;"> BONUS SCHEME </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.bonus_scheme}}</th>
+                {% endfor %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_total_bonus_scheme}}</th>
+            </tr>
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> VARIANT WISE TOTAL CRATES  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.variant_wise_total_crates}}</th>
+                {% endfor %}
+                <th style="background-color: #ffffff; color: #000000;">{{ product_without_milk_total_crates|add:product_without_milk_total_bonus_scheme }}</th>
+            </tr> -->
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> POUCH PER CRATE  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.pouch_per_crate}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> FREE POUCHES  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.free_pouch_per_crate}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+            </tr>
+            <!-- <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL POUCH PER CRATE  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_pouch_per_crate}}</th>
+                {% endfor %}
+                <th style="background-color: #adce74; color: #000000;"></th>
+            </tr> -->
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL NO. OF POUCHES  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_no_of_pouch}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #ffffff; color: #000000;"> SKU SIZE  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #ffffff; color: #000000;">{{product_without_milk_variant.sku_size}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #ffffff; color: #000000;"></th> -->
+            </tr>
+            <tr>
+                <td style="background-color: #adce74; color: #000000;"> TOTAL QTY (LTR / KG)  </td>
+                {% for product_without_milk_variant in product_without_milk_variant_list %}
+                <th style="background-color: #adce74; color: #000000;">{{product_without_milk_variant.total_quantity|floatformat:2}}</th>
+                {% endfor %}
+                <!-- <th style="background-color: #adce74; color: #000000;">{{ product_without_milk_total_quantity|floatformat:2 }}</th> -->
+            </tr>
+            
+        </tbody>
+    </table>
+    
+</div>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}

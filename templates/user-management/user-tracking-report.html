@@ -1,0 +1,220 @@
+{% extends 'layout/layout.html' %} 
+{% load helper_tags %} 
+{% load humanize %} 
+{% block content %} 
+{% load static %} 
+
+{% block style %} 
+<style type="text/css">
+  .tg  {border-collapse:collapse;border-spacing:0;}
+  .tg td{font-family:Arial, sans-serif;font-size:14px;
+    overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-27m9{background-color:#c0c0c0;border-color:#9b9b9b;
+        font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif !important;;text-align:left;vertical-align:top}
+        .tg .tg-fb1n{background-color:#c0c0c0;border-color:#9b9b9b;text-align:left;vertical-align:top}
+      </style>
+      <style type="text/css">
+        
+        #map_canvas {
+          width: 100%;
+          height: 100%;
+        }
+        
+        .img-circle{
+          border-radius: 50%;
+          height: 120px;
+          width: 120px;
+        }
+        .card {
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+          text-align: center;
+          background-color: #444;
+          color: white;
+        }
+      </style>
+      {% endblock %}
+      
+      
+      
+      <div class="row" id="containerHeight">
+        
+        <div class="col-sm-12 h-100">
+          
+          <div class="col-md-4 p-md-0">
+            <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+          </div>
+          
+          <div class="primaryContainer h-100 ajaxReportSection mt-4" id="mainbox">
+            <div class="row mb-2" id="topRow">
+              <div class="col-sm-6 px-0">
+                <div class="row">
+                  
+                  <div class="col-sm-6 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="user_id" id="user_id" onchange="filterTrack()">
+                      <option value="">Select User</option>
+                      {% for user in users %}
+                      <option value="{{ user.id }}">
+                        {{ user.first_name }} {% if user.middle_name is not None %}
+                        {{ user.middle_name }} {% endif %}{{ user.last_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  
+                  <div class="col-sm-6 pl-0 pr-2">
+                    <input class="inputField w-100 " id="track_date" placeholder="Date" value="{% now 'd/m/Y' %}" type="text" readonly onchange="filterTrack()">
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="row" id="tableBox">
+              <div class="col-md-12 primaryContainerBG h-100 p-0" id="ajaxTrackingSection">
+                <div id="map_canvas"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </section>
+      
+      <script type="text/javascript">
+        
+        function initialize() {
+          var map;
+          var bounds = new google.maps.LatLngBounds();
+          var mapOptions = {
+            center: new google.maps.LatLng({{org_latitude}}, {{org_longitude}}),
+            zoom: 12,
+          };
+          var customer_icon = '/static/img/gif/userLocation.gif';
+          map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+          
+          var markers = [];
+          var infoWindowContent = [];
+          {% for customer in customers %}
+          markers.push(['{{customer.first_name}}', '{{customer.latitude}}', '{{customer.longitude}}']);
+          {% if customer.profile_image is None %}
+          var img = '/static/img/png/default_app_icon.png';
+          {% else %}
+          var img = "{{customer.profile_image}}";
+          {% endif %}
+          infoWindowContent.push([
+            `
+            <table class="tg">
+            <thead>
+            <tr>
+            <th class="tg-0lax" colspan="2" rowspan="4"><img src="`+img+`" height="110" alt="Customer Image"/></th>
+            <th class="tg-0lax" colspan="2"><b>{{customer.first_name}}({{customer.primary_contact_number}})</b></th>
+            </tr>
+            <tr>
+            <td class="tg-0lax" colspan="2">{{customer.town_name}}</td>
+            </tr>
+            <tr>
+            <td class="tg-0lax" colspan="2"><b>Wallet Amount:</b> {{customer.wallet_amount}}</td>
+            </tr>
+            <tr>
+            <td class="tg-0lax" colspan="2"><b>Last Order Placed:</b> {{customer.last_order_place_date|date:'d/m/Y H:i'}}</td>
+            </tr>
+            </thead>
+            </table>
+            `
+            ]);
+          
+          {% endfor %}
+          
+          var infoWindow = new google.maps.InfoWindow(), marker, i;
+          
+          for( i = 0; i < markers.length; i++ ) {
+            var position = new google.maps.LatLng(markers[i][1], markers[i][2]);
+            bounds.extend(position);
+            marker = new google.maps.Marker({
+              position: position,
+              map: map,
+              title: markers[i][0],
+              icon: customer_icon
+            });
+            
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+                infoWindow.setContent(infoWindowContent[i][0]);
+                infoWindow.open(map, marker);
+              }
+            })(marker, i));
+            
+            map.fitBounds(bounds);
+          }
+          
+          // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+          var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+            this.setZoom(12);
+            google.maps.event.removeListener(boundsListener);
+          });
+          
+        }
+      </script>
+      
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initialize&libraries=&v=weekly">
+      </script>
+      <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initialize&libraries=&v=weekly"> -->
+        <!-- </script> -->
+        
+        {% endblock content %} 
+        {% block script %}
+        <script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+        <script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+        
+        <script>
+          
+          $(document).ready(function() {
+            setHeightWidth();
+            $("#track_date").datepicker({
+              weekStart: 1,
+              changeMonth: true,
+              changeYear: true,
+              yearRange: "-100:+10",
+              daysOfWeekHighlighted: "6,0",
+              autoclose: true,
+              todayHighlight: true,
+              dateFormat: 'dd/mm/yy',
+              maxDate: new Date()
+            });
+            
+          });
+          
+          
+          $(window).resize(function() {
+            setHeightWidth();
+          });
+          
+          function filterTrack(){
+            user_id = $('#user_id option:selected').val();
+            track_date = $('#track_date').val();
+            if(user_id != ""){
+              var url = "{% url 'src:ajax-user-tracking' 'user_id' %}";
+              url = url.replace('user_id',user_id)
+              $.ajax({
+                url: url,
+                method: 'GET',
+                data: { track_date:track_date },
+                success: function (data) {
+                  $('#ajaxTrackingSection').html(data);
+                },
+                error: function (err) {
+                }
+              });
+            }
+            
+          }
+        </script>
+        
+        
+        
+        
+        
+        {% endblock %}
+        
+        

@@ -1,0 +1,42 @@
+<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Distributor name</th>
+            <th>Applied on variant</th>
+            <th>Discount Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <input type="hidden" name="user_id[]" value="{{user.user_id}}">
+                <input type="hidden" name="is_disabled[]" value="{{user.is_scheme_applied}}">
+                {{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+                <br>
+                <b>{% if user.is_route == 0 %}{{user.main_route_name}}{% else %}{% if user.route_name %}{{user.route_name}} {% else %}  {{user.town_name}} {% endif %}{% endif %} </b>
+            </td>
+            <td style="width: 20%;">
+                <select class="inputField selectField"  name="user_applied_on_variant_id[]" style="width: 100% !important;">
+                    <option value="">Select Product</option>
+                    {% for product in products %}
+                    <optgroup label="{{product.product_name}} ({{product.product_class_name}}) - {{product.container_name}}">
+                        {% for product_variant in product.product_variants %}
+                        <option value="{{product_variant.id}}" {% if product_variant.id == applied_on_variant_id %}selected{% endif %} >{{product_variant.variant_name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><input type="text" style="background-color: #fff;border: 1px solid lightgrey;font-size: 0.9rem;padding: 0.5rem 0.5rem 0.5rem 1rem;border-radius: 0.6rem;width: 100px" maxlength="3" onkeypress="return validateFloatKeyPress(this,event);" name="user_incentive_amount[]" value="{{incentive_amount}}"></td>
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function(){
+        $('.selectField').select2();
+    })
+</script>

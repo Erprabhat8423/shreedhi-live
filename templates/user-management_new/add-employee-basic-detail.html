@@ -1,0 +1,912 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+	<form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+		{% csrf_token %}
+		<input type="hidden" name="page-step" id="page-step" value="1" />
+		<div class="modal-header" id="headerStep1">
+			<div class="col-12 p-0">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="mt-md-2">Basic Information &nbsp;&nbsp;</h5>
+					</div>
+					<div class="col-6">
+						<button class="btn btn-save float-right" type="submit" >
+							Save & Proceed
+						</button>
+						<button class="btn btn-close float-right" type="button" onclick="closeUserModal()">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal-body" id="addUserModalBody" style="overflow: auto">
+			<div class="row">
+				<div class="col-md-12 p-0 h-100 w-100" id="step1Emp">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="row">
+								<div class="col-md-12 p-0 mt-2">
+									<div class="row">
+										<div class="col-md-2 p-0">
+											<div class="user_ProfileImg" onclick="openImageSelector('file-upload_Emp')">
+												<img id="previewEmpProfile" src="{% static 'img/svg/uploadProfile.svg' %}" class="imgStyleRound">
+											</div>
+											<input id="file-upload_Emp" name="profile_image" type="file" accept="image/*"
+											style="display: none;" onchange="fileUploader(this.id,'previewEmpProfile','Profile Image')" />
+											<label class="error_msg float-right" id="profile_image_error" style="text-align:left"></label>
+										</div>
+										<div class="col-md-10 p-0">
+											<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+											<h6 class="mt-2 mb-0" style="display: inline-block;">
+												Contact Person Name*
+											</h6>
+											<div class="row mt-2">
+												<div class="col-md-2 p-0">
+													<select class="inputField selectField" style="width: 100% !important;" name="salutation" id="salutation">
+														<option value="Mr">Mr</option>
+														<option value="Mrs">Mrs</option>
+													</select>
+												</div>
+												<div class="col-md-4 pr-0">
+													<input class="inputField alpha" type="text" placeholder="Enter First Name"
+													name="first_name" id="first_name" maxlength="50">
+													<label class="error_msg float-right" id="emp_firstName_error"></label>
+												</div>
+												<div class="col-md-3 pr-0">
+													<input class="inputField alpha" type="text" placeholder="Enter Middle Name"
+													name="middle_name" id="middle_name" maxlength="50">
+													<label class="error_msg float-right" id="emp_middleName_error"></label>
+												</div>
+												<div class="col-md-3 pr-0">
+													<input class="inputField alpha" type="text" placeholder="Enter Last Name"
+													name="last_name" id="last_name">
+													<label class="error_msg float-right" id="emp_lastName_error"></label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							
+							
+							<div class="row mt-3 wrapper">
+								<div class="col-md-12 p-0">
+									<img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+									<h6 class="mt-2 mb-0" style="display: inline-block;">
+										Contact Number*
+									</h6>
+								</div>
+								<div class="col-md-2 mt-3 p-0">
+									<select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+										{% for country_code in country_codes %}
+										<option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="col-md-3 mt-3">
+									<input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]" id="contact_no_1" maxlength="10" />
+									<label class="error_msg float-right"></label>
+								</div>
+								<div class="col-md-3 mt-3 pl-0">
+									<select class="inputField contact_field" style="width: 100% !important;" name="contact_type[]" id="contact_type_1">
+										{% for contact_type in contact_types %}
+										<option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+								<div class="col-md-3 mt-3 p-0">
+									<div class="inputfield">
+										<input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" checked="">
+										<input type="hidden" name="primary_contact[]" value="1">
+										<label class="mb-0" for="user_Primary_name">Set as Primary</label>
+									</div>
+								</div>
+								<div class="col-md-1 mt-3 p-0">
+									<button class="iconCover float-right add_user_contact" style="padding: 0.75rem;" type="button">
+										<img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+									</button>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12 p-0" id="contactNumberCont">
+								</div>
+							</div>
+							
+							<div class="row mt-3">
+								<div class="col-md-6 p-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Father Name*
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<input class="inputField alpha" type="text" placeholder="Enter Father Name" name="father_name"
+										id="father_name" maxlength="50">
+										<label class="error_msg float-right" id="fatherName_error"></label>
+									</div>
+								</div>
+								<div class="col-md-6 pr-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Mother Name*
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<input class="inputField alpha" type="text" placeholder="Enter Mother Name" name="mother_name"
+										id="mother_name" maxlength="50">
+										<label class="error_msg float-right" id="motherName_error"></label>
+									</div>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-6 p-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Email ID*
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<input class="inputField" type="text" placeholder="Enter Email Id" name="official_email"
+										id="official_email " maxlength="50">
+										<label class="error_msg float-right" id="emailId_error"></label>
+									</div>
+								</div>
+								<div class="col-md-6 pr-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Date Of Birth*
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<input class="inputField" placeholder="Enter Date of Birth" name="date_of_birth" id="date_of_birth">
+										<label class="error_msg float-right" id="dob_error"></label>
+									</div>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-8 p-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Gender*
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<div class="row">
+											<div class="col-md-4 pl-0">
+												<div class="col-md-12 inputField cursurorclass">
+													<label class="checkBoxContainer mb-0 cursurorclass">
+														<img src="{% static 'img/svg/male.svg' %}" class="genderImg" id="user_gender_male">
+														<input type="radio" name="user_gender" value="male" id="user_male_gender" checked="" style="display: none;" />
+														MALE
+													</label>
+												</div>
+												<label class="error_msg float-right" id="user_gender_error"></label>
+											</div>
+											<div class="col-md-4 p-0">
+												<div class="col-md-12 inputField cursurorclass">
+													<label class="checkBoxContainer mb-0 cursurorclass">
+														<img src="{% static 'img/svg/femalegrey.svg' %}" class="genderImg" id="user_gender_female">
+														<input type="radio" name="user_gender" value="female" id="user_female_gender" style="display: none;" />
+														Female
+													</label>
+												</div>
+											</div>
+											<div class="col-md-4 pr-0">
+												<div class="col-md-12 inputField cursurorclass">
+													<img src="{% static 'img/svg/othergrey.svg' %}" class="genderImg" id="user_gender_other">
+													<label class="checkBoxContainer mb-0 cursurorclass">
+														<input type="radio" name="user_gender" value="other" id="user_other_gender" style="display: none;" />
+														Other
+													</label>
+												</div>
+											</div>
+										</div>
+										
+									</div>
+								</div>
+								<div class="col-md-4 pr-0">
+									<div class="col-md-12 p-0">
+										<img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+										<h6 class="mt-2 mb-0" style="display: inline-block;">
+											Blood group
+										</h6>
+									</div>
+									<div class="col-md-12 p-0 mt-2">
+										<select class="inputField selectField" style="width: 100% !important;" name="blood_group" id="blood_group">
+											<option value="">Select blood Group type</option>
+											<option value="O−">O−</option>
+											<option value="O+">O+</option>
+											<option value="A−">A−</option>
+											<option value="A+">A+</option>
+											<option value="B−">B−</option>
+											<option value="B+">B+</option>
+											<option value="AB−">AB−</option>
+											<option value="AB+">AB+</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="row">
+								<div class="col-md-12">
+									<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+									<h6 class="mt-2 mb-0" style="display: inline-block;">
+										Correspondance Adress
+									</h6>
+								</div>
+								<div class="col-md-12 mt-3">
+									<input class="inputField" type="text" placeholder="Address Line 1" name="store_address_line_1"
+									id="store_address_line_1" maxlength="50" />
+									<label class="error_msg float-right" id="store_address_line_1_error"></label>
+								</div>
+								<div class="col-md-12 mt-3">
+									<input class="inputField" type="text" placeholder="Address Line 2" name="store_address_line_2"
+									id="store_address_line_2" maxlength="50" />
+									<label class="error_msg float-right" id="addressLine2_error"></label>
+								</div>
+								<div class="col-md-6 mt-3">
+									<select class="inputField selectField" style="width: 100% !important;" name="store_country_id" id="store_country_id" onchange="getState(this.value, 'store_state_id', '', '', 'store_city_id')">
+										<option value="">Select Country</option>
+										{% for countrie in countries %}
+										<option value="{{countrie.id}}">{{countrie.country}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right" id="store_country_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3 pl-0">
+									<select class="inputField selectField" style="width: 100% !important;" name="store_state_id" id="store_state_id" onchange="getCity(this.value, 'store_city_id', '')">
+										<option value="">Select State</option>
+									</select>
+									<label class="error_msg float-right" id="store_state_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3">
+									<select class="inputField selectField" style="width: 100% !important;" name="store_city_id" id="store_city_id" >
+										<option value="">Select City</option>
+									</select>
+									<label class="error_msg float-right" id="store_city_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3 pl-0">
+									<input class="inputField numeric" type="text" placeholder="Pin Code*" name="store_pincode"
+									id="store_pincode" maxlength="50" />
+									<label class="error_msg float-right" id="store_pincode_error"></label>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-7">
+									<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+									<h6 class="mt-2 mb-0" style="display: inline-block;">
+										Permanent Adress
+									</h6>
+								</div>
+								<div class="col-md-5">
+									<button type="button" class="btn btn-addDept" onclick="sameAbove('user')">
+										Same as above
+										<img src="{% static 'img/svg/depart_no.svg' %}" class="btnDeptIcon" />
+									</button>
+								</div>
+								<div class="col-md-12 mt-3">
+									<input class="inputField" type="text" placeholder="Address Line 1"
+									name="permanent_address_line_1" id="permanent_address_line_1" maxlength="50" />
+									<label class="error_msg float-right" id="permanent_address_line_1_error"></label>
+								</div>
+								<div class="col-md-12 mt-3">
+									<input class="inputField" type="text" placeholder="Address Line 2"
+									name="permanent_address_line_2" id="permanent_address_line_2" maxlength="50" />
+									<label class="error_msg float-right" id="perm_addressLine2_error"></label>
+								</div>
+								<div class="col-md-6 mt-3">
+									<select class="inputField selectField" style="width: 100% !important;" name="permanent_country_id" id="permanent_country_id" onchange="getState(this.value, 'permanent_state_id', '', '', 'permanent_city_id')">
+										<option value="">Select Country</option>
+										{% for countrie in countries %}
+										<option value="{{countrie.id}}">{{countrie.country}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right" id="permanent_country_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3 pl-0">
+									<select class="inputField selectField" style="width: 100% !important;" name="permanent_state_id" id="permanent_state_id" onchange="getCity(this.value, 'permanent_city_id', '')">
+										<option value="">Select State</option>
+									</select>
+									<label class="error_msg float-right" id="permanent_state_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3">
+									<select class="inputField selectField" style="width: 100% !important;" name="permanent_city_id" id="permanent_city_id" >
+										<option value="">Select City</option>
+									</select>
+									<label class="error_msg float-right" id="permanent_city_id_error"></label>
+								</div>
+								<div class="col-md-6 mt-3 pl-0">
+									<input class="inputField numeric" type="text" placeholder="Pin Code*" name="permanent_pincode"
+									id="permanent_pincode" maxlength="50" />
+									<label class="error_msg float-right" id="permanent_pincode_error"></label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 p-0" id="otherContactCont">
+								</div>
+							</div>
+							<br clear="all">
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		
+		
+		
+		<nav class="navbar fixed-bottom" id="modalFooter">
+			<div class="dropdown-divider w-100"></div>
+			<div class="col-3 offset-9 p-0">
+				<ul id="stepFooter">
+					<li id="li1" class="selectedstep">
+						<button class="btn btn-step activeStep" id="stepBtn1">
+							&#10004;
+						</button>
+					</li>
+					<li id="li2">
+						<button class="btn btn-step" id="stepBtn2">
+							&#10004;
+						</button>
+					</li>
+					<li id="li3">
+						<button class="btn btn-step" id="stepBtn3">
+							&#10004;
+						</button>
+					</li>
+					<li id="li4">
+						<button class="btn btn-step" id="stepBtn4">
+							&#10004;
+						</button>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+	
+	<script>
+		$('#addBasicDetailsForms').submit(function(e){
+			showLoader();
+			if(validateForm()){
+				hideLoader();
+				return false;
+			}else{
+				
+				showLoader();
+				e.preventDefault();
+				$form = $(this)
+				var formData = new FormData(this);
+				
+				$.ajax({
+					url: "{% url 'src:add-employee-basic-detail' %}",
+					type: 'POST',
+					data: formData,
+					success: function (response) {
+						$('.error').remove();
+						console.log(response)
+						if(response.error){
+							hideLoader();
+							$(".text-danger").html('');
+							var data = response.message;
+							$.each(data, function (index, value) {
+								console.log(index);
+								console.log(value);
+								$('#' + index).html(value);
+							});
+						} else {
+							$('#addUserModal').html('');
+							hideLoader();
+							$('#addUserModal').html(response);
+							
+							var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+							$("#addUserModalBody").height(mch);
+							$(".selectField").select2();    
+							
+							$("#date_of_joining").datepicker({
+								weekStart: 1,
+								changeMonth: true,
+								changeYear: true,  
+								yearRange: "-100:+0",
+								daysOfWeekHighlighted: "6,0",
+								autoclose: true,
+								todayHighlight: true,
+								dateFormat: 'dd/mm/yy',
+							});
+						}
+					},
+					cache: false,
+					contentType: false,
+					processData: false
+				});
+			}
+			
+		});
+		
+		
+		function validateForm(){
+			error = 0;
+			
+			$('.error_msg').text('');
+			
+			$('#first_name').css("border", "");
+			if ($('[name="first_name"]').val() == null || $('[name="first_name"]').val() == "") {
+				$('#first_name').parent().find('.error_msg').text("Please enter first name*");
+				$('#first_name').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			$('#last_name').css("border", "");
+			if ($('[name="last_name"]').val() == null || $('[name="last_name"]').val() == "") {
+				$('#last_name').parent().find('.error_msg').text("Please enter last name*");
+				$('#last_name').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			// $('#profile_image').css("border", "");
+			// if ($('[name="profile_image"]').val() == null || $('[name="profile_image"]').val() == "") {
+			// 	$('#profile_image_error').text("Please select profile image*");
+			// 	error = error + 1;
+			// }
+			$('#father_name').css("border", "");
+			if ($('[name="father_name"]').val() == null || $('[name="father_name"]').val() == "") {
+				$('#father_name').parent().find('.error_msg').text("Please enter father name*");
+				$('#father_name').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			$('#mother_name').css("border", "");
+			if ($('[name="mother_name"]').val() == null || $('[name="mother_name"]').val() == "") {
+				$('#mother_name').parent().find('.error_msg').text("Please enter mother name*");
+				$('#mother_name').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			$('[name="official_email"]').css("border", "");
+			if ($('[name="official_email"]').val() == null || $('[name="official_email"]').val() == "") {
+				$('[name="official_email"]').parent().find('.error_msg').text("Please enter email*");
+				$('[name="official_email"]').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			if (!validateEmail($('[name="official_email"]').val())) {
+				$('[name="official_email"]').parent().find('.error_msg').text("Please enter valid email*");
+				$('[name="official_email"]').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			$('#date_of_birth').css("border", "");
+			if ($('[name="date_of_birth"]').val() == null || $('[name="date_of_birth"]').val() == "") {
+				$('#date_of_birth').parent().find('.error_msg').text("Please enter date of birth*");
+				$('#date_of_birth').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			var h1 = document.getElementById("user_male_gender").checked;
+			var h2 = document.getElementById("user_female_gender").checked;
+			var h3 = document.getElementById("user_other_gender").checked;
+			
+			document.getElementById('user_gender_error').innerHTML = '';
+			$('#user_gender_male').css("border", "");
+			$('#user_gender_female').css("border", "");
+			$('#user_gender_other').css("border", "");
+			if (h1 == false && h2 == false && h3 == false) {
+				error = error + 1;
+				document.getElementById('user_gender_error').innerHTML = 'Please select gender*';
+				$('#user_gender_male').css("border", "1px solid #db8305");
+				$('#user_gender_female').css("border", "1px solid #db8305");
+				$('#user_gender_other').css("border", "1px solid #db8305");
+			}
+			
+			var i = document.forms["addBasicDetailsForms"]["store_address_line_1"].value;
+			document.getElementById('store_address_line_1_error').innerHTML = '';
+			$('#store_address_line_1').css("border", "");
+			if (i == null || i == "") {
+				error = error + 1;
+				document.getElementById('store_address_line_1_error').innerHTML = 'Please enter address*';
+				$('#store_address_line_1').css("border", "1px solid #db8305");
+			}
+			
+			var j = document.forms["addBasicDetailsForms"]["store_country_id"].value;
+			document.getElementById('store_country_id_error').innerHTML = '';
+			$('#store_country_id').css("border", "");
+			if (j == null || j == "") {
+				error = error + 1;
+				document.getElementById('store_country_id_error').innerHTML = 'Please select country*';
+				$('#store_country_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var k = document.forms["addBasicDetailsForms"]["store_state_id"].value;
+			document.getElementById('store_state_id_error').innerHTML = '';
+			$('#store_state_id').css("border", "");
+			if (k == null || k == "") {
+				error = error + 1;
+				document.getElementById('store_state_id_error').innerHTML = 'Please select state*';
+				$('#store_state_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var l = document.forms["addBasicDetailsForms"]["store_city_id"].value;
+			document.getElementById('store_city_id_error').innerHTML = '';
+			$('#store_city_id').css("border", "");
+			if (l == null || l == "") {
+				error = error + 1;
+				document.getElementById('store_city_id_error').innerHTML = 'Please select city*';
+				$('#store_city_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var m = document.forms["addBasicDetailsForms"]["store_pincode"].value;
+			document.getElementById('store_pincode_error').innerHTML = '';
+			$('#store_pincode').css("border", "");
+			if (m == null || m == "") {
+				error = error + 1;
+				document.getElementById('store_pincode_error').innerHTML = 'Please enter pincode*';
+				$('#store_pincode').css("border", "1px solid #db8305");
+			} else {
+				if (m.length < 6) {
+					error = error + 1;
+					document.getElementById('store_pincode_error').innerHTML = 'Pincode should be 6 digits*';
+					$('#store_pincode').css("border", "1px solid #db8305");
+				} else {
+					$('#store_pincode').css("border", "1px solid lightgrey");
+				}
+			}
+			
+			var n = document.forms["addBasicDetailsForms"]["permanent_address_line_1"].value;
+			document.getElementById('permanent_address_line_1_error').innerHTML = '';
+			$('#permanent_address_line_1').css("border", "");
+			if (n == null || n == "") {
+				error = error + 1;
+				document.getElementById('permanent_address_line_1_error').innerHTML = 'Please enter address*';
+				$('#permanent_address_line_1').css("border", "1px solid #db8305");
+			}
+			
+			var o = document.forms["addBasicDetailsForms"]["permanent_country_id"].value;
+			document.getElementById('permanent_country_id_error').innerHTML = '';
+			$('#permanent_country_id').css("border", "");
+			if (o == null || o == "") {
+				error = error + 1;
+				document.getElementById('permanent_country_id_error').innerHTML = 'Please select country*';
+				$('#permanent_country_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var p = document.forms["addBasicDetailsForms"]["permanent_state_id"].value;
+			document.getElementById('permanent_state_id_error').innerHTML = '';
+			$('#permanent_state_id').css("border", "");
+			if (p == null || p == "") {
+				error = error + 1;
+				document.getElementById('permanent_state_id_error').innerHTML = 'Please select state*';
+				$('#permanent_state_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var q = document.forms["addBasicDetailsForms"]["permanent_city_id"].value;
+			document.getElementById('permanent_city_id_error').innerHTML = '';
+			$('#permanent_city_id').css("border", "");
+			if (q == null || q == "") {
+				error = error + 1;
+				document.getElementById('permanent_city_id_error').innerHTML = 'Please select city*';
+				$('#permanent_city_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			}
+			
+			var r = document.forms["addBasicDetailsForms"]["permanent_pincode"].value;
+			document.getElementById('permanent_pincode_error').innerHTML = '';
+			$('#permanent_pincode').css("border", "");
+			if (r == null || r == "") {
+				error = error + 1;
+				document.getElementById('permanent_pincode_error').innerHTML = 'Please enter pincode*';
+				$('#permanent_pincode').css("border", "1px solid #db8305");
+			} else {
+				if (r.length < 6) {
+					error = error + 1;
+					document.getElementById('permanent_pincode_error').innerHTML = 'Pincode should be 6 digits*';
+					$('#permanent_pincode').css("border", "1px solid #db8305");
+				} else {
+					$('#permanent_pincode').css("border", "1px solid lightgrey");
+				}
+			}
+			$('.contact_no_class').css("border", "");
+			$('.contact_no_class').each(function(){
+				val = $(this).val();
+				if($(this).val() == ""){
+					$(this).css("border", "1px solid #db8305");
+					$(this).parent().find('.error_msg').text('Please enter contact details');
+					error = error + 1;
+				}else if ($(this).val() && val.length < 10) {
+					$(this).css("border", "1px solid #db8305");
+					$(this).parent().find('.error_msg').text('Contact No. should be 10 digits*');
+					error = error + 1;
+				}
+			});
+
+			$('.contact_field').css("border", "");
+			$('.contact_field').each(function(){
+				val = $(this).val();
+				if($(this).val() == ""){
+					$(this).css("border", "1px solid #db8305");
+					$(this).parent().find('.error_msg').text('Please enter contact details');
+					error = error + 1;
+				}
+			});
+			
+			
+			$('.error_msg').css("margin-bottom", "0rem");
+			
+			if(error > 0){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		
+		function getState(country_id, id, store_state_id, store_city_id, permanent_city_id){
+			if(country_id != ""){
+				//showLoader();
+				var url = "{% url 'src:get-state-options' 1 %}";
+				url = url.replace(1,country_id)
+				$.ajax({
+					url: url,
+					method: 'GET',
+					success: function (data) {
+						// hideLoader();
+						$('[name="'+id+'"]').html(data.options)
+						$(".selectField").select2();
+						if(store_state_id!=''){
+							$('#permanent_state_id').val(store_state_id).trigger('change');
+							getCity(store_state_id, 'permanent_city_id', store_city_id); 
+						}
+					},
+					error: function (err) {
+						hideLoader();
+						console.log(err)
+					}
+				});
+			} else {
+				$('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+				$('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+				$(".selectField").select2();
+			}
+			
+		}
+		
+		function getCity(state_id, id, store_city_id){
+			if(state_id != ""){
+				//showLoader();
+				var url = "{% url 'src:get-city-options' 1 %}";
+				url = url.replace(1,state_id)
+				$.ajax({
+					url: url,
+					method: 'GET',
+					success: function (data) {
+						// hideLoader();
+						$('[name="'+id+'"]').html(data.options)
+						$(".selectField").select2();
+						if(store_city_id!=''){
+							$('#permanent_city_id').val(store_city_id).trigger('change');
+						}
+					},
+					error: function (err) {
+						hideLoader();
+						console.log(err)
+					}
+				});
+			} else {
+				$('[name="'+id+'"]').html('<option value="" selected>Select City</option>')
+				$(".selectField").select2();
+			}
+			
+		}
+		
+		function openImageSelector(fileUploadID) {
+			$("#" + fileUploadID).click();
+		}
+		
+		
+		
+		function fileUploader(id, previewId, fileType) {
+			for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+				var file1=$("#"+id).get(0).files[i].name;
+				var error = 0;
+				document.getElementById('profile_image_error').innerHTML = '';
+				if(file1){                     
+					var ext = file1.split('.').pop().toLowerCase(); 
+					if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+						error = 1;   
+						
+						document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+						$("#"+previewId).attr("src", "static/img/png/bannerBG.png");
+						$("#"+id).val('');
+					}else{
+						error = 0;
+						if(file1){                        
+							var file_size=$("#"+id).get(0).files[i].size;
+							file_size = Math.round((file_size / 1024));
+							if(file_size>2048){
+								error = 1;
+								document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+								$("#"+previewId).attr("src", "static/img/png/bannerBG.png");
+								$("#"+id).val('');
+							}else{
+								error = 0;
+							}                        
+						} else {
+							error = 0; 
+						}
+					}                        
+				} else {
+					error = 0;
+				}
+			}
+			if(error == 0){
+				var i = $('#' + id).prev("label").clone();
+				var temp = $('#' + id)[0].files;
+				var file = temp[0].name;
+				$('#' + id).prev("label").text(file);
+				readURL(temp, previewId);
+			}
+		}
+		
+		function readURL(input, previewId) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				$('#' + previewId).attr('src', e.target.result);
+				$('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+				$('#' + previewId).addClass('w-100 imgStyle');
+			}
+			reader.readAsDataURL(input[0]);
+		}
+		
+		
+		function sameAbove(formtype) {
+			var store_address_line_1 = document.getElementById('store_address_line_1')
+			var store_address_line_2 = document.getElementById('store_address_line_2')
+			var store_country_id = document.getElementById('store_country_id').value
+			var store_state_id = document.getElementById('store_state_id').value
+			var store_city_id = document.getElementById('store_city_id').value
+			var store_pincode = document.getElementById('store_pincode')
+			var permanent_address_line_1 = document.getElementById('permanent_address_line_1');
+			var permanent_address_line_2 = document.getElementById('permanent_address_line_2');
+			var permanent_country_id = document.getElementById('permanent_country_id');
+			var permanent_state_id = document.getElementById('permanent_state_id');
+			var permanent_city_id = document.getElementById('permanent_city_id');
+			var permanent_pincode = document.getElementById('permanent_pincode');
+			
+			permanent_address_line_1.value = store_address_line_1.value
+			permanent_address_line_2.value = store_address_line_2.value
+			permanent_pincode.value = store_pincode.value
+			
+			$('#permanent_country_id').val(store_country_id).trigger('change');
+			
+			if(store_country_id != ''){
+				getState(store_country_id, 'permanent_state_id', store_state_id, store_city_id, 'permanent_city_id');
+			}    
+		}
+		
+		
+		$(".add_user_contact").click(function(){
+			var length = $('.contact_no_class').length;
+			console.log(length);
+			var contactPerson = `<div class="row wrapper">
+				<div class="col-md-2 mt-3 p-0">
+					<select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+						{% for country_code in country_codes %}
+						<option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-md-3 mt-3">
+					<input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+					id="contact_no_` + length + `" maxlength="10" />
+					<label class="error_msg float-right contact_no_err_class" id="contact_no_` + length + `_error"></label>
+				</div>
+				<div class="col-md-3 mt-3 pl-0">
+					<select class="inputField contact_field" style="width: 100% !important;" name="contact_type[]" id="contact_type_` + length + `">
+						{% for contact_type in contact_types %}
+						<option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+						{% endfor %}
+					</select>
+					<label class="error_msg float-right contact_type_err_class" id="contact_type_` + length + `_error"></label>
+				</div>
+				<div class="col-md-3 mt-3 p-0">
+					<div class="inputfield">
+						<input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" >
+						<input type="hidden" name="primary_contact[]" value="0">
+						<label class="mb-0" for="user_Primary_name">Set as Primary</label>
+					</div>
+				</div>
+				<div class="col-md-1 mt-3 p-0">
+					<button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+					</button>
+				</div></div>`;
+				
+				$("#contactNumberCont").append(contactPerson);
+				$(".selectField").select2();
+				$('.removeContactNumber').click(function() {
+					$(this).closest('.wrapper').remove();
+					resetRowIndex();
+				});
+			});
+			
+			$('.removeContactNumber').click(function() {
+				$(this).closest('.wrapper').remove();
+				resetRowIndex();
+			});
+			
+			$(document).on('click','.is_primary',function(){
+				if($(this).prop('checked')){
+					$('.is_primary').prop('checked',false);
+					$('input[name="primary_contact[]"]').val(0);
+					$(this).prop('checked',true);
+					$(this).next().val(1);
+				}
+			});
+			
+			$(document).ready(function () {    
+				
+				$("#date_of_birth").datepicker({  
+					changeMonth: true,
+					changeYear: true,  
+					yearRange: "-100:+0"
+					,maxDate: 0,
+					dateFormat: 'dd/mm/yy' 
+				});
+				
+				$("input[type='radio']").click(function () {
+					if ($("input[name='user_gender']:checked")) {
+						var radioValue = $("input[name='user_gender']:checked").val();
+						$("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+						if (radioValue == 'male') {
+							$("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+							$("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+						} else if (radioValue == 'female') {
+							$("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+							$("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+						} else {
+							$("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+							$("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+						}
+					}
+				});
+			});
+			
+			function resetRowIndex(){
+				obj = $('#addUserModalBody').find('.contact_no_class');
+				$.each( obj, function( key, value ) {
+					id=value.id;
+					var sum = key;
+					$('#'+id).attr('id', 'contact_no_'+sum);
+				});
+				
+				obj = $('#addUserModalBody').find('.contact_no_err_class');
+				$.each( obj, function( key, value ) {
+					id=value.id;
+					var sum = key;
+					$('#'+id).attr('id', 'contact_no_'+sum+'_error');
+				});
+				
+				obj = $('#addUserModalBody').find('.contact_type_class');
+				$.each( obj, function( key, value ) {
+					id=value.id;
+					var sum = key;
+					$('#'+id).attr('id', 'contact_type_'+sum);
+				});
+				
+				obj = $('#addUserModalBody').find('.contact_type_err_class');
+				$.each( obj, function( key, value ) {
+					id=value.id;
+					var sum = key;
+					$('#'+id).attr('id', 'contact_type_'+sum+'_error');
+				});
+			}
+			
+		</script>
+		
+		

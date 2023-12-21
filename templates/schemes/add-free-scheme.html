@@ -1,0 +1,742 @@
+	{% load static %}
+
+	<style>
+		.inputField{
+			font-size: 0.7rem !important;
+		}
+		
+	</style>
+	<div class="modal-AddUser centered">
+		<form name="addFreeSchemeForm" id="addFreeSchemeForm" method="POST" enctype="multipart/form-data" >
+			{% csrf_token %}
+			<div class="modal-header" id="headerStep1">
+				<div class="col-12 p-0">
+					<div class="row">
+						<div class="col-6">
+							<h5 class="mt-md-2">Create Free Scheme &nbsp;&nbsp;</h5>
+						</div>
+						<div class="col-6">
+							<button class="btn btn-save float-right" type="button" onclick="saveFreeScheme()" >
+								Save & Proceed
+							</button>
+							<button class="btn btn-close float-right" type="button" onclick="closeModal()">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal-body" id="addUserModalBody" style="overflow: auto">
+				<div class="row">
+					<div class="col-md-12 p-0 h-100 w-100" >
+						<div class="row">
+							<div class="col-md-4" style="border-right: 1px solid lightgrey;">
+								<div class="row">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp; State</label>
+										<select class="inputField selectField" name="state_id" style="width: 100% !important;" onchange="getStateZoneOptions(this.value);getFilteredUsers();">
+											<option value="">Select State</option>
+											{% for state in states %}
+											<option value="{{state.id}}">{{state.state}}</option>
+											{% endfor %}
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12" style="margin-top: 8px;">
+									Route Wise        
+									<input type="hidden" class="checkbox" name="is_route" id="is_route" value="0">
+									<label class="switch" style="top: -10px;">
+										<input type="checkbox" class="checkbox" id="toggle_route"
+										onclick="updateRouteWise(this); getFilteredUsers();" >
+										<span class="slider round"></span>
+									</label>
+									Town Wise
+								</div>
+								</div>
+								
+								<div class="row route_wise" >
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/route.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Route</label>
+										<select class="inputField selectField subroute" data-placeholer="Select Route"  name="route_id[]" style="width: 100% !important;" onchange="routeOptions(this);" multiple>
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								
+								<div class="row town_wise" style="display: none;">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Zone</label>
+										<select class="inputField selectField" data-placeholer="Select Zone"  name="zone_id[]" style="width: 100% !important;" onchange="zoneTownOptions(this);getFilteredUsers();" multiple>
+											<!-- <option value="all">All</option>
+											{% for zone in zones %}
+											<option value="{{zone.id}}">{{zone.zone}}</option>
+											{% endfor %} -->
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+
+								<div class="row town_wise" style="display: none;">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Town</label>
+										<select class="inputField selectField" data-placeholer="Select Town"  name="town_id[]" style="width: 100% !important;" onchange="selectTownAllOption(this);getFilteredUsers();" multiple>
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								
+								
+								<div class="row">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/product_variant.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Applied on</label>
+										<select class="inputField selectField"  name="applied_on_variant_id" id="applied_on_variant_id" style="width: 100% !important;" onchange="getProductVariantDetails(this.value,1);getFilteredUsers();">
+											<option value="">Select Product</option>
+											{% for product in products %}
+											<optgroup label="{{product.product_name}} ({{product.product_class_name}})">
+												{% for product_variant in product.product_variants %}
+												<option value="{{product_variant.id}}" container_name="{{product_variant.container_name}}" packaging_name="{{product_variant.packaging_type_name}}">{{product_variant.variant_name}}</option>
+												{% endfor %}
+											</optgroup>
+											{% endfor %}
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								
+								
+								<div class="row">
+									<div class="col-md-9">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;On order of</label>
+										<input class="inputField numeric" type="text" placeholder="Enter Quantity" name="minimum_order_quantity" id="minimum_order_quantity" maxlength="4" onkeyup="getFilteredUsers();" />
+										<label class="error_msg float-right"></label>
+									</div>
+									<div class="col-md-3 padding_0 product_unit_class" style="margin-top: 38px; display:none;">
+										<select name="packaging_type" id="packaging_type" class="inputField" onchange="getFilteredUsers()">
+										</select>
+									</div>
+								</div>
+								
+								<div class="row">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/schemeDate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Scheme Time Period</label>
+										<div class="row">
+											<div class="col-md-6 padding_0">
+												<input class="inputField" type="text" placeholder="Start Date"
+												name="start_date" id="start_date" readonly  />
+												<label class="error_msg float-right"></label>
+											</div>
+											
+											<div class="col-md-6 padding_0">
+												<input class="inputField" type="text" placeholder="End date"
+												name="end_date" id="end_date" readonly  />
+												<label class="error_msg float-right"></label>
+											</div>
+											
+										</div>
+										
+									</div>
+								</div>
+								
+								<!-- <input class="inputField" type="hidden" placeholder="Start Date"
+												name="start_date" id="start_date"value="{{today_date}}"  />
+							    <input class="inputField" type="hidden" placeholder="End date" name="end_date" id="end_date"  />					 -->
+								<div class="row">
+									<div class="col-md-12">
+										<label for="" class="scheme_label"><img src="{% static 'img/svg/product_variant.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Free Product</label>
+										<select class="inputField selectField"  name="free_variant_id" id="free_variant_id" style="width: 100% !important;" onchange="getProductVariantDetails(this.value,2); getFilteredUsers();">
+											<option value="">Select Product</option>
+											{% for product in products %}
+											<optgroup label="{{product.product_name}} ({{product.product_class_name}})">
+												{% for product_variant in product.product_variants %}
+												<option value="{{product_variant.id}}" container_name="{{product_variant.container_name}}" packaging_name="{{product_variant.packaging_type_name}}">{{product_variant.variant_name}}</option>
+												{% endfor %}
+											</optgroup>
+											{% endfor %}
+										</select>
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								
+								<div class="row crate_pouch_class" style="margin-top: 5px; display:none;">
+									<!--<div class="col-md-6">-->
+									<!--	<span><input type="checkbox" onclick="toggleQty(this)" style="display: inline-block;" > </span>-->
+									<!--	<input class="container_qty numeric" style="display: none;"  type="text" placeholder="Qty" name="container_qty" onkeyup="getFilteredUsers()" size="2" />-->
+									<!--	<label class="scheme_label container_qtys" for="" id="free_product_unit" style="display: inline-block;"> </label>-->
+									<!--</div>-->
+									
+									<input class="container_qty numeric"  type="hidden" placeholder="Qty" name="container_qty" value="0" size="2" />
+									
+									<div class="col-md-6" style="margin-top:9px;">
+										<!--<span><input type="checkbox" onclick="toggleQty(this)" style="display: inline-block;"> </span>-->
+										<label class="scheme_label pouch_qty" for="" style="display: inline-block;"><img src="/static/img/svg/crate.svg" class="profileIconSize">&nbsp;&nbsp; </label>
+										<br/>
+										<input class="container_qty numeric" type="text" placeholder="Qty" name="pouch_qty" onkeyup="getFilteredUsers()" size="2" />
+										
+									</div>
+									
+								</div>
+								
+								
+							</div>
+							
+							<div class="col-md-8" id="ajaxDistributors">
+								
+								<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+									<thead>
+										<tr>
+											<th>Distributor name</th>
+											<th>Applied on</th>
+											<th>On Order of</th>
+											<th>Free Product variant</th>
+											<th>Free Product quantity</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			
+			
+		</form>	
+	</div>
+
+	<script>
+		function updateRouteWise(){
+			showLoader();
+			if ($('#toggle_route').prop("checked") == true) {
+				$('#is_route').val(1);
+				$('.town_wise').css("display","block");
+				$('.route_wise').css("display","none");
+			} else {
+				$('#is_route').val(0);
+				$('.town_wise').css("display","none");
+				$('.route_wise').css("display","block");
+			}
+			hideLoader();
+		}
+		function getStateZoneOptions(state_id){
+			showLoader();
+			$('[name="town_id[]"]').html('')
+			url = "{% url 'src:get-state-zone-list' %}";
+			$.ajax({
+				url: url,
+				method: 'POST',
+				data: {state_id:state_id,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+				success: function (data) {
+					hideLoader();
+					$('[name="zone_id[]"]').html(data.options)
+					$('[name="zone_id[]"]').select2();
+					
+					$('[name="route_id[]"]').html(data.route_options)
+					$('[name="route_id[]"]').select2();
+					
+					addMultiSelectPlacehoder();
+					getFilteredUsers();
+				},
+				error: function (err) {
+					console.log(err)
+					hideLoader();
+				}
+			});
+		}	
+		function showSubRoutes(route_ids){
+        showLoader();
+        url = "{% url 'src:get-sub-route-list' %}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {route_ids:route_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+            success: function (data) {
+                hideLoader();
+				$('[name="route_id[]"]').html(data)
+				$('[name="route_id[]"]').select2();
+				addMultiSelectPlacehoder();
+				getFilteredUsers();
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+
+	function getZoneTowns(zone_ids){
+        showLoader();
+        url = "{% url 'src:get-zone-town-list' %}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {zone_ids:zone_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+            success: function (data) {
+                hideLoader();
+				$('[name="town_id[]"]').html(data)
+				$('[name="town_id[]"]').select2();
+				addMultiSelectPlacehoder();
+				getFilteredUsers();
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+
+		function GetFormattedDate(date) {
+			var todayTime = new Date(date);
+			var month = format(todayTime . getMonth() + 1);
+			var day = format(todayTime . getDate());
+			var year = format(todayTime . getFullYear());
+			return day + "/" + month + "/" + year;
+		}
+		$(document).ready(function(){
+			
+			// $("#start_date").datepicker({
+			// 	weekStart: 1,
+			// 	changeMonth: true,
+			// 	changeYear: true,  
+			// 	yearRange: "-100:+10",
+			// 	daysOfWeekHighlighted: "6,0",
+			// 	autoclose: true,
+			// 	todayHighlight: true,
+			// 	dateFormat: 'dd/mm/yy',
+			// 	minDate: 0
+			// });
+			
+			// $("#end_date").datepicker({
+			// 	weekStart: 1,
+			// 	changeMonth: true,
+			// 	changeYear: true,  
+			// 	yearRange: "-100:+10",
+			// 	daysOfWeekHighlighted: "6,0",
+			// 	autoclose: true,
+			// 	todayHighlight: true,
+			// 	dateFormat: 'dd/mm/yy',
+			// 	minDate: 0
+			// });
+
+			$("#start_date").datepicker({
+				numberOfMonths: 2,
+				dateFormat: 'dd/mm/yy',
+				onSelect: function (selected) {
+
+					selected  = selected.split('/');
+					selected = selected[1] + '/' + selected[0] + '/' + selected[2];
+
+					var dt = new Date(selected);
+					console.log(selected);
+					dt.setDate(dt.getDate() + 1);
+					$("#end_date").datepicker("option", "minDate", dt);
+				}
+			});
+			$("#end_date").datepicker({
+				numberOfMonths: 2,
+				dateFormat: 'dd/mm/yy',
+				onSelect: function (selected) {
+					selected  = selected.split('/');
+					selected = selected[1] + '/' + selected[0] + '/' + selected[2];
+
+					var dt = new Date(selected);
+					console.log(selected);
+					dt.setDate(dt.getDate() - 1);
+					$("#start_date").datepicker("option", "maxDate", dt);
+				}
+			});
+			
+			
+			$("#applied_on_variant_id").change(function(){ 
+	            var container_id = $('#applied_on_variant_id').find('option:selected'); 
+	            var container_name = container_id.attr("container_name"); 
+	        
+	            if(container_name){
+	                $('.product_unit_class').show();
+	                // $('.product_container_unit').text(container_name); 
+	            } else {
+	                $('.product_unit_class').hide(); 
+	            }
+	        });
+			
+			
+			$("#free_variant_id").change(function(){ 
+	            var container_id = $('#free_variant_id').find('option:selected'); 
+	            var packaging_name = container_id.attr("packaging_name"); 
+	        
+	            if(packaging_name){
+	                $('.crate_pouch_class').show();
+	                $('.pouch_qty').text(packaging_name); 
+	            } else {
+	                $('.crate_pouch_class').hide(); 
+	            }
+	            
+	            var container_name = container_id.attr("container_name"); 
+	        
+	            if(container_name){
+	                $('.container_qtys').text(container_name); 
+	            } else {
+	                $('.container_qtys').text(''); 
+	            }
+	        });
+			
+		});
+		
+		
+		function saveFreeScheme(){
+			showLoader();
+			if(validateFreeSchemeForm()){
+				hideLoader();
+				return false;
+			}else{
+				$.ajax({
+					url: "{% url 'src:add-free-scheme' %}",
+					method: 'POST',
+					data: $('#addFreeSchemeForm').serialize(),
+					success: function (data) {
+						hideLoader();
+						if(data.flag){
+							openToaster("success", data.message);
+							
+							$("#addUserModal").html('');
+							$("#addUserModal").hide();
+							openToaster("success", data.message);
+							setTimeout(function(){ window.location.reload(); }, 500);
+							
+						}else{
+							openToaster("danger", data.message);
+						}
+					},
+					error: function (err) {
+						hideLoader();
+						console.log(err)
+					}
+				}).always(function() {
+					hideLoader();
+				});
+			}
+			
+		}
+		function validateFreeSchemeForm(){
+			error = 0;
+			$('.error_msg ').text('');
+			$('.inputField').css("border", "");
+			// if($('[name="scheme_name"]').val() == ""){
+			// 	$('[name="scheme_name"]').parent().find('.error_msg').text('Please enter scheme name');
+			// 	$('[name="scheme_name"]').css("border", "1px solid #db8305");
+			// 	error = error + 1;
+			// }
+			if($('[name="state_id"]').val() == ""){
+				$('[name="state_id"]').parent().find('.error_msg').text('Please select state');
+				$('[name="state_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+				error = error + 1;
+			}
+			is_route = $('#is_route').val();
+			if(is_route == '0'){
+				if($('[name="route_id[]"]').val() == "" || $('[name="route_id[]"]').val() == null){
+					$('[name="route_id[]"]').parent().find('.error_msg').text('Please select route/routes');
+					$('[name="route_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+					error = error + 1;
+				}
+			} else {
+				if($('[name="zone_id[]"]').val() == "" || $('[name="zone_id[]"]').val() == null){
+					$('[name="zone_id[]"]').parent().find('.error_msg').text('Please select zone/zones');
+					$('[name="zone_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+					error = error + 1;
+				}
+				if($('[name="town_id[]"]').val() == "" || $('[name="town_id[]"]').val() == null){
+					$('[name="town_id[]"]').parent().find('.error_msg').text('Please select town/towns');
+					$('[name="town_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+					error = error + 1;
+				}
+			}
+			
+			
+			if($('[name="applied_on_variant_id"]').val() == "" || $('[name="applied_on_variant_id"]').val() == null){
+				$('[name="applied_on_variant_id"]').parent().find('.error_msg').text('Please select applied on');
+				$('[name="applied_on_variant_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+				error = error + 1;
+			}
+			
+			if($('[name="minimum_order_quantity"]').val() == ""){
+				$('[name="minimum_order_quantity"]').parent().find('.error_msg').text('Please enter minimum order quantity');
+				$('[name="minimum_order_quantity"]').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			
+			if($('[name="start_date"]').val() == ""){
+				$('[name="start_date"]').parent().find('.error_msg').text('Please enter start date');
+				$('[name="start_date"]').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+			if($('[name="end_date"]').val() == ""){
+				$('[name="end_date"]').parent().find('.error_msg').text('Please enter end date');
+				$('[name="end_date"]').css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+
+			if($('[name="free_variant_id"]').val() == "" || $('[name="free_variant_id"]').val() == null){
+				$('[name="free_variant_id"]').parent().find('.error_msg').text('Please select free product');
+				$('[name="free_variant_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+				error = error + 1;
+			}
+			
+			if(error > 0){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function getStateRouteOptions(value){
+			if(value == ""){
+				$('[name="route_id[]"]').html('');
+				$('#ajaxDistributors').html('');
+			}else{
+				showLoader();
+				var url = "{% url 'src:get-state-route-options' 1 %}";
+				url = url.replace(1,parseInt(value));
+				$.ajax({
+					url: url,
+					method: 'GET',
+					success: function (data) {
+						hideLoader();
+						$('[name="route_id[]"]').html(data.options);
+						$('[name="route_id[]"]').select2();
+						addMultiSelectPlacehoder();
+					},
+					error: function (err) {
+						hideLoader();
+						console.log(err)
+					}
+				});
+			}
+			
+		}
+		
+		function getProductVariantDetails(value,type){
+			if(value == ""){
+				
+			}else{
+				showLoader();
+				var url = "{% url 'src:get-product-variant-details' 1 %}";
+				url = url.replace(1,parseInt(value));
+				$.ajax({
+					url: url,
+					method: 'GET',
+					success: function (data) {
+						hideLoader();
+						product = data.product;
+						if(type == 1){
+							$('#product_unit').html(product.container_name)
+							$('#packaging_type').html(data.options);
+						}else{
+							$('#free_product_unit').text(product.container_name)
+						}
+						
+					},
+					error: function (err) {
+						hideLoader();
+						console.log(err)
+					}
+				});
+			}
+			
+		}
+		
+		function toggleQty(element){
+			if($(element).is(':checked')){
+				$(element).parent().parent().find('.numeric').show();
+				$(element).parent().parent().find('.numeric').css('display','inline-block');
+			}else{
+				$(element).parent().parent().find('.numeric').val('');
+				$(element).parent().parent().find('.numeric').hide();
+			}
+		}
+		
+
+		function zoneTownOptions(element){
+			if($(element).val() != null){
+				zone_ids = $(element).val().join();
+				if(zone_ids == "all" || zone_ids.includes("all")){
+					$('[name="zone_id[]"] > option').prop("selected","selected");
+					var wanted_option = $('[name="zone_id[]"] option[value="all"]');
+					wanted_option.prop('selected', false);
+					$('[name="zone_id[]"]').trigger('change.select2');
+				}else{
+					getZoneTowns(zone_ids);
+				}
+			}else{
+				$('[name="town_id[]"]').html('')
+				getFilteredUsers();
+			}
+		}
+	
+
+		function routeOptions(element){
+			if($(element).val() != null){
+				route_ids = $(element).val().join();
+				if(route_ids == "all" || route_ids.includes("all")){
+					$('[name="route_id[]"] > option').prop("selected","selected");
+					var wanted_option = $('[name="route_id[]"] option[value="all"]');
+					wanted_option.prop('selected', false);
+					$('[name="route_id[]"]').trigger('change.select2');
+					getFilteredUsers();
+				}else{
+					getFilteredUsers();
+				}
+			}else{
+				getFilteredUsers();
+			}
+		}
+		
+		
+		function routeTownOptions(element){
+			if($(element).val() != null){
+				route_ids = $(element).val().join();
+				if(route_ids == "all" || route_ids.includes("all")){
+					$('[name="route_id[]"] > option').prop("selected","selected");
+					var wanted_option = $('[name="route_id[]"] option[value="all"]');
+					wanted_option.prop('selected', false);
+					$('[name="route_id[]"]').trigger('change.select2');
+				}else{
+					// url = "{% url 'src:get-route-town-options' %}";
+					// $.ajax({
+					// 	url: url,
+					// 	method: 'POST',
+					// 	data:{'route_ids':route_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+					// 	success: function (data) {
+					// 		$('[name="town_id[]"]').html(data)
+					// 		$('[name="town_id[]"]').select2();
+					// 		addMultiSelectPlacehoder();
+					// 	},
+					// 	error: function (err) {
+					// 		console.log(err)
+					// 	}
+					// });
+				}
+			}else{
+				$('[name="town_id[]"]').html('')
+			}
+			
+		}
+		
+		function selectTownAllOption(element){
+			if($(element).val() != null){
+				town_ids = $(element).val().join();
+				if(town_ids == "all" || town_ids.includes("all")){
+					$('[name="town_id[]"] > optgroup option').prop("selected","selected");
+					var wanted_option = $('[name="town_id[]"] option[value="all"]');
+					wanted_option.prop('selected', false);
+					$('[name="town_id[]"]').trigger('change.select2');
+				}else{
+					getFilteredUsers();
+				}
+			}
+		}
+		
+		
+		function getFilteredUsers(){
+			
+			applied_on_variant_id = $('[name="applied_on_variant_id"]').val();
+			state_id = $('[name="state_id"]').val();
+			
+
+			if($('[name="route_id[]"]').val() == null){
+				route_ids = '';
+			}else{
+				route_ids = $('[name="route_id[]"]').val().join();
+			}
+
+			if($('[name="zone_id[]"]').val() == null){
+				zone_ids = '';
+			}else{
+				zone_ids = $('[name="zone_id[]"]').val().join();
+			}
+
+			if($('[name="town_id[]"]').val() == null){
+				town_ids = '';
+			}else{
+				town_ids = $('[name="town_id[]"]').val().join();
+			}
+			
+			is_route = $('#is_route').val();
+			
+			if(applied_on_variant_id!='')
+			{	
+				free_variant_id = $('[name="free_variant_id"]').val();
+				minimum_order_quantity = $('[name="minimum_order_quantity"]').val();
+				container_qty = $('[name="container_qty"]').val();
+				pouch_qty = $('[name="pouch_qty"]').val();
+				packaging_type = $('#packaging_type').val();
+				if(applied_on_variant_id!='')
+				{
+					var container_id = $('#applied_on_variant_id').find('option:selected'); 
+					var container_name = container_id.attr("container_name"); 
+					var packaging_name = container_id.attr("packaging_name"); 
+				}else{
+					var container_name = ''; 
+					var packaging_name = ''; 
+				}
+				
+				
+				url = "{% url 'src:get-filtered-users' %}";
+				$.ajax({
+					url: url,
+					method: 'POST',
+					data:{
+						'state_id':state_id,
+						'is_route':is_route,
+						'route_ids':route_ids,
+						'zone_ids':zone_ids,
+						'town_ids':town_ids,
+						'applied_on_variant_id':applied_on_variant_id,
+						'free_variant_id':free_variant_id,
+						'minimum_order_quantity':minimum_order_quantity,
+						'container_qty':container_qty,
+						'pouch_qty':pouch_qty,
+						'packaging_type':packaging_type,
+						'container_name':container_name,
+						'packaging_name':packaging_name,
+						'scheme_type':1,
+						csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (data) {
+						$('#ajaxDistributors').html(data)
+						
+						addMultiSelectPlacehoder();
+						
+					},
+					error: function (err) {
+						console.log(err)
+					}
+				});
+			}else{
+				table = `<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+					<thead>
+						<tr>
+							<th>Distributor name</th>
+							<th>Applied on</th>
+							<th>On Order of</th>
+							<th>Free Product variant</th>
+							<th>Free Product quantity</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>`;
+				$('#ajaxDistributors').html(table)
+			}
+		}
+	</script>
+

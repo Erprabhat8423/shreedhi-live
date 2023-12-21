@@ -1,0 +1,206 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <select class="inputField selectField" name="route_id" id="route_id" onchange="getCratesReport()">
+                                        <option value="">Select Route</option>
+                                        {% for route in routes %}
+                                        <option value="{{route.id}}">{{route.route}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="inputField selectField" name="crate_type" id="crate_type" onchange="getCratesReport()">
+                                        <option value="normal" selected>Normal</option>
+                                        <option value="jumbo">Jumbo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input class="inputField" placeholder="Order Date" name="crate_date" id="crate_date_picker" value="{{ today_date }}" onchange="getCratesReport()" readonly>
+                                </div>
+                                <div class="col-md-2">
+                                    <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px;padding:0.1rem!important"></a>
+                                </div>
+                                <div class="col-md-4">
+                                   
+                                </div>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th> Sr. No. </th>
+                                <th> Customer Code  </th>
+                                <th> Name of Distributor/SS </th>
+                                <th style="text-align: center;"> Opening </th>
+                                {% for months in month_list %}
+                                <th colspan="2" style=" padding: 0px; text-align: center;">{{months}} 
+                                    <table style="padding: 0px; ">
+                                        <td style="font-size: 11px;font-weight: bold;">Dispatch</td>
+                                        <td style="font-size: 11px;font-weight: bold;">Plant</td>
+                                    </table>
+                                </th>
+                                {% endfor %}
+                                <th style="text-align: center;"> Plant  </th>
+                                <th style="text-align: center;"> Dispatch  </th>
+                                <th style="text-align: center;"> Short for Month  </th>
+                                <th style="text-align: center;"> Short Since starting  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if user_list %}
+                            {% for user in user_list %}
+                            <tr>
+                                <td>{{forloop.counter}}.</td>
+                                <td>{{ user.emp_sap_id }}</td>
+                                <td nowrap="">
+                                    {% if user.store_name is not None %}{{user.store_name}} {%endif%}({{ user.first_name }} {{ user.middle_name }} {{ user.last_name }})</td>
+                                <td style="text-align: center;">{{ user.opening_crates }}</td>
+                                {% for crate in user.crates %}
+                                <th colspan="2" style=" padding: 0px; text-align: center;">
+                                    <table style="padding: 0px; ">
+                                        <td style="width: 510px; text-align: center; font-size: 12px;">{{crate.dispatch}}</td>
+                                        <td style="width: 450px; text-align: center; font-size: 12px;">{{crate.plant}}</td>
+                                    </table>
+                                </th>
+                                {% endfor %}
+                                <td style="text-align: center;">{{ user.total_plant_crates }}</td>
+                                <td style="text-align: center;">{{ user.total_dispatch_crates }}</td>
+                                <td style="text-align: center;">{{ user.short_for_month }}</td>
+                                <td style="text-align: center;">{{ user.short_since_starting }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <th colspan="3" style="text-align: center;">Total Crates Per Day</th>
+                                <th style="text-align: center;">{{total_opening_crates}}</th>
+                                {% for crate_list in total_crate_lists %}
+                                <th colspan="2" style=" padding: 0px; text-align: center;">
+                                    <table style="padding: 0px; ">
+                                        <th style="width: 550px; text-align: center; font-size: 12px;">{{ crate_list.dispatch }}</th>
+                                        <th style="width: 450px; text-align: center; font-size: 12px;">{{ crate_list.plant }}</th>
+                                    </table>
+                                </th>
+                                {% endfor %}
+                                <th style="text-align: center;">{{ total_plant_crate }}</th>
+                                <th style="text-align: center;">{{ total_dispatch_crate }}</th>
+                                <th style="text-align: center;">{{ total_short_for_month }}</th>
+                                <th style="text-align: center;">{{ total_short_since_starting }}</th>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                
+                                
+                                <th colspan="{{ month_list_count }}" style=" padding: 0px; text-align: center;"> No Record Found...
+                                </th>
+                                
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script>
+    
+    function generateIndentReport(id){
+        $.ajax({
+            url: "{% url 'src:generate-indent-report' %}",
+            method: 'GET',
+            data: { id:id },
+            success: function (data) {
+                console.log(data)
+                if(data.error == true){
+                    openToaster(data.error_type, data.message);
+                }else{
+                    openToaster(data.error_type, data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            },
+            error: function (err) {
+                err = JSON.parse(err);
+                console.log(err.message);
+                window.location.reload();
+            }
+        });
+    };
+    function getCratesReport(){
+        var crate_date      = $('#crate_date_picker').val();
+        var crate_type      = $('#crate_type').val();
+        var route_id        = $('#route_id').val();
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-crate-summary' %}",
+                method: 'GET',
+                data: { crate_date:crate_date, route_id:route_id, crate_type:crate_type },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $("#crate_date_picker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                dateFormat: 'mm/yy' 
+            });
+        });
+        function exportsInExcel(){
+            var crate_date      = $('#crate_date_picker').val();
+            var crate_type      = $('#crate_type').val();
+            if(crate_date){ 
+                crate_date = crate_date.split('/');
+                crate_date = crate_date[0]+'-'+crate_date[1]
+            }else{ crate_date = '0' }
+            var route_id        = $('#route_id').val();
+            if(route_id){ 
+                route_id = route_id;
+            }else{ route_id = '0' }
+            var url = "{% url 'src:export-crate-summary' 'crate_date' 'crate_type' 'route_id' %}";
+            url = url.replace('crate_date',crate_date).replace('crate_type',crate_type).replace('route_id',route_id);
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

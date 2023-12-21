@@ -1,0 +1,139 @@
+{% load static %}
+
+{% if leaveReport %}
+{% for leaveReportRecord in leaveReport %}
+<tr>
+    <td class="checked_class {{leaveReportRecord.leave_status}}  {{leaveReportRecord.level_id}}" >
+        {% if role_id == 0 and leaveReportRecord.leave_status != 3 and leaveReportRecord.leave_status != 4 %}
+        
+        <input type="checkbox" class="checkbox" id="new_module_1 1" name="order_id[]" value="{{ leaveReportRecord.id }}" onclick="checkBox()"> 
+        {% else %} 
+        {% if leaveReportRecord.status == 0 %}
+        {% if leaveReportRecord.leave_status == 1 and leaveReportRecord.level_id == 2 %} 
+        <input type="checkbox" class="checkbox " id="new_module_1 2" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+        {% elif leaveReportRecord.leave_status == 2 %} 
+        <input type="checkbox" class="checkbox " id="new_module_1 3" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+        {% elif leaveReportRecord.leave_status == 3 %} 
+        <input type="checkbox" class="checkbox  4{{leaveReportRecord.status}}" id="new_module_1" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+        {% else %}  
+        {% endif %} 
+        {% else %} 
+        <input type="checkbox" disabled checked> 
+        {% endif %}
+        {% endif %}
+    </td>
+    
+    <td class="user_name" >{{ leaveReportRecord.user_name  }}</td>
+    
+    <td class="leave_from_date" >
+        {{ leaveReportRecord.leave_from_date | date:"d/m/Y"}} - {{ leaveReportRecord.leave_to_date | date:"d/m/Y"}}
+    </td>
+    <td class="remark" >{% if leaveReportRecord.leave_detail %} {{  leaveReportRecord.leave_detail   }} {% else %} - {% endif %}</td>
+    <td class="attachment" >
+        {% if leaveReportRecord.attachment is not None and leaveReportRecord.attachment != "" %}
+        <a href="{{leaveReportRecord.attachment}}" download><i class="fa fa-download"></i></a>
+        {% else %}
+        --
+        {% endif %}
+    </td>
+    
+    <td class="status">  
+        <a href="javascript:void(0)" onclick="getLeaveStatus('{{ leaveReportRecord.id }}')">
+            {% if role_id == 0 %} {% if leaveReportRecord.leave_status	 == 1 %} Initiated {% elif leaveReportRecord.leave_status == 2 %} Forwarded {% elif leaveReportRecord.leave_status == 3 %} Approved {% elif leaveReportRecord.leave_status == 4 %} Declined {% else %} {{leaveReportRecord.leave_status}}   {% endif %} {% else %} 
+            {% if leaveReportRecord.leave_status == 4 %} Declined {% elif leaveReportRecord.leave_status == 3 %}Approved {% elif leaveReportRecord.status == 0 %}{% if leaveReportRecord.leave_status == 1 and leaveReportRecord.level_id == 2 %} Initiated {% elif leaveReportRecord.leave_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}
+        </a></td>
+    </td>
+</tr>
+{% endfor %}
+<input type="hidden" name="leave_status" id="leave_status" value="{{ leave_status }}" />
+<tr id="loading" style="display: none;">
+    <td class="text-center" colspan="12"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="5" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+
+
+<script>
+    
+    $('#forward').hide();
+    $('.iconApproved').hide();
+    $('.iconDeclined').hide();
+    $('.iconForward').hide();
+    $(".checked_all_checkbox").attr("checked", false);
+    
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked")); 
+        checked_all();           
+    });
+    
+    function checked_all(){
+        
+        $('.iconForward').hide();
+        $('.iconApproved').hide();
+        $('.iconDeclined').hide();
+        $('#forward').hide();
+        if($('.checkbox:checked').prop('checked') == true){
+            $('.checked_all').prop('checked',true);
+        }else{
+            $('.checked_all').prop('checked',false);
+        }
+        if($('.checkbox:checked').length > 0){
+            {% if role_id == 0 %}
+            {% if leave_status == "1" %}
+            $('.iconForward').show();
+            {% else %} 
+            
+            $('.iconApproved').show();
+            $('.iconDeclined').show();
+            {% endif %}
+            {% else %}
+            $('#forward').show();
+            {% endif %}
+            
+        }else{
+            $('.iconForward').hide();
+            $('.iconApproved').hide();
+            $('.iconDeclined').hide();
+            $('#forward').hide();
+        }
+    }
+    
+    $('.checkbox').change(function(){ 
+        checked_all();
+    });
+    
+    
+    {% if role_id == 0 %}
+    {% if leave_status and leave_status != '' %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% else %} 
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% if leave_status == '3' %}
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% else %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% endif %}
+    
+    
+    {% if leaveReport %}
+    $(".checked_all").attr("disabled", false);
+    {% else %}    
+    $(".checked_all").attr("disabled", true);
+    {% endif %}
+    
+    
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    $('#order_count').html('Order Count: {{foc_requests|length}}');
+</script>

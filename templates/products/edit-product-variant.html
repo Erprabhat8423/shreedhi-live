@@ -1,0 +1,1011 @@
+{% load static %}
+
+<style>
+    .padding-0{
+        padding-right:0;
+        padding-left:0;
+    }
+    #select2-variant_unit-container{background-color:lightgray;}
+    .box {
+        margin: 10px;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        overflow: hidden;
+        height: 215px;
+    }
+    .inner_pics{
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        overflow: hidden;
+        height: 50px;
+        width: 50px;
+        margin-left: 10px;
+    }
+    .variant-pic {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .variant-pic:hover .removeImage {
+        display: block;
+    }
+    
+    .removeImage {
+        padding-top: 7px;	
+        padding-right: 7px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: none;
+    }
+    
+    .removeImage a {
+        color: #000;
+    }
+    .modal-AddOrganisation{
+    	width: 90%;
+        max-height: 90%;
+        background-color: #f8f9fa;
+        overflow: auto;
+        border-radius: 11px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: 0px 7px 81px 0px rgb(0 115 224 / 22%);
+    }
+</style>
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/new_Variant.png' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit Variant</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="updateProductVariantForm" method="POST" autocomplete="off" action="" aria-label="Product">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_variant_id" value="{{product_variant.id}}">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="updateProductVariant()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 box variant-pic">
+                                {% if product_variant_images.count %}
+                                <img src="{{product_variant_images.0.image_url}}" id="primaryImage" alt="" style="height: 100%; width: 100%;">
+                                {% else %}
+                                <img src="" id="primaryImage" alt="" >
+                                {% endif %}
+                            </div>
+                            <div class="col-md-12">
+                                <input type="file" id="variantImage"  name="variantImage[]" class="image-upload" onchange="uploadImages(this.id)" multiple accept="image/*">
+                                <label class="error_msg" id="variant_image_error_msg" style="color: red; font-size: 11px;"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="row mt-md-3">
+                            <div class="col-md-8 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Product</b></h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="product_id" id="product_id">
+                                            <option value="">Select</option>
+                                            {% for current_product in products %}
+                                            <option value="{{current_product.id}}" {% if product_variant.product_id == current_product.id %}selected{% endif %}>{{current_product.product_name}} ({{current_product.product_class_name}})</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Item Code</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField alpha_numeric" type="text" placeholder="Item code*" id="item_code" name="item_code" maxlength="50" value="{{product_variant.item_sku_code}}" />
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="row mt-md-3">
+                            <div class="col-md-6 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Container Type</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="container_id" id="container_id">
+                                            <option value="">Select</option>
+                                            {% for product_container in product_containers %}
+                                            <option value="{{product_container.id}}" container_name="{{product_container.container}}" {% if product_variant.container_id == product_container.id %}selected{% endif %}>{{product_container.container}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Packaging Type</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="packaging_type_id" id="packaging_type_id">
+                                            <option value="">Select</option>
+                                            {% for packaging_type in packaging_types %}
+                                            <option value="{{packaging_type.id}}" packaging_name="{{packaging_type.packaging_type}}" {% if product_variant.packaging_type_id == packaging_type.id %}selected{% endif %}>{{packaging_type.packaging_type}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-md-3">
+                            <div class="col-md-7 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Variant Qty</b></h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input class="inputField numeric" type="text" placeholder="Variant Qty*" id="variant_qty" name="variant_qty" onchange="calculateContainerSize();handleNameSize()" maxlength="15" value="{{product_variant.variant_quantity}}"/>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="inputField selectField" style="width: 100%;" name="variant_unit" id="variant_unit" onchange="handleNameSize()">
+                                            <option value="">Select</option>
+                                            {% for product_unit in product_units %}
+                                            <option value="{{product_unit.id}}" {% if product_variant.variant_unit_id == product_unit.id %}selected{% endif %}>{{product_unit.unit}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Variant Name</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField" type="text" placeholder="Variant Name*" id="variant_name" name="variant_name" maxlength="255" value="{{product_variant.variant_name}}" />
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="row mt-md-3">
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>SKU Size</b></h6>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <input class="inputField" type="text" placeholder="SKU Size*" id="variant_size" name="variant_size" onchange="calculateContainerSize()" maxlength="5" value="{{product_variant.variant_size}}" />
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                    <div class="col-md-3 padding-0" style="margin-top: 6px;">
+                                        <div id="upperUnit" style="display: inline;
+                                        width: 50%;
+                                        height: 70%;
+                                        border: 1px solid lightgrey;
+                                        padding: 0.5rem 1.0rem 0.5rem 0.6rem;
+                                        border-radius: 0.6rem;
+                                        background-color: lightgray">{{product_variant_unit.largest_unit}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>No. of <span class="packaging_text"></span> <span class="container_text"></span></b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField numeric" type="text" placeholder="No. of Pouch*" id="no_of_pouch" name="no_of_pouch" onchange="calculateContainerSize();" maxlength="15" value="{{product_variant.no_of_pouch}}"/>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            
+                            
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Container size</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField" type="text" placeholder="Container size*" id="container_size" name="container_size" maxlength="25" value="{{product_variant.container_size}}" readonly/>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                        <div class="row mt-md-3">
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>GST</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="gst" id="gst">
+                                            <option value="">Select</option>
+                                            {% for gst in gst_list %}
+                                            <option value="{{gst.gst}}" {%if product_variant.gst == gst.gst %}selected{% endif %}>{{gst.gst}}%</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Variant Type</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="variant_type" id="variant_type" onchange="handleNameSize()">
+                                            <option value="0" {%if product_variant.is_bulk_pack == 0 %}selected{% endif %}>Normal Pack</option>
+                                            <option value="1" {%if product_variant.is_bulk_pack == 1 %}selected{% endif %}>Bulk Pack</option>
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Allow Demand in Packaging</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <select class="inputField selectField" style="width: 100%;" name="is_allow_in_packaging" id="is_allow_in_packaging" onchange="handleNameSize()">
+                                            <option value="1" {%if product_variant.is_allow_in_packaging == 1 %}selected{% endif %}>Yes</option>
+                                            <option value="0" {%if product_variant.is_allow_in_packaging == 0 %}selected{% endif %}>No</option>
+                                        </select>
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+
+                    
+                    
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col-md-3 secondary_images" >
+                        {% if product_variant_images.count %}
+                        
+                        {% for product_variant_image in product_variant_images %}
+                        {% if not forloop.first %}
+                        <div class="variant-pic inner_pics">
+                            <img  style="height: 100%; width: 100%;" src="{{product_variant_image.image_url}}" alt="" />
+                            <div class="removeImage"><a href="javascript:;" onclick="removeImage(this)"><i class="fa fa-times fa-lg"></i></a></div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        
+                    </div>
+                    
+                    
+                    
+                    <!-- <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b>included in scheme</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField" style="width: 100%;" name="included_in_scheme" id="included_in_scheme" onchange="handleNameSize()">
+                                    <option value="1" {%if product_variant.included_in_scheme == 1 %}selected{% endif %}>Yes</option>
+                                    <option value="0" {%if product_variant.included_in_scheme == 0 %}selected{% endif %}>No</option>
+                                </select>
+                                <label class="error_msg float-right" id=""></label>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 style="display: inline-block;"><b>Set Rate</b></h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b>MRP</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="MRP*" id="mrp" name="mrp" maxlength="7" onkeypress="return validateFloatKeyPress(this,event);" onkeyup="calculateContainerPrice();" value="{{product_variant.mrp}}"/>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b>Sp for Distributors</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="Sp for Distributors*" id="sp_distributor" name="sp_distributor" maxlength="7" onkeypress="return validateFloatKeyPress(this,event);" onkeyup="calculateContainerPrice();" value="{{product_variant.sp_distributor}}" />
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b>Sp for Super Stockist</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="Sp for Super Stockist*" id="sp_superstockist" name="sp_superstockist" maxlength="7" onkeypress="return validateFloatKeyPress(this,event);" onkeyup="calculateContainerPrice();" value="{{product_variant.sp_superstockist}}"/>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b>Sp for Employee</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="Sp for Employee*" id="sp_employee" name="sp_employee" maxlength="7" onkeypress="return validateFloatKeyPress(this,event);" onkeyup="calculateContainerPrice();" value="{{product_variant.sp_employee}}"/>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b><span class="container_text"></span> MRP</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="{{product.container_name}} MRP*" id="container_mrp" name="container_mrp" maxlength="7" value="{{product_variant.container_mrp}}" readonly />
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b><span class="container_text"></span> Sp for Distributors</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="{{product.container_name}} Sp for Distributors*" id="container_sp_distributor" name="container_sp_distributor" maxlength="7" value="{{product_variant.container_sp_distributor}}" readonly />
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b><span class="container_text"></span> Sp for Super Stockist</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="{{product.container_name}} Sp for Super Stockist*" id="container_sp_superstockist" name="container_sp_superstockist" maxlength="7" value="{{product_variant.container_sp_superstockist}}" readonly />
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-3 padding-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.7rem"><b><span class="container_text"></span> Sp for Employee</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input class="inputField" type="text" placeholder="{{product.container_name}} Sp for Employee*" id="container_sp_employee" name="container_sp_employee" maxlength="7" value="{{product_variant.container_sp_employee}}" readonly />
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                <div class="col-md-3 padding-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 style="display: inline-block; font-size:0.7rem"><b>Time period</b></h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input class="inputField" type="text" placeholder="Valid from" id="valid_from" name="valid_from" value="{% if product_variant.valid_from %}{{product_variant.valid_from | date:'d/m/Y'}}{% endif %}" readonly />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="col-md-3 padding-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 style="display: inline-block; font-size:0.7rem"><b> &nbsp;</b></h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input class="inputField" type="text" placeholder="Valid to*" id="valid_to" name="valid_to"  value="{% if product_variant.valid_to %}{{product_variant.valid_to | date:'d/m/Y'}}{% endif %}"  readonly />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="col-md-6 padding-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 style="display: inline-block; font-size:0.7rem"><b>Production Unit*</b></h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <select class="inputField selectField" style="width: 100%;" name="production_unit_id[]" id="production_unit_id" >
+                                {% for production in production_unit %}
+                                <option value="{{production.id}}" {% if production.id|stringformat:"i" in product_variant.production_unit_id %}selected{% endif %}>{{production.production_unit_name}}</option>
+                                {% endfor %}
+                                
+                            </select>
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                
+            </div>
+
+
+
+
+               
+                
+                
+                <input type="hidden" name="update_confirm" id="update_confirm" value="0">
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    var product_variant_id = "{{product_variant.id}}";
+    var filecollection = [];
+    $(document).ready(function(){
+        var packaging_text = '{{product_variant.packaging_type_name}}'+' in ';
+        $('.packaging_text').text(packaging_text);
+        $('.container_text').text('{{product_variant.container_name}}');
+
+        $('.selectField').select2();
+        
+        $("#valid_from").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+10",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+            minDate: new Date(),
+            onSelect: function () {
+                validateDateRange();
+            }
+        });
+        
+        $("#valid_to").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+10",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+            minDate: new Date(),
+            onSelect: function () {
+                validateDateRange();
+            }
+        });
+        
+        function getDateFormat(date){
+            var dateTemp = date.split('/');
+            date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+            return date
+        }
+        
+        
+        
+        function validateDateRange(){
+            to_date = new Date(getDateFormat($("[name='valid_to']").val()));
+            from_date = new Date(getDateFormat($("[name='valid_from']").val()));
+            $('.error_msg').text('');
+            $("[name='valid_from']").css("border", "");
+            $("[name='valid_to']").css("border", "");
+            
+            if(from_date > to_date ){
+                $("[name='valid_from']").parent().find('.error_msg').text('Start date must be less then or equal to end date');
+                $("[name='valid_from']").css("border", "1px solid #db8305");
+                $("[name='valid_from']").val('')
+                return false;
+            }
+        }
+
+        $("#container_id").change(function(){ 
+            var packaging_type_id = $('#packaging_type_id').find('option:selected'); 
+            var packaging_name = packaging_type_id.attr("packaging_name");
+            
+            if(packaging_name){
+                var element = $(this).find('option:selected'); 
+                var container_name = element.attr("container_name"); 
+            
+                if(container_name){
+                    $('.container_text').text(container_name); 
+                } else {
+                    $('.container_text').text(''); 
+                }
+            }
+            
+        }); 
+
+        $("#packaging_type_id").change(function(){ 
+            var container_id = $('#container_id').find('option:selected'); 
+            var container_name = container_id.attr("container_name"); 
+        
+            if(container_name){
+                $('.container_text').text(container_name); 
+            } else {
+                $('.container_text').text(''); 
+            }
+
+            var element = $(this).find('option:selected'); 
+            var packaging_name = element.attr("packaging_name");
+            if(packaging_name){
+                packaging_name  = packaging_name+' in ';
+                $('.packaging_text').text(packaging_name);
+            } else {
+                $('.container_text').text(''); 
+                $('.packaging_text').text('');
+            }
+             
+        }); 
+
+        
+        
+    })
+    var product_unit = {};
+    
+    function calculateContainerSize() {
+        var no_of_pouch = $('#no_of_pouch').val();
+        variant_size = $('#variant_size').val();
+        variant_qty = $('#variant_qty option:selected').val();
+        var container_id = $('#container_id').find('option:selected'); 
+        var container_name = container_id.attr("container_name"); 
+    
+        if(container_name){
+            container_name = container_name
+        } else {
+            container_name = ''
+        }
+        if(product_unit.largest_unit){
+            largest_unit = product_unit.largest_unit
+        }else{
+            largest_unit = '{{product_variant_unit.largest_unit}}'
+        }
+
+        if(variant_qty != "" && variant_size != "" && no_of_pouch != ""){
+            container_size = (parseFloat(variant_size) * parseInt(no_of_pouch)).toFixed(2) +" "+ largest_unit+ "/"+container_name;
+            $('#container_size').val(container_size);
+        }else{
+            $('#container_size').val('');
+        }
+    }
+    
+    function calculateContainerPrice(){
+        var no_of_pouch = $('#no_of_pouch').val();
+        var mrp = $('#mrp').val();
+        var sp_distributor = $('#sp_distributor').val();
+        var sp_superstockist = $('#sp_superstockist').val();
+        var sp_employee = $('#sp_employee').val();
+        
+        if(no_of_pouch > 0){
+            container_mrp = ($('#mrp').val()) * parseFloat(no_of_pouch);
+            container_sp_distributor = ($('#sp_distributor').val()) * parseFloat(no_of_pouch)
+            container_sp_superstockist = ($('#sp_superstockist').val()) * parseFloat(no_of_pouch);
+            container_sp_employee = ($('#sp_employee').val()) * parseFloat(no_of_pouch);
+            
+            $('#container_mrp').val(container_mrp.toFixed(2));
+            $('#container_sp_distributor').val(container_sp_distributor.toFixed(2));
+            $('#container_sp_superstockist').val(container_sp_superstockist.toFixed(2));
+            $('#container_sp_employee').val(container_sp_employee.toFixed(2));
+        }else{
+            $('#container_mrp').val(0);
+            $('#container_sp_distributor').val(0);
+            $('#container_sp_superstockist').val(0);
+            $('#container_sp_employee').val(0);
+        }
+    }
+    
+    
+    function handleNameSize(){
+        unit = $('#variant_unit option:selected').val();
+        var variant_qty = $('#variant_qty').val();
+        if(unit == "" || !$.isNumeric(unit) || unit == 0){
+            
+        }else{
+            
+            if(variant_qty == ""){
+                $('#variant_unit').val("").trigger('change');
+            }else{
+                
+                url = "{% url 'src:product-unit-details' 1 %}";
+                url = url.replace(1,parseInt(unit))
+                $.ajax({
+                    url: url ,
+                    method: 'GET',
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            product_unit = data.product_unit;
+                            product_name = $('#product_id option:selected').text();
+                            
+                            var variant_name = product_name+" "+variant_qty+product_unit.unit
+                            
+                            $('#variant_name').val(variant_name);
+                            variant_size = (parseFloat(variant_qty) / parseFloat(product_unit.conversion_value))
+                            $('#variant_size').val(variant_size).trigger('change');
+                            console.log(variant_name)
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    // hideLoader();
+                });
+            }
+        }
+    }
+    
+    $('#updateProductVariantForm').submit(function(e){
+        showLoader();
+        if(validateProductVariantForm()){
+            hideLoader();
+            return false;
+        }else{
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            
+            url = "{% url 'src:edit-product-variant' 1 %}";
+            url = url.replace(1,parseInt(product_variant_id))
+            $.ajax({
+                url: url ,
+                method: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        
+                        openToaster("success", data.message);
+                        setTimeout(function(){ window.location.reload(); }, 500);
+                    }else{
+                        console.log(data.confirm)
+                        if(data.confirm){
+                            
+                            $.confirm({
+                                title: 'Confirm!',
+                                theme:'material',
+                                content: data.message,
+                                buttons: {
+                                    confirm: {
+                                        btnClass: 'btn-blue',
+                                        action: function(){
+                                            $('#update_confirm').val(1);
+                                            $('#updateProductVariantForm').submit();
+                                        }
+                                    },
+                                    cancel: {
+                                        btnClass: 'btn-red',
+                                        action: function(){
+                                            
+                                        }
+                                    },
+                                    
+                                    
+                                }
+                            });
+                            
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        }
+    });
+    function updateProductVariant() {
+        $('#updateProductVariantForm').submit();
+    }
+    
+    
+    function validateProductVariantForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        $('.select2-container').css("border", "");
+        
+        if($('[name="variantImage"]').val() == ""){
+            $('[name="variantImage"]').parent().find('.error_msg').text('Please select variant images');
+            error = error + 1;
+        }
+        if($('[name="product_id"]').val() == ""){
+            $('[name="product_id"]').parent().find('.error_msg').text('Please select product');
+            $('[name="product_id"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="item_code"]').val()) == ""){
+            $('[name="item_code"]').parent().find('.error_msg').text('Please enter item code');
+            $('[name="item_code"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="container_id"]').val()) == ""){
+            $('[name="container_id"]').parent().find('.error_msg').text('Please select container type');
+            $('[name="container_id"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="packaging_type_id"]').val()) == ""){
+            $('[name="packaging_type_id"]').parent().find('.error_msg').text('Please select packaging type');
+            $('[name="packaging_type_id"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="variant_qty"]').val() == ""){
+            $('[name="variant_qty"]').parent().find('.error_msg').text('Please enter variant quantity');
+            $('[name="variant_qty"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        
+        if($('[name="variant_unit"]').val() == ""){
+            $('[name="variant_unit"]').parent().find('.error_msg').text('Please select variant unit');
+            $('[name="variant_unit"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        if($.trim($('[name="variant_name"]').val()) == ""){
+            $('[name="variant_name"]').parent().find('.error_msg').text('Please enter variant name');
+            $('[name="variant_name"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($.trim($('[name="variant_size"]').val()) == ""){
+            $('[name="variant_size"]').parent().find('.error_msg').text('Please enter SKU Size');
+            $('[name="variant_size"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="no_of_pouch"]').val() == ""){
+            $('[name="no_of_pouch"]').parent().find('.error_msg').text('Please enter number of pouch');
+            $('[name="no_of_pouch"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="container_size"]').val() == ""){
+            $('[name="container_size"]').parent().find('.error_msg').text('Please enter container size');
+            $('[name="container_size"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($('[name="mrp"]').val() == ""){
+            $('[name="mrp"]').parent().find('.error_msg').text('Please enter MRP');
+            $('[name="mrp"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="sp_distributor"]').val() == ""){
+            $('[name="sp_distributor"]').parent().find('.error_msg').text('Please enter SP for distributor');
+            $('[name="sp_distributor"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="sp_superstockist"]').val() == ""){
+            $('[name="sp_superstockist"]').parent().find('.error_msg').text('Please enter SP for superstockist');
+            $('[name="sp_superstockist"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="sp_employee"]').val() == ""){
+            $('[name="sp_employee"]').parent().find('.error_msg').text('Please enter SP for Employee');
+            $('[name="sp_employee"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($('[name="valid_from"]').val() == ""){
+            $('[name="valid_from"]').parent().find('.error_msg').text('Please enter from date');
+            $('[name="valid_from"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($('[name="valid_to"]').val() == ""){
+            $('[name="valid_to"]').parent().find('.error_msg').text('Please enter SP to date');
+            $('[name="valid_to"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($.trim($('[name="production_unit_id[]"]').val()) == ""){
+            $('[name="production_unit_id"[]').parent().find('.error_msg').text('Please select Production Unit');
+            $('[name="production_unit_id[]"').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function uploadImages(id) {
+        
+        $('.secondary_images').html('');
+        $('#primaryImage').removeAttr('src').removeAttr('style');
+        
+        for (var i = 0; i < $("#"+id).get(0).files.length; i++) {
+            var current_file = $("#"+id).get(0).files[i];
+            var current_file_name = $("#"+id).get(0).files[i].name;
+            var error = 0;
+            if(current_file_name){
+                var ext = current_file_name.split('.').pop().toLowerCase();
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG']) !== -1){
+                    error = 0;
+                    if(current_file_name){
+                        console.log('test3');
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>5120){
+                            error = 1;
+                            document.getElementById('variant_image_error_msg').innerHTML = 'Image should be upto 5MB*';
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                            document.getElementById('variant_image_error_msg').innerHTML = '';
+                        }
+                    }
+                    if(i == 0 && error == 0){
+                        $('#primaryImage').attr('src',window.URL.createObjectURL(current_file)).css('height','100%').css('width','100%');
+                        filecollection.push(current_file_name);
+                    }else if(error == 0){
+                        var img = `<div class="variant-pic inner_pics">
+                            <img style="height: 100%; width: 100%;" src="`+ window.URL.createObjectURL(current_file) + `" alt="`+current_file_name +`" />
+                        </div>`;
+                        console.log(img);
+                        $('.secondary_images').append(img);
+                        filecollection.push(current_file_name);
+                    }
+                } else {
+                    error = 1;
+                    document.getElementById('variant_image_error_msg').innerHTML = 'Image should be jpg and png*';
+                    $("#"+id).val('');
+                }
+                
+                
+            }
+        }
+        
+    }
+    
+    function removeImage(element){
+        $(element).parent().parent().remove();
+    }
+    function removePrimrayImage(element){
+        $('#primaryImage').attr('src','');
+    }
+    
+    
+</script>

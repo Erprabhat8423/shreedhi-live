@@ -1,0 +1,46 @@
+{% load static %}
+{% if non_operational_users %}
+{% for user in non_operational_users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+            <td class="non_store_name" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.store_name %} {{ user.store_name }} {% else %} - {% endif %}</td>
+            <td class="non_role" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.role_name %} {{ user.role_name }} {% else %} - {% endif %}</td>
+            <td class="non_contact_person" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.first_name %} {{ user.first_name }} {% if user.middle_name %} {{ user.middle_name }} {% endif %} {% if user.last_name %} {{ user.last_name }} {% endif %} {% else %} - {% endif %}</td>
+            <td class="non_contact_no" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.primary_contact_number %} {{ user.primary_contact_number }} {% else %} - {% endif %}</td>
+            <td width="20%">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            {% if user.is_tagged == 1 %}
+                            <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}')"><img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" /></a>
+                            {% else %}
+                            <img src="{% static 'img/svg/viewonmapgray.svg' %}" class="tableRowIcon" />
+                            {% endif %}
+                            <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ user.id }}"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'nonoperational')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+        </tr>
+        {% endfor %}
+        {% if page_loading_type == '1' %}
+        <tr id="nonoperational_loading" style="display: none;">
+            <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>
+        {% endif %}
+        {% else %}
+        <tr>
+            <td colspan="5" style="text-align: center;">No Record Found...</td>
+        </tr>
+        {% endif %}
+        <script>
+            $('#non_total_pages').val('{{non_operational_total_pages}}');
+        </script>

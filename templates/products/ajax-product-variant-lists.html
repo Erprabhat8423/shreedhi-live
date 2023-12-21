@@ -1,0 +1,32 @@
+{% load static %}
+
+    {% if product_variants %}
+    {% for product_variant in product_variants %}
+    <tr>
+        <td class="item_sku_code">{{ product_variant.item_sku_code }}</td>
+        <td class="variant_name">{{ product_variant.variant_name }}</td>
+        <td class="variant_size">{{ product_variant.variant_size }}</td>
+        <td class="no_of_pouch">{{ product_variant.no_of_pouch }}</td>
+        <td class="container_size">{{ product_variant.container_size }}</td>
+        <td onclick="priceBreakdown('{{ product_variant.gst }}','{{ product_variant.mrp }}',{{ product_variant.sp_distributor }},{{ product_variant.sp_superstockist }},{{ product_variant.sp_employee }})"><i class="fa fa-rupee"></i> View</td>
+        <td >
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="javascript:void(0)"
+                    onclick="editProductVariant('{{ product_variant.id }}')" ><img
+                    src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                    <div class="col-md-5">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox" name="is_active"
+                            id="is_active_variant_{{ product_variant.id }}"
+                            {% if product_variant.status == 1 %} checked="" {% else %}
+                            {% endif %}
+                            onclick="updateProductVariantStatus('{{ product_variant.id }}', '{{ product_variant.status }}')">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}

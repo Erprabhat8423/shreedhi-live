@@ -1,0 +1,310 @@
+{% load static %}
+<form name="addOfficalDetailsForms" id="addOfficalDetailsForms" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="last_user_id" id="last_user_id" value="{{ last_user_id }}" >
+    <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" onclick="editDriverBasic('{{ last_user_id }}', '1')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Official Details
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit">
+                            Save & Proceed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Personal Email
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Personal Email" name="personal_email"
+                                    id="personal_email" maxlength="12" value="{% if basic_details.personal_email %}{{ basic_details.personal_email }}{% endif %}" />
+                                    <label class="error_msg float-right" id="personal_email_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Aadhaar Card No *
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField numeric" type="text" placeholder="Aadhaar Card No." name="aadhaar_nubmer"
+                                    id="aadhaar_nubmer" maxlength="12" value="{% if basic_details.aadhaar_nubmer %}{{ basic_details.aadhaar_nubmer }}{% endif %}" />
+                                    <label class="error_msg float-right" id="aadhaar_nubmer_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/PAN.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Driving License No*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField alpha_numeric" type="text" placeholder="Enter Driving License" name="dl_number"
+                                    id="dl_number" maxlength="10" value="{% if basic_details.dl_number %}{{ basic_details.dl_number }}{% endif %}"  />
+                                    <label class="error_msg float-right" id="dl_number_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Date of Joining
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="datepicker inputField"
+                                    placeholder="Enter Date of Joining" name="date_of_joining" id="date_of_joining" value="{% if basic_details.date_of_joining %}{{ basic_details.date_of_joining | date:'d/m/Y' }}{% endif %}" readonly>
+                                    <label class="error_msg float-right" id="date_of_joining_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                    
+                    
+                    <div class="row">
+                        <div class="col-md-3" style="">
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Aadhar Card
+                            </h6>
+                            <div class="card">
+                                {% if basic_details.aadhaar_document %}
+                                <img id="previewAadhar" src="{{ basic_details.aadhaar_document }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewAadhar" src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_aadhaar_document" id="previous_aadhaar_document" value="{% if basic_details.aadhaar_document %}{{ basic_details.aadhaar_document }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="aadhar_card_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_Aadhar" name="aadhaar_document" type="file" accept="image/*"
+                                    style="display: none;" onchange="fileUploader(this.id,'previewAadhar', 'Aadhaar Card', 'aadhar_card_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_Aadhar')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="">
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Driving License
+                            </h6>
+                            <div class="card">
+                                {% if basic_details.dl_document %}
+                                <img id="previewCIN" src="{{ basic_details.dl_document }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                                {% else %}
+                                <img id="previewCIN" src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                                {% endif %}
+                                <input type="hidden" name="previous_dl_document" id="previous_dl_document" value="{% if basic_details.dl_document %}{{ basic_details.dl_document }} {% endif %}" >
+                            </div>
+                            <label class="error_msg float-right" id="cin_error"></label>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_CIN" name="dl_document" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploader(this.id,'previewCIN', 'CIN', 'cin_error')" />
+                                </div>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_CIN')">
+                                    Upload
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <br clear="all"> 
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</form>
+
+
+<script>
+    
+    
+    $('#addOfficalDetailsForms').submit(function(e){
+        var error = 0;
+        
+        var s = document.forms["addOfficalDetailsForms"]["aadhaar_nubmer"].value;
+        document.getElementById('aadhaar_nubmer_error').innerHTML = '';
+        $('#aadhaar_nubmer').css("border", "");
+        if (s == null || s == "") {
+            var error = 1;
+            document.getElementById('aadhaar_nubmer_error').innerHTML = 'Please enter aadhaar nubmer*';
+            $('#aadhaar_nubmer').css("border", "1px solid #db8305");
+        }
+        
+        var d = document.forms["addOfficalDetailsForms"]["dl_number"].value;
+        document.getElementById('dl_number_error').innerHTML = '';
+        $('#dl_number').css("border", "");
+        if (d == null || d == "") {
+            var error = 1;
+            document.getElementById('dl_number_error').innerHTML = 'Please enter pan card no.*';
+            $('#dl_number').css("border", "1px solid #db8305");
+        }
+        
+        
+        var i = document.forms["addOfficalDetailsForms"]["date_of_joining"].value;
+        document.getElementById('date_of_joining_error').innerHTML = '';
+        $('#date_of_joining').css("border", "");
+        if (i == null || i == "") {
+            var error = 1;
+            document.getElementById('date_of_joining_error').innerHTML = 'Please enter date of joining*';
+            $('#date_of_joining').css("border", "1px solid #db8305");
+        }
+        
+        
+        
+        $('.error_msg').css("margin-bottom", "0rem");
+        
+        if (error == 0) {                        
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            url = "{% url 'src:edit-driver-official' 1 %}";
+            url = url.replace(1,"{{official_details.id}}")
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.error == true) {
+                        hideLoader();
+                        $(".text-danger").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            console.log(index);
+                            console.log(value);
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        hideLoader();
+                        $('#addUserModal').html('');
+                        $('#addUserModal').hide();
+                        openToaster("success", response.message);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        } else {
+            return false;
+        }
+    });
+    
+    
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function fileUploader(id, previewId, fileType, error_id) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            document.getElementById(error_id).innerHTML = '';
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    document.getElementById(error_id).innerHTML = ''+fileType+' should be jpg or png*';
+                    
+                    $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            
+                            document.getElementById(error_id).innerHTML = ''+fileType+' should be upto 2MB*';
+                            
+                            $("#"+previewId).attr("src", "/static/img/svg/PANGrey.svg");
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+</script>

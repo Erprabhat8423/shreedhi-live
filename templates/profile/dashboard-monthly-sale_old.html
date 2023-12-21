@@ -1,0 +1,579 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+{% load humanize %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/paper-dashboard.css' %}" />
+<link rel="stylesheet" href="{% static 'css/sales-dashboard.css' %}" />
+{% endblock %}
+<script type="text/javascript" src="{% static 'js/canvas/canvas.js' %}"></script>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<script src="{% static 'js/jquery.jscroll.min.js' %}"></script>
+<script src="{% static 'js/piechart/core.js' %}"></script>
+<script src="{% static 'js/piechart/charts.js' %}"></script>
+<script src="{% static 'js/piechart/themes/animated.js' %}"></script>
+                    
+<main class="" id="containerHeight">
+    <div class="row px-3 ">
+        <div class="col-sm-12 col-12 px-0  " >
+            <h6 class="font-wt-b mb-2">Sales-Dashboard </h6>
+            <div class="row" >
+                <!--  PPM start-->
+                {% for product_data in product_class%}
+                    <div class="col-sm-4 col-12  mob-mt-8 card-ht pl-0" >
+                        <div class="primaryContainerBG h-100 card-monthlysale" >
+                            <div class="row just-center">
+                                <img alt="" src="{% static 'img/svg/graph.svg' %}" style="margin-right: 6px; margin-top: -4px;"/>
+                                <h6 class="font-wt-b mb-0"> {{product_data.product_class}} Sale Performance </h6>
+                                
+                            </div>
+
+                            <div class="col-sm-12 col-12 px-0 card-monthly-box mt-3">
+                                <div class="row " style="padding: 8px;">
+                                    <div class="pl-0 pr-2">
+                                        <span class="font-12 dark-blue-color font-wt-b">
+                                            {% if product_data.product_class == 'Curd'%}
+                                            <b>{{product_data.product_class}}</b> Sales (Kg)
+                                            {%else%}
+                                            <b>{{product_data.product_class}}</b> Sales (Ltr)
+                                            {%endif%}
+                                        </span>
+                                    </div>
+                                    <div class="pl-0 pr-2 font-11 font-wt-b">
+                                        {%if product_data.today_total %}
+                                        <span class=""> {{product_data.today_total}}</span>
+                                        {% else %}
+                                        <span class=""> 0 </span>
+                                        {% endif %}
+                                        <span class="d-block accent-color "> Current Day</span>
+                                    </div>
+                                    <div class="pl-0 pr-2 font-11 font-wt-b">
+                                        
+                                        {%if product_data.yesterday_total %}
+                                        <span class=" "> {{product_data.yesterday_total}}</span>
+                                        {% else %}
+                                        <span class=""> 0 </span>
+                                        {% endif %}
+                                        <span class="d-block yellow-color "> Previous Day</span>
+                                    </div>
+                                    <div class="col-sm-4 col-3 px-0 "> 
+                                        <div class="row border-left">
+                                            <div style="width: 57%; margin-left: 2px;">  
+                                                {%if product_data.daily_profit_loss_status == 1%}
+                                                <a class="grph-bar-day accent-bg" href="#" title="current-day-graph" style="width:100%;"></a>
+                                                {%if product_data.daily_profit_loss_percentage %}
+                                                <a class="grph-bar-day yellow-bg" style="margin-top: 4px;" href="#" title="current-day-graph" style="width:{{product_data.daily_profit_loss_bar_percentage}}%;"></a>
+                                                {% else %}
+                                                <a class="grph-bar-day yellow-bg" style="margin-top: 4px;" href="#" title="current-day-graph" style="width:1%;"></a>
+                                                {% endif %}
+                                                {% else %}
+                                                {%if product_data.daily_profit_loss_percentage %}
+                                                <a class="grph-bar-day accent-bg" href="#" title="current-day-graph" style="width:{{product_data.daily_profit_loss_bar_percentage}}%;"></a>
+                                                {% else %}
+                                                <a class="grph-bar-day accent-bg" href="#" title="current-day-graph" style="width:1%;"></a>
+                                                {% endif %}
+                                                <a class="grph-bar-day yellow-bg" style="margin-top: 4px;" href="#" title="current-day-graph"style="width:100%;"></a>
+                                                {% endif %}
+                                            </div>
+                                            <div class="ml-2  font-wt-b">
+                                                {%if product_data.daily_profit_loss_status == 1%}
+                                                <span class="d-inline-block grph-percent-vlu-icon grph-percent-green">
+                                                    <i class="fa fa-angle-up"></i>
+                                                </span>
+                                                <span class="grph-percent-vlu-green font-12" style="font-size: 0.7rem;">{{product_data.daily_profit_loss_percentage}}%</span>
+                                                {%elif product_data.daily_profit_loss_status == 0%}
+                                                <span class="d-inline-block grph-percent-vlu-icon grph-percent-red" style="padding: 2px;">
+                                                    <i class="fa fa-angle-down"></i>
+                                                </span>
+                                                <span class="grph-percent-vlu-red font-12" style="font-size: 0.7rem;">{{product_data.daily_profit_loss_percentage}}%</span>
+                                                {% else %}
+                                                <span class="d-inline-block grph-percent-vlu-icon grph-percent-red" style="padding: 2px;">
+                                                    <i class="fa fa-angle-down"></i>
+                                                </span>
+                                                <span class="grph-percent-vlu-red font-12" style="font-size: 0.7rem;">0%</span>
+                                                {%endif%}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row monthly-sale-vlu light-yellow-bg">
+                                    
+                                    {% if product_data.product_class == 'Curd' %}
+                                    {% if product_data.month_data %}
+                                    <div class="col-sm-6 col-12 px-0"> Monthly Total Sale (kg)<span style="margin-left: 0.1rem;">{{product_data.month_data}}</span></div>
+                                    <div class="col-sm-6 col-12 px-0 mob-mt-8"> Monthly Average Sale (kg)<span style="margin-left: 0.1rem;">{{product_data.month_data_avg}}</span></div>
+                                    {% else %}
+                                    <div class="col-sm-6 col-12 px-0"> Monthly Total Sale (kg)<span style="margin-left: 0.1rem;">0</span></div>
+                                    <div class="col-sm-6 col-12 px-0 mob-mt-8"> Monthly Average Sale (kg)<span style="margin-left: 0.1rem;">0</span></div>
+                                    {%endif%}
+                                    {% else %}
+                                    {% if product_data.month_data %}
+                                    <div class="col-sm-6 col-12 px-0"> Monthly Total Sale (Ltr)<span style="margin-left: 0.1rem;" >{{product_data.month_data}}</span></div>
+                                    <div class="col-sm-6 col-12 px-0 mob-mt-8"> Monthly Average Sale (Ltr)<span style="margin-left: 0.1rem;" >{{product_data.month_data_avg}}</span></div>
+                                    {% else %}
+                                    <div class="col-sm-6 col-12 px-0"> Monthly Total Sale (Ltr)<span style="margin-left: 0.1rem;">0</span></div>
+                                    <div class="col-sm-6 col-12 px-0 mob-mt-8" > Monthly Average Sale (Ltr)<span style="margin-left: 0.1rem;">0</span></div>
+                                    {%endif%}
+                                    {% endif %}
+
+                                    
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-12 px-0 mt-3">
+                                <div class="row" >
+                                    <div class="col-sm-6 col-6  pl-0 pr-2">
+                                        <div class="col-sm-12 col-12 px-0  pt-3 card-monthly-box">
+                                            <span class="d-block mb-3 px-2  font-13 dark-blue-color font-wt-b">
+                                                {{product_data.product_class}} Sale <b>(YTD) </b>
+                                            </span>
+                                            <div class="row font-wt-b px-2 pb-3">
+                                                <div class="col-sm-7  px-0 col-5">
+
+                                                    {% if product_data.prev_year_data_sum %}
+                                                    <span class=" dark-blue-color font-16 d-inline-block ml-2" style="line-height: 16px;">{{product_data.prev_year_data_sum}}
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.prev_year}}</b>
+                                                    </span>
+                                                    {%else%}
+                                                    <span class=" dark-blue-color font-16 d-inline-block ml-2" style="line-height: 16px;">0
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.prev_year}}</b>
+                                                    </span>
+                                                    {%endif%}
+                                                    
+                                                    {% if product_data.current_year_data %}
+                                                    <span class=" dark-blue-color font-16 d-inline-block ml-2" style="line-height: 16px;">{{product_data.current_year_data}}
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.current_year}}</b>
+                                                    </span>
+                                                    {% else %}
+                                                    <span class=" dark-blue-color font-16 d-inline-block ml-2" style="line-height: 16px;">0
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.current_year}}</b>
+                                                    </span>
+                                                    {%endif%}
+                                                    
+                                                </div>
+                                                <div class=" col-sm-5 pl-2 pr-0  font-wt-b col-5">
+                                                    {%if product_data.yearly_profit_loss_status == 1 %}
+                                                        <span class="d-inline-block grph-percent-vlu-icon secnd-percnt-vlu-box grph-percent-green d-inline-block">
+                                                            <i class="fa fa-angle-up"></i>
+                                                        </span>
+                                                        {% if product_data.yearly_profit_loss_percentage %}
+                                                        <span class="grph-percent-vlu-green  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">{{product_data.yearly_profit_loss_percentage}}%</span>
+                                                        {%else%}
+                                                        <span class="grph-percent-vlu-green  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">0%</span>
+                                                        {%endif%}
+                                                    {%else%}
+                                                    <span class="d-inline-block grph-percent-vlu-icon secnd-percnt-vlu-box grph-percent-red d-inline-block">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </span>
+                                                    {% if product_data.yearly_profit_loss_percentage %}
+                                                    <span class="grph-percent-vlu-red  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">{{product_data.yearly_profit_loss_percentage}}%kk</span>
+                                                    {% else %}
+                                                    <span class="grph-percent-vlu-red  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">0%</span>
+                                                    {% endif %}
+                                                    {%endif%}
+                                                </div>
+                                            </div>
+                                            <div class="monthly-sale-vlu grph-percent-green"></div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-6  pl-2 pr-0" >
+                                        <div class="col-sm-12 col-12 px-0  pt-3 card-monthly-box">
+                                            <span class="d-block mb-3 px-2  font-13 dark-blue-color font-wt-b">
+                                                {{product_data.product_class}} Sale <b>(MTD) </b>
+                                            </span>
+                                            <div class="row font-wt-b px-2 pb-3">
+                                                <div class="col-sm-7  px-0 col-5">
+                                                    {% if product_data.prev_month_data_sum %}
+                                                    <span class=" dark-blue-color d-inline-block  font-16" style="line-height: 0.8rem;">{{product_data.prev_month_data_sum}}
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.prev_date}}</b>
+                                                    </span>
+                                                    {%else%}
+                                                    <span class=" dark-blue-color d-inline-block  font-16" style="line-height: 0.8rem;">0
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11">{{product_data.prev_date}}</b>
+                                                    </span>
+                                                    {%endif%}
+                                                    
+
+                                                    {% if product_data.month_data %}
+                                                    <span class=" dark-blue-color font-16 d-inline-block ml-2" style="line-height: 0.8rem; margin-left: 0.1rem;">{{product_data.month_data}}
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11" style="margin-left: 0.1rem;">{{product_data.current_date}}</b>
+                                                    </span>
+                                                    {%else%}
+                                                    <span class=" dark-blue-color d-inline-block  font-16" style="line-height: 0.8rem; margin-left: 0.2rem;">0
+                                                        <b class="grph-percent-vlu-grey ml-0 d-block font-11" style="margin-left: 0.2rem;">{{product_data.current_date}}</b>
+                                                    </span>
+                                                    {%endif%}
+                                                    
+                                                </div>
+                                                <div class=" col-sm-5 pl-2 pr-0  font-wt-b col-5">
+                                                    {%if product_data.monthly_profit_loss_status == 1 %}
+                                                        <span class="d-inline-block grph-percent-vlu-icon secnd-percnt-vlu-box grph-percent-green d-inline-block">
+                                                            <i class="fa fa-angle-up"></i>
+                                                        </span>
+                                                        {%if product_data.monthly_profit_loss_percentage %}
+                                                        <span class="grph-percent-vlu-green  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">{{product_data.monthly_profit_loss_percentage}}%</span>
+                                                        {%else%}
+                                                        <span class="grph-percent-vlu-green  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">0%</span>
+                                                        {%endif%}
+                                                    {%else%}
+                                                    <span class="d-inline-block grph-percent-vlu-icon secnd-percnt-vlu-box grph-percent-red d-inline-block">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </span>
+                                                    {%if product_data.monthly_profit_loss_percentage %}
+                                                    <span class="grph-percent-vlu-red  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">{{product_data.monthly_profit_loss_percentage}}%</span>
+                                                    {%else%}
+                                                    <span class="grph-percent-vlu-red  d-inline-block" style="margin-left: 2px; font-size: 1rem; ">0%</span>
+                                                    {%endif%}
+                                                    {%endif%}
+                                                </div>
+                                            </div>
+                                            <div class="monthly-sale-vlu grph-percent-green"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-12 px-0 mt-3"  style="min-height:420px;">
+                            <!-- Bar chart days vise sale in ltr start-->
+                            <div class="row just-center dark-blue-color font-16 mt-3 pb-2">
+                                {% if product_data.product_class == 'Curd' %}
+                                <h6 class="font-wt-b mb-2"> Total {{product_data.product_class}} Sale in Kg </h6>
+                                {% else %}
+                                <h6 class="font-wt-b mb-2"> Total {{product_data.product_class}} Sale in Ltr </h6>
+                                {% endif %}
+                                <div class="col-sm-12 col-12 px-0">
+                                    <div class="bar-chart-monthly-sale">
+                                        <div class="hidden-tittle-barchart"></div>
+                                        <div class="hidden-version"></div>
+                                        <div id="chartMonthlySale{{product_data.product_class}}" >	</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Bar chart  End-->
+                            </div>
+                            <div class="col-sm-12 col-12 px-0 mt-3">
+                                <div class="row">
+                                    <div class="col-sm-8 px-0">
+                                        <span class="font-14 dark-blue-color ml-1" style="font-weight: 600;">{{product_data.product_class}} Sale 
+                                        {% if product_data.product_class == 'Curd' %} Kg {% else %} Ltr {% endif %}</span>
+                                        <!-- {% for  sevenData in product_data.sevenDayData %} -->
+                                        <span class="font-14 grey-color" id="current_date" style="font-weight: 600;"></span>
+                                        <!-- {% endfor %} -->
+                                    </div>
+                                    <div class="col-sm-4 px-0">
+                                        <div class="float-right">
+                                            <button class="table-btn-show" id="hidetable{{product_data.product_class}}" onclick="showDayvisesale(this.name)" name="{{product_data.product_class}}" style="display: block;">
+                                                <i class="fas fa-list mr-1" style="font-size: 14px; -webkit-transform: scaleX(-1);
+                                                transform: scaleX(-1);"></i> View in Table
+                                            </button>
+                                            <button class="pie-btn-show" id="hidepiechart{{product_data.product_class}}" onclick="showDayvisesale(this.name)" name="{{product_data.product_class}}" style="display: none;">
+                                                <i class="fa fa-pie-chart" style="font-size: 15px;"></i> View in Graph
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- pie chart days vise sale in ltr-->
+                                <div class="col-sm-12 col-12 px-0 mt-3" id="showpieChartdayvise{{product_data.product_class}}" style="height:210px; display: block; font-size: 0.6rem;">
+                                    <div class="row" style="height:210px" >
+                                        <div class="col-sm-8 px-0 " >
+                                            <div class=""  style="position: relative; ">
+                                                <div class="blank"></div>
+                                                <div id="dayvisesales{{product_data.product_class}}"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 px-0 clearfix">
+                                            <div class=" ">
+                                                <table style="position: absolute; border-collapse: unset; bottom: 0; right: 0; width: 80%;" >
+                                                    <thead></thead>
+                                                    <tbody class="row border py-2" style="justify-content: center; border-radius: 10px;">
+                                                        {% for product_name in product_data.product_names %}
+                                                        <tr>
+                                                            <td style="line-height: 10px;">
+                                                                <span class="day-chart-shades d-inline-block grph-percent-red"></span>
+                                                                <span class="font-wt-b font-12">{{product_name}} Sale</span>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                        {% endfor %}
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td class="day-piechart-totalsale">
+                                                                {% if product_data.product_class == 'Curd'%}
+                                                                {%if product_data.today_total %}
+                                                                <span class=""> {{product_data.today_total}}  </span>
+                                                                {% else %}
+                                                                <span class=""> 0 TOTAL SALE in Kg</span>
+                                                                {% endif %}
+                                                                {% else %}
+                                                                {%if product_data.today_total %}
+                                                                <span class=""> {{product_data.today_total}}  TOTAL SALE in Ltr</span>
+                                                                {% else %}
+                                                                <span class=""> 0 TOTAL SALE in Ltr</span>
+                                                                {% endif %}
+                                                                {%endif%}
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- table chart formet of days vise sale in ltr-->
+                                <div class="border border-redius-17 mt-3" id="showtabledayvise{{product_data.product_class}}" style="display: none;">
+                                    <table class="w-100 table table-striped table-striped-bar-table mb-0">
+                                        <thead></thead>
+                                        <tbody  >
+                                            
+                                            {% for product_name in product_data.product_names %}
+                                            <tr>
+                                                <td style="line-height: 10px;">
+                                                    <span class="day-chart-shades d-inline-block grph-percent-red"></span>
+                                                    <span class="font-wt-b font-12">{{product_name}} Sale</span>
+                                                </td>
+                                                {% if product_data.product_name_quantities %}
+                                                    {% for  product_name_quantity in product_data.product_name_quantities %}
+                                                        {% if product_name_quantity.product_name == product_name %}
+                                                        <td style="line-height: 10px; text-align: right;">
+                                                            <span class="font-wt-b font-12">{{product_name_quantity.quantity}}</span>
+                                                        </td>
+                                                        {%else%}
+                                                        
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {%else%}
+                                                <td style="line-height: 10px; text-align: right;" >
+                                                    <span class="font-wt-b font-12">0</span>
+                                                </td>
+                                                {%endif%}
+                                                
+                                            </tr>
+                                            
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td class="font-16 font-wt-b"> Total <span>{{product_data.product_class}}</span> Sale</td>
+                                                    {%if product_data.today_total %}
+                                                    <td class="text-right font-13 dark-blue-color" style=" font-weight: 600;">{{product_data.today_total}}</td>
+                                                    {% else %}
+                                                    <td class="text-right font-13 dark-blue-color" style=" font-weight: 600;">0</td>
+                                                    
+                                                    {%endif%}
+                                                
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <script>
+                        
+                        
+                            var chartName = new CanvasJS.Chart("chartMonthlySale{{product_data.product_class}}", {
+                                animationEnabled: true,
+                                theme: "light2",
+                
+                                axisX: {
+                                    valueFormat: "d m Y"
+                                },
+                                axisY: {
+                                    valueFormat: "0"
+                                },
+                                toolTip: {
+                                    shared: true
+                                },
+                                legend: {
+                                    cursor: "pointer",
+                                    itemclick: toggleDataSeries
+                                },
+                                data: [
+                                {
+                                    type: "column",
+                                    name: "Actual Sales",
+                                    showInLegend: true,
+                                    xValueFormat: "d m Y",
+                                    yValueFormat: "",
+                                    {% if product_data.sevenDayData %}
+                                        dataPoints: [
+                                        {% for  sevenData in product_data.sevenDayData %}
+                                        {% if sevenData.product_class == product_data.product_class %}
+                                        { x: new Date({{sevenData.year}}, {{sevenData.month}},{{sevenData.day}}), y: {{sevenData.last_week_total}} }, 
+                                        
+                                        {%else%}
+                                        { x: new Date({{sevenData.year}}, {{sevenData.month}},{{sevenData.day}}), y: 0 },
+                                        {%endif%} 
+                                        {% endfor %}
+                                        ]
+                                    {% else %}
+
+                                    dataPoints: [
+                                    {% for  sevenData in product_data.sevenDayData %}
+                                    { x: new Date({{sevenData.year}}, {{sevenData.month}},{{sevenData.day}}), y: 0 },
+                                    {% endfor %}
+                                    ]
+
+                                    {% endif %}
+                                },
+                                {
+                                    type: "line",
+                                    name: "Expected Sales",
+                                    showInLegend: true,
+                                    yValueFormat: "",
+                                    {% if product_data.tempSevenDayData %}
+                                    dataPoints: [
+                                    {% for  tempSevenData in product_data.tempSevenDayData %}
+                                        {% if tempSevenData.product_class == product_data.product_class %}
+                                        { x: new Date({{tempSevenData.year}}, {{tempSevenData.month}},{{tempSevenData.day}}), y: {{tempSevenData.temp_last_week_total}} }, 
+                                        {%else%}
+                                        { x: new Date({{tempSevenData.year}}, {{tempSevenData.month}},{{tempSevenData.day}}), y: 0 },
+                                        {%endif%} 
+                                                                     
+                                    {% endfor %}
+                                    ]
+                                    {% else %}
+
+                                    dataPoints: [
+                                    {% for  tempSevenData in product_data.tempSevenDayData %}
+                                    // { x: '', y: 0 },
+                                    { x: new Date({{tempSevenData.year}}, {{tempSevenData.month}},{{tempSevenData.day}}), y: 0 },  
+                                    {% endfor %}
+                                    
+                                    ]
+
+                                    {% endif %}
+                                }]
+                            });
+                            
+                            chartName.render();
+                    </script>
+                    
+
+                    <script>
+                        piechartdaycore.ready(function () {
+                            piechartdaycore.useTheme(piechartdaythemes_animated);
+                            var chart = piechartdaycore.create("dayvisesales{{product_data.product_class}}", piechartdaycharts.PieChart);
+                            // Add data
+                            // array_data = []
+                            // {% for  product_name_quantity in product_data.product_name_quantities %}
+                            // var arr = {}
+                            // arr["litres"] = {{product_name_quantity.quantity}}
+                            // arr["product"] = "{{product_name_quantity.product_name}}"
+                            // array_data.push(arr);
+                            // {% endfor %}
+                            {% if product_data.product_name_quantities %}
+                            chart.data = 
+                            [
+                            {% for product_name in product_data.product_names %}
+                                {% for  product_name_quantity in product_data.product_name_quantities %}
+                                    {% if product_name_quantity.product_name == product_name %}
+                                    { "litres": {{product_name_quantity.quantity}}, "product": "{{product_name}}" },
+                                    {% else %}
+                                    {% endif %}                                
+                                {% endfor %}
+                            {% endfor %}
+                                ];
+                            {% else %}
+                            chart.data = [
+                            // { "litres": 0, "product": "No Sale" },
+                                ];
+                            {% endif %}
+
+                            // Add and configure Series
+                            var pieSeries = chart.series.push(new piechartdaycharts.PieSeries());
+                            pieSeries.dataFields.value = "litres";
+                            // pieSeries.dataFields.value.style = ;
+                            pieSeries.dataFields.category = "product";
+                            pieSeries.slices.template.stroke = piechartdaycore.color("#fff");
+                            pieSeries.slices.template.strokeOpacity = 1;
+
+                            // This creates initial animation
+                            pieSeries.hiddenState.properties.opacity = 1;
+                            pieSeries.hiddenState.properties.endAngle = -90;
+                            pieSeries.hiddenState.properties.startAngle = -90;
+
+                            chart.hiddenState.properties.radius = piechartdaycore.core();
+
+
+                        }); // end piechartdaycore.ready()
+                    </script>
+                    <script>
+                        function showDayvisesale(value) {
+                          var x = document.getElementById("showtabledayvise"+value);
+                          if (x.style.display === "none") {
+                            x.style.display = "block";
+                
+                        } else {
+                            x.style.display = "none";
+                        }
+                
+                
+                        var x = document.getElementById("hidetable"+value);
+                        if (x.style.display === "none") {
+                            x.style.display = "block";
+                
+                        } else {
+                            x.style.display = "none";
+                        }
+                
+                        var x = document.getElementById("showpieChartdayvise"+value);
+                        if (x.style.display === "none") {
+                            x.style.display = "block";
+                        } else {
+                            x.style.display = "none";
+                        }
+                        var x = document.getElementById("hidepiechart"+value);
+                        if (x.style.display === "none") {
+                            x.style.display = "block";
+                
+                        } else {
+                            x.style.display = "none";
+                        }
+                    }
+                    
+                
+                    
+                </script>
+
+                {% endfor %}
+                <!--  PPM close-->
+                </div>
+            </div>
+        </div>
+    </main>
+<!-- here is the party is the  -->
+    {% endblock content %}
+    {% block script %}
+    <!-- Pie chart monthly sale -->
+    
+
+    
+<script>
+    
+    
+                
+    function toggleDataSeries(e) {
+                                if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                                    e.dataSeries.visible = false;
+                                } else {
+                                    e.dataSeries.visible = true;
+                                }
+                                e.chart.render();
+                            }
+                            setTimeout( function() { $(".canvasjs-chart-credit").attr("style","");  $(".canvasjs-chart-credit").addClass("hide"); },2000)
+</script>
+{% endblock %}
+<style>
+    .canvasjs-chart-credit{
+        display: none !important;
+    }
+</style>

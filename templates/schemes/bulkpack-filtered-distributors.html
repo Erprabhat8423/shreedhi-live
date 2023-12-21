@@ -1,0 +1,44 @@
+{% load helper_tags %}
+
+<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Dis./SS name</th>
+            <th class="text-center">Incentive Bifurcations / {{unit_name}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr {% if user.is_scheme_applied == 1 %}style="background-color: lightsalmon;"{% endif %}>
+            <td>
+                <input type="hidden" name="user_id[]" value="{{user.user_id}}">
+                <input type="hidden" name="is_disabled[]" value="{{user.is_scheme_applied}}">
+                {{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+                <br>
+                <b>{{user.route_name}}, {{user.town_name}}</b>
+            </td>
+            <td>
+                {% for above_order_of in above_order_ofs %}
+                <div class="row" style="margin-top:5px;">
+                    <div class="col-md-6 padding_0">
+                        <input class="inputField incentive_field numeric" type="text" placeholder="Above order of" maxlength="4" name="user_above_order_of_{{user.user_id}}" value="{{above_order_ofs|index:forloop.counter0}}" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    <div class="col-md-4">
+                        <input class="inputField incentive_field" type="text" onkeypress="return validateFloatKeyPress(this,event);"  placeholder="Incentive" name="user_incentive_amount_{{user.user_id}}" value="{{incentive_amounts|index:forloop.counter0}}"/>
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                {% endfor %}
+            </td>
+          
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function(){
+        $('.selectField').select2();
+    })
+</script>

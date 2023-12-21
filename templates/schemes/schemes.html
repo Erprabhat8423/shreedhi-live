@@ -1,0 +1,1823 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+
+<style>
+	.select2-search__field::placeholder{
+		color: #444 !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		white-space: nowrap !important;
+		padding: 0.5rem 0.5rem 0.5rem 1rem !important;
+		font-size: 0.9rem !important;
+	}
+	.select2-search__field:-ms-input-placeholder {
+		color: #444 !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		white-space: nowrap !important;
+		padding: 0.5rem 0.5rem 0.5rem 1rem !important;
+		font-size: 0.9rem !important;
+	}
+	.select2-search__field::-ms-input-placeholder {
+		color: #444 !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		white-space: nowrap !important;
+		padding: 0.5rem 0.5rem 0.5rem 1rem !important;
+		font-size: 0.9rem !important;
+	}
+	.select2-selection--multiple:before {
+		content: "";
+		position: absolute;
+		right: 7px;
+		top: 42%;
+		border-top: 5px solid #888;
+		border-left: 4px solid transparent;
+		border-right: 4px solid transparent;
+	}
+	
+	.container_qty{
+		background-color: #fff;
+		border: 1px solid lightgrey;
+		font-size: 0.9rem;
+		padding: 0.5rem 0.5rem 0.5rem 1rem;
+		border-radius: 0.6rem;
+		width: 88px;
+		
+	}
+	.scheme_label{
+		font-size: 0.7rem;
+		font-weight: bold;
+		margin-top:9px;
+	}
+	label{
+	    margin-top:9px;
+	}
+	.padding_0{
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.ui-datepicker-prev span,
+	.ui-datepicker-next span {
+		background-image: none !important;
+	}
+	
+	.ui-datepicker-prev:before,
+	.ui-datepicker-next:before {
+		font-family: FontAwesome;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: flex;
+		font-weight: normal;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.ui-datepicker-prev:before {
+		content: "\f100";
+	}
+	
+	.ui-datepicker-next:before {
+		content: "\f101";
+	}
+
+	#ajaxDistributors{
+		height: 700px !important;
+		overflow: scroll;
+	}
+	
+</style>
+
+{% endblock %}
+
+<div class="row" id="containerHeight">
+	
+	
+	<div class="col-12 mt-3 mb-3 col-md-4 mt-md-0 mb-md-0 h-100" id="">
+		
+		<div class="row mb-2" id="topRow">
+			<div class="col-md-12 p-md-0">
+				<h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+			</div>
+			<div class="col-md-12 p-md-0">
+				<ul class="tabBar pull-right p-0 marginTop1rem">
+					<li class="customisedTab2 activeTab" id="free_tab" onclick="handleSchemeTabChange(this,'free_scheme_table','freeSchemeBlock','freeSchemeUserBlock')">Free Scheme</li>
+					<li class="customisedTab2" id="bonus_tab" onclick="handleSchemeTabChange(this,'bonus_scheme_table','bonusSchemeBlock','bonusSchemeUserBlock')">Discount</li>
+				</ul> 
+			</div>
+		</div>
+		
+		<div class="primaryContainerBG h-100">
+			
+			<div class="row table_block" id="free_scheme_table">
+				<div class="col-md-12">
+					<div class="row mb-2 mt-2" id="secondRow">
+						<div class="col-md-12 p-md-0">
+							<h6><b>Free Scheme List &nbsp;&nbsp;</b></h6>
+						</div>
+						<div class="col-md-12 p-md-0">
+							<input class="searchTable free_scheme_search" placeholder="Search" type="search" data-column="all">
+							<button type="button" class="btn iconBox iconAddScheme" onclick="addScheme(1)"></button>
+							
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12 commonTableBg">
+					<table id="freeSchemeTable" class="table table-borderless table-striped table-hover mt-0"
+					style="width: 100%;">
+					<thead>
+						<tr>
+							<th>Scheme</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id="">
+						{% if free_schemes %}
+						{% for free_scheme in free_schemes %}
+						<tr  {% if forloop.first %} class="odd selected" {% endif %} >
+							<td onclick="freeSchemeUsers('{{ free_scheme.id }}')">{{ free_scheme.name}} 
+								<!-- <span style="color:#009cff;">({{ free_scheme.route_name|slice:":-2"}})</span> -->
+							</td>
+							<td>
+								<div class="row">
+									<div class="col-md-3">
+										<a href="javascript:void(0)"
+										onclick="editScheme('{{ free_scheme.id }}','free_scheme')"><img src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+										<div class="col-md-5">
+											<label class="switch">
+												<input type="hidden" id="free_scheme_is_active_{{ bulkpack_incentive_scheme.id }}" value="{{ free_scheme.status }}">
+												<input type="checkbox" class="checkbox" name="is_active"
+												{% if free_scheme.status == 1 %} checked="" {% else %}
+												{% endif %}
+												onclick="updateSchemeStatus('{{ free_scheme.id }}', this,'free_scheme')">
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+							<tr id="" style="display: none;">
+								<td class="text-center" colspan="2"></td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="2" style="text-align: center;">No Record Found...</td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+					
+				</div>
+				
+			</div>
+			
+			
+			<div class="row table_block" id="bonus_scheme_table" style="display:none;">
+				
+				<div class="col-md-12 scheme_searchbar" id="flat_incentive_searchbar">
+					<div class="row mb-2 mt-2" >
+						<div class="col-md-12 p-md-0">
+							<h6><b>Discount Scheme List &nbsp;&nbsp;</b></h6>
+						</div>
+						<div class="col-md-12 p-md-0">
+							<input class="searchTable flatIncentive_scheme_search" placeholder="Search" type="search" data-column="all">
+							<button type="button" class="btn iconBox iconAddDiscount" onclick="addScheme(3)"></button>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-12 scheme_searchbar" id="bulkpack_incentive_searchbar" style="display: none;">
+					<div class="row mb-2 mt-2" >
+						<div class="col-md-12 p-md-0">
+							<h6><b>Bulk Pack Incentive List &nbsp;&nbsp;</b></h6>
+						</div>
+						<div class="col-md-12 p-md-0">
+							<input class="searchTable bulkpackIncentive_scheme_search" placeholder="Search" type="search" data-column="all">
+							<button type="button" class="btn iconBox iconAddScheme" onclick="addScheme(4)"></button>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-12 scheme_searchbar" id="quantitative_incentive_searchbar" style="display: none;">
+					<div class="row mb-2 mt-2" >
+						<div class="col-md-12 p-md-0">
+							<h6><b>Quantitative Scheme List &nbsp;&nbsp;</b></h6>
+						</div>
+						<div class="col-md-12 p-md-0">
+							<input class="searchTable quantitative_scheme_search" placeholder="Search" type="search" data-column="all">
+							<button type="button" class="btn iconBox iconAddScheme" onclick="addScheme(2)"></button>
+						</div>
+					</div>
+				</div>
+				
+				<!-- <div class="col-md-12 p-md-0">
+					<ul class="tabBar pull-right p-0 marginTop1rem">
+						<li class="customisedTab3 activeTab" id="flat_incentive_tab" onclick="handleBonusSchemeTabChange(this,'flatIncetiveTable','flat_incentive_scheme','flat_incentive_searchbar')">Flat Incentive Scheme </li>
+						<li class="customisedTab3" id="bulk_incentive_tab" onclick="handleBonusSchemeTabChange(this,'bulkpackIncetiveTable','bulkpack_incentive_scheme','bulkpack_incentive_searchbar')">Bulk Pack Scheme </li>
+						<li class="customisedTab3" id="qps_tab" onclick="handleBonusSchemeTabChange(this,'quantitativeSchemeTable','quantitative_scheme','quantitative_incentive_searchbar')">Quantitative Scheme</li>
+					</ul> 
+				</div> -->
+				
+				
+				<div class="col-md-12 commonTableBg" style="margin-top:10px;">
+					<table id="flatIncetiveTable" class="bonus_scheme_table table table-borderless table-striped table-hover mt-0"
+					style="width: 100%;" >
+					<thead>
+						<tr>
+							<th>Discount</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id="">
+						{% if flat_incentive_schemes %}
+						{% for flat_incentive_scheme in flat_incentive_schemes %}
+						<tr  {% if forloop.first %} class="odd selected" {% endif %}>
+							<td onclick="getSchemeUsers('flat_incentive','{{ flat_incentive_scheme.id }}')">{{ flat_incentive_scheme.name}}</td>
+							<td>
+								<div class="row">
+									<div class="col-md-3">
+										<a href="javascript:void(0)"
+										onclick="editScheme('{{ flat_incentive_scheme.id }}','flat_incentive')"><img src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+										<div class="col-md-5">
+											<label class="switch">
+												<input type="hidden" id="user_flat_incentive_is_active_{{ flat_incentive_scheme.id }}" value="{{ flat_incentive_scheme.status }}">
+												<input type="checkbox" class="checkbox" name="is_active"
+												{% if flat_incentive_scheme.status == 1 %} checked="" {% else %}
+												{% endif %}
+												onclick="updateSchemeStatus('{{ flat_incentive_scheme.id }}', this,'flat_incentive')">
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+							<tr id="" style="display: none;">
+								<td class="text-center" colspan="2"></td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="2" style="text-align: center;">No Record Found...</td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+					
+					<table id="bulkpackIncetiveTable" class="bonus_scheme_table table table-borderless table-striped table-hover mt-0"
+					style="width: 100%; display: none;">
+					<thead>
+						<tr>
+							<th>Scheme</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id="">
+						{% if bulkpack_incentive_schemes %}
+						{% for bulkpack_incentive_scheme in bulkpack_incentive_schemes %}
+						<tr  {% if forloop.first %} class="odd selected" {% endif %}>
+							<td onclick="getSchemeUsers('bulkpack_incentive','{{ bulkpack_incentive_scheme.id }}')">{{ bulkpack_incentive_scheme.name}}</td>
+							<td>
+								<div class="row">
+									<div class="col-md-3">
+										<a href="javascript:void(0)"
+										onclick="editScheme('{{ bulkpack_incentive_scheme.id }}','bulkpack_incentive')"><img src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+										<div class="col-md-5">
+											<label class="switch">
+												<input type="hidden" id="user_bulkpack_incentive_is_active_{{ bulkpack_incentive_scheme.id }}" value="{{ bulkpack_incentive_scheme.status }}">
+												<input type="checkbox" class="checkbox" name="is_active"
+												
+												{% if bulkpack_incentive_scheme.status == 1 %} checked="" {% else %}
+												{% endif %}
+												onclick="updateSchemeStatus('{{ bulkpack_incentive_scheme.id }}', this,'bulkpack_incentive')">
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+							<tr id="" style="display: none;">
+								<td class="text-center" colspan="2"></td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="2" style="text-align: center;">No Record Found...</td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+					
+					<table id="quantitativeSchemeTable" class="bonus_scheme_table table table-borderless table-striped table-hover mt-0"
+					style="width: 100%; display: none;">
+					<thead>
+						<tr>
+							<th>Scheme</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id="">
+						{% if quantitative_schemes %}
+						{% for quantitative_scheme in quantitative_schemes %}
+						<tr  {% if forloop.first %} class="odd selected" {% endif %}>
+							<td onclick="getSchemeUsers('quantitative_scheme','{{ quantitative_scheme.id }}')">{{ quantitative_scheme.name}}</td>
+							<td>
+								<div class="row">
+									<div class="col-md-3">
+										<a href="javascript:void(0)"
+										onclick="editScheme('{{ quantitative_scheme.id }}','quantitative_scheme')"><img src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+										<div class="col-md-5">
+											<label class="switch">
+												<input type="hidden" id="user_quantitative_scheme_is_active_{{ quantitative_scheme.id }}" value="{{ quantitative_scheme.status }}">
+												<input type="checkbox" class="checkbox" name="is_active"
+												{% if quantitative_scheme.status == 1 %} checked="" {% else %}
+												{% endif %}
+												onclick="updateSchemeStatus('{{ quantitative_scheme.id }}', this,'quantitative_scheme')">
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+							<tr id="" style="display: none;">
+								<td class="text-center" colspan="2"></td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="2" style="text-align: center;">No Record Found...</td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+	
+	<div class="col-md-8 pr-md-0 h-100">
+		<div class="primaryContainer h-100" id="mainbox">
+			<div class="row mb-2" id="topRow">
+				
+				<div class="col-md-8 offset-md-4 p-md-0">
+					
+					<div class="row mb-2 mt-2 action_section " id="freeSchemeBlock"> 
+						<div class="col-md-12 p-md-0 text-right">
+							<input class="search searchTable" placeholder="Search" type="search" data-column="all">
+							
+							<div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+								<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+								<div class="dropdown-menu dropdown-menu-right logoutContainer"
+								aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_distributor_name" id="free_distributor_name" data-id="1"
+									onclick="showHideColumns('operationalBlock', this.id,2)"
+									/>
+									<label class="mb-0" for="free_distributor_name">Distributor</label>
+								</a>
+								
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_town" id="free_town" data-id="2"
+									onclick="showHideColumns('operationalBlock', this.id, 2)"
+									/>
+									<label class="mb-0" for="free_town">Town</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_state" id="free_state" data-id="3"
+									onclick="showHideColumns('operationalBlock', this.id, 3)"
+									/>
+									<label class="mb-0" for="free_state">State</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_applied_on" id="free_applied_on" data-id="4"
+									onclick="showHideColumns('operationalBlock', this.id, 4)"
+									/>
+									<label class="mb-0" for="free_applied_on">Applied on</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_on_order_of" id="free_on_order_of" data-id="4"
+									onclick="showHideColumns('operationalBlock', this.id, 5)"
+									/>
+									<label class="mb-0" for="free_on_order_of">On Order Of</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_free_product_variant" id="free_free_product_variant" data-id="4"
+									onclick="showHideColumns('operationalBlock', this.id, 5)"
+									/>
+									<label class="mb-0" for="free_free_product_variant">Free Product variant</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_free_quantity" id="free_free_quantity" data-id="4"
+									onclick="showHideColumns('operationalBlock', this.id, 5)"
+									/>
+									<label class="mb-0" for="free_free_quantity">Free Product Qty</label>
+								</a>
+								<a class="dropdown-item columnHideItem">
+									<input type="checkbox" class="colCheck" name="free_created_date" id="free_created_date" data-id="4"
+									onclick="showHideColumns('operationalBlock', this.id, 5)"
+									/>
+									<label class="mb-0" for="free_created_date">Created Date</label>
+								</a>
+							</div>
+						</div>
+						
+						<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+							<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+							<div class="dropdown-menu dropdown-menu-right logoutContainer"
+							aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_distributor_name" id="lock_free_distributor_name" data-id="1"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_distributor_name',1)" />
+								<label class="mb-0" for="lock_free_distributor_name">Distributor</label>
+							</a>
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_town" id="lock_free_town" data-id="2" 
+								onclick="toggleFreeze('addOrgTable', this.id,'free_town',2)" />
+								<label class="mb-0" for="lock_free_town">Town</label>
+							</a>
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_state"
+								id="lock_free_state" data-id="3"  
+								onclick="toggleFreeze('addOrgTable', this.id,'free_state',3)" />
+								<label class="mb-0" for="lock_free_state">State</label>
+							</a>
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_applied_on" id="lock_free_applied_on" data-id="4"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_applied_on',4)" />
+								<label class="mb-0" for="lock_free_applied_on">Applied on</label>
+							</a>
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_on_order_of" id="lock_free_on_order_of" data-id="4"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_on_order_of',5)" />
+								<label class="mb-0" for="lock_free_on_order_of">on Order Of</label>
+							</a>
+							
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_free_product_variant" id="lock_free_free_product_variant" data-id="4"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_free_product_variant',5)" />
+								<label class="mb-0" for="lock_free_free_product_variant">Free product Variant</label>
+							</a>
+							
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_free_quantity" id="lock_free_free_quantity" data-id="4"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_free_quantity',5)" />
+								<label class="mb-0" for="lock_free_free_quantity">Free Product Qty</label>
+							</a>
+							
+							<a class="dropdown-item columnHideItem">
+								<input type="checkbox" class="colFreezeCheck" name="free_created_date" id="lock_free_created_date" data-id="4"
+								onclick="toggleFreeze('addOrgTable', this.id,'free_created_date',5)" />
+								<label class="mb-0" for="lock_free_created_date">Created Date</label>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row mb-2 mt-2 action_section " id="bonusSchemeBlock" style="display: none;"> 
+				<div class="col-md-12 p-md-0 text-right" id="bonus_scheme_toolbar">
+					
+					<input class="searchTable bonus_scheme_search" placeholder="Search" type="search" data-column="all">
+					<div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+						<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+						<div class="dropdown-menu dropdown-menu-right logoutContainer"
+						aria-labelledby="dropdownMenuButton">
+						
+						<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_distributor_name" id="flat_distributor_name" data-id="1"
+							onclick="showHideColumns('operationalBlock', this.id,2)"
+							/>
+							<label class="mb-0" for="flat_distributor_name">Distributor</label>
+						</a>
+						
+						<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_town" id="flat_town" data-id="2"
+							onclick="showHideColumns('operationalBlock', this.id, 2)"
+							/>
+							<label class="mb-0" for="flat_town">Town</label>
+						</a>
+						<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_state" id="flat_state" data-id="3"
+							onclick="showHideColumns('operationalBlock', this.id, 3)"
+							/>
+							<label class="mb-0" for="flat_state">State</label>
+						</a>
+							<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_applied_on_vriant" id="flat_applied_on_vriant" data-id="4"
+							onclick="showHideColumns('operationalBlock', this.id, 5)"
+							/>
+							<label class="mb-0" for="flat_applied_on_vriant">Applied on variant </label>
+						</a>
+						<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_incentive" id="flat_incentive" data-id="4"
+							onclick="showHideColumns('operationalBlock', this.id, 5)"
+							/>
+							<label class="mb-0" for="flat_incentive">Discount Value </label>
+						</a>
+						
+						
+						
+						<a class="dropdown-item columnHideItem">
+							<input type="checkbox" class="colCheck" name="flat_created_date" id="flat_created_date" data-id="4"
+							onclick="showHideColumns('operationalBlock', this.id, 5)"
+							/>
+							<label class="mb-0" for="flat_created_date">Created Date</label>
+						</a>
+						
+					</div>
+				</div>
+				
+				<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+					<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+					<div class="dropdown-menu dropdown-menu-right logoutContainer"
+					aria-labelledby="dropdownMenuButton">
+					
+					
+					<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_distributor_name" id="lock_flat_distributor_name" data-id="1"
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_distributor_name',1)" />
+						<label class="mb-0" for="lock_flat_distributor_name">Distributor</label>
+					</a>
+					<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_town" id="lock_flat_town" data-id="2" 
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_town',2)" />
+						<label class="mb-0" for="lock_flat_town">Town</label>
+					</a>
+					<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_state"
+						id="lock_flat_state" data-id="3"  
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_state',3)" />
+						<label class="mb-0" for="lock_flat_state">State</label>
+					</a>
+						<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_applied_on_vriant" id="lock_flat_applied_on_vriant" data-id="4"
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_applied_on_vriant',5)" />
+						<label class="mb-0" for="lock_flat_applied_on_vriant">Applied on variant</label>
+					</a>
+					<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_incentive" id="lock_flat_incentive" data-id="4"
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_incentive',5)" />
+						<label class="mb-0" for="lock_flat_incentive">Discount Value</label>
+					</a>
+					
+				
+					
+					<a class="dropdown-item columnHideItem">
+						<input type="checkbox" class="colFreezeCheck" name="flat_created_date" id="lock_flat_created_date" data-id="4"
+						onclick="toggleFreeze('addOrgTable', this.id,'flat_created_date',5)" />
+						<label class="mb-0" for="lock_flat_created_date">Created Date</label>
+					</a>
+					
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	
+</div>
+</div>
+<div class="row userTable tableBox" id="freeSchemeUserBlock">
+	<div class="col-md-12 freeprimaryContainerBG h-100 p-0 commonTableBg" >
+		<input type="hidden" name="page" id="page" value="2" />
+		<input type="hidden" name="page_status" id="page_status" value="0" />
+		<input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+		<table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+		style="width: 100%;">
+		<thead>
+			<tr>
+				<th class="free_distributor_name" id="free_distributor_name">
+					Distributor
+					<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_town" id="free_town">Town<i
+					class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_state" id="free_state">State<i
+					class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_applied_on" id="free_applied_on">Applied On<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_on_order_of" id="free_on_order_of">On order of<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_free_product_variant" id="free_free_product_variant">Free Product Variant<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_free_quantity" id="free_free_quantity">Free Product Qty<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="free_created_date" id="free_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="tablebody">
+			{% if scheme_free_users %}
+			{% for user in scheme_free_users %}
+			<tr  {% if forloop.first %} class="odd" {% endif %}>
+				<td class="free_distributor_name">
+					{{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+					<br>
+					<b>{% if user.is_route == 0 %}{{user.main_route_name}}{% else %}{% if user.route_name %}{{user.route_name}} {% else %}  {{user.town_name}} {% endif %}{% endif %}</b>
+				</td>
+				<td class="free_town">{{user.town_name}}</td>
+				<td class="free_state">{{user.state_name}}</td>
+				<td class="free_applied_on">{{user.applied_on_variant_name}}</td>
+				<td class="free_on_order_of">{{user.minimum_order_quantity}} {% if user.packaging_type == 0 %} {{user.order_container_name}}{% else %}{{user.order_packaging_name}} {% endif %}</td>
+				<td class="free_free_product_variant">{{user.free_variant_name}}</td>
+				<td class="free_free_quantity">
+					{% if user.container_quantity > 0 %}{{user.container_quantity}} {{user.order_container_name}} {% endif %} 
+					{% if user.pouch_quantity > 0 %}{{user.pouch_quantity}} {{user.order_packaging_name}}{% endif %}
+				</td>
+				<td class="free_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+				<td>
+					<div class="row">
+						<div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+							<div class="labelContainerOP">
+								<label class="switch">
+									<input type="hidden" id="user_free_scheme_is_active_{{ user.user_id }}" value="{{ user.status }}">
+									<input type="checkbox" class="checkbox" name="is_active"
+									{% if user.status == 1 %} checked="" {% else %}
+									{% endif %}
+									onclick="updateUserSchemeStatus('{{ user.id }}', this, 'free_scheme')">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			{% endfor %}
+			<tr id="operational_loading" style="display: none;">
+				<td class="text-center" colspan="9">
+				</td>
+			</tr>
+			
+			{% else %}
+			<tr>
+				<td colspan="9" style="text-align: center;">No Record Found...</td>
+			</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+</div>
+
+
+
+<div class="row userTable tableBox" id="bonusSchemeUserBlock" style="display:none">
+	<div class="col-md-12 bonusSchemeContainerBG h-100 p-0 commonNonOperationalTableBg" id="ajax-div">
+		<input type="hidden" name="non_page" id="non_page" value="2" />
+		<input type="hidden" name="non_page_status" id="non_page_status" value="0" />
+		<input type="hidden" name="non_total_pages" id="non_total_pages" value="{{ non_operational_total_pages }}" />
+		
+		<table id="FlatIncentiveSchemeTable" class="table table-borderless table-striped table-hover mt-0"
+		style="width: 100%;">
+		<thead>
+			<tr>
+				<th class="flat_distributor_name" id="flat_distributor_name">
+					Distributor
+					<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="flat_town" id="flat_town">Town<i
+					class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="flat_state" id="flat_state">State<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="flat_applied_on_vriant" id="flat_applied_on_vriant">Applied on variant<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				<th class="flat_incentive" id="flat_incentive">Discount Value<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				
+				
+				<th class="flat_created_date" id="flat_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+					<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+					<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+				</th>
+				
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="bonus_scheme_tablebody">
+			{% if scheme_flat_incentive_users %}
+			{% for user in scheme_flat_incentive_users %}
+			<tr  {% if forloop.first %} class="odd" {% endif %}>
+				<td class="flat_distributor_name">
+					{{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+					<br>
+					<b>{% if user.is_route == 0 %}{{user.main_route_name}}{% else %}{% if user.route_name %}{{user.route_name}} {% else %}  {{user.town_name}} {% endif %}{% endif %}</b>
+				</td>
+				<td class="flat_town">{{user.town_name}}</td>
+				<td class="flat_state">{{user.state_name}}</td>
+				<td class="flat_applied_on_vriant">{{user.applied_on_variant_name}} </td>
+				<td class="flat_incentive">{{user.incentive_amount}} </td>
+				<td class="flat_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+				<td>
+					<div class="row">
+						<div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+							<div class="labelContainerOP">
+								<label class="switch">
+									<input type="hidden" id="user_flat_incentive_is_active_{{ user.user_id }}" value="{{ user.status }}">
+									<input type="checkbox" class="checkbox" name="is_active"
+									{% if user.status == 1 %} checked="" {% else %}
+									{% endif %}
+									onclick="updateUserSchemeStatus('{{ user.id }}', '{{ user.status }}', 'flat_incentive')">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			{% endfor %}
+			<tr id="nonoperational_loading" style="display: none;">
+				<td class="text-center" colspan="9">
+				</td>
+			</tr>
+			
+			{% else %}
+			<tr>
+				<td colspan="9" style="text-align: center;">No Record Found...</td>
+			</tr>
+			{% endif %}
+		</tbody>
+	</table>
+	
+</div>
+</div>
+
+
+</div>
+</div>
+
+
+
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+	
+</div>
+
+
+<div class="overlayModal" id="viewEmployeeModal">
+	
+</div>
+<div class="overlayModal" id="viewUserModal" style="display: none;">
+	
+</div>
+
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/variable-pie.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+
+<script type="text/javascript">
+
+	function editScheme(id,scheme_type) {
+	    if(scheme_type == "flat_incentive"){
+	        var text = 'discount';
+	    }else{
+	        var text = 'schemes';
+	    }
+		var question = "Editing of master scheme will change associated Distributor "+text+". Do you want to proceed?";
+		$.confirm({
+			title: 'Confirm!',
+			content: question,
+			buttons: {
+				confirm: function () {
+					if(scheme_type == "free_scheme"){
+						url = "{% url 'src:edit-free-scheme' '1' %}"
+						url = url.replace('1',id)
+					}else if(scheme_type == "quantitative_scheme"){
+						url = "{% url 'src:edit-bonus-scheme' '1' %}"
+						url = url.replace('1',id)
+					}else if(scheme_type == "flat_incentive"){
+						url = "{% url 'src:edit-flat-incentive' '1' %}"
+						url = url.replace('1',id)
+					}else if(scheme_type == "bulkpack_incentive"){
+						url = "{% url 'src:edit-bulkpack-incentive' '1' %}"
+						url = url.replace('1',id)
+					}
+					
+					$.ajax({
+						url: url,
+						method: 'GET',
+						success: function (data) {
+							$("#addUserModal").show();
+							$('#addUserModal').html(data);
+							
+							var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+							$("#addUserModalBody").height(mch);
+							$(".selectField").select2();
+							
+							addMultiSelectPlacehoder();
+						},
+						error: function (err) {
+							console.log(err)
+						}
+					});
+					
+				},
+				cancel: function () {
+					
+				}
+			}
+		});
+	}
+	
+	function updateSchemeStatus(id, element,scheme_type) {
+		if ($(element).prop("checked") == true) {
+			var question = "This action will enable associated user's scheme status. Do you want to proceed?";
+		}else{
+			var question = "This action will disable associated user's scheme status. Do you want to proceed?";
+		}
+		$.confirm({
+			title: 'Confirm!',
+			content: question,
+			buttons: {
+				confirm: function () {
+					
+					if ($(element).prop("checked") == true) {
+						is_active = 1;
+						$(element).prev().val(1);
+					} else {
+						is_active = 0;
+						$(element).prev().val(0);  
+					}
+					if(scheme_type == "free_scheme"){
+						url = "{% url 'src:update-free-scheme-status' %}"
+					}else if(scheme_type == "quantitative_scheme"){
+						url = "{% url 'src:update-quantitative-scheme-status' %}"
+					}else if(scheme_type == "flat_incentive"){
+						url = "{% url 'src:update-flat-incentive-status' %}"
+					}else if(scheme_type == "bulkpack_incentive"){
+						url = "{% url 'src:update-bulkpack-incentive-status' %}"
+					}
+					
+					$.ajax({
+						url: url,
+						method: 'POST',
+						data: {
+							id: id,
+							is_active: is_active,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function (data) {
+							if (data.error == false) {
+								hideLoader();
+								getSchemeUsers(scheme_type, id);
+								openToaster("success", data.message);
+							}
+						},
+						error: function (err) {
+							console.log(err)
+						}
+					});
+					
+				},
+				cancel: function () {
+					if ($(element).prop("checked") == true) {
+						$(element).prop("checked",false);
+					}else{
+						$(element).prop("checked",true);
+					}
+				}
+			}
+		});
+		
+		
+	}
+	
+	
+	function updateUserSchemeStatus(id, element,scheme_type) {
+		if ($(element).prop("checked") == true) {
+			is_active = 1;
+			$(element).prev().val(1);
+		} else {
+			is_active = 0;
+			$(element).prev().val(0);  
+		}
+		console.log(scheme_type)
+		if(scheme_type == "free_scheme"){
+			url = "{% url 'src:update-user-free-scheme-status' %}"
+		}else if(scheme_type == "quantitative_scheme"){
+			url = "{% url 'src:update-user-quantitative-scheme-status' %}"
+		}else if(scheme_type == "flat_incentive"){
+			url = "{% url 'src:update-user-flat-incentive-status' %}"
+		}else if(scheme_type == "bulkpack_incentive"){
+			url = "{% url 'src:update-user-bulkpack-incentive-status' %}"
+		}
+		
+		$.ajax({
+			url: url,
+			method: 'POST',
+			data: {
+				id: id,
+				is_active: is_active,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function (data) {
+				if (data.error == false) {
+					hideLoader();
+					openToaster("success", data.message);
+				}
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+	}
+	
+	$(document).ready(function () {
+		
+		$('#freeSchemeTable').tablesorter({
+			widgets: ["zebra", "filter"],
+			widgetOptions: {
+				filter_external: '.free_scheme_search',
+				filter_columnFilters: false,
+			}
+		});
+		$("#freeSchemeTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+		$('#flatIncetiveTable').tablesorter({
+			widgets: ["zebra", "filter"],
+			widgetOptions: {
+				filter_external: '.flatIncentive_scheme_search',
+				filter_columnFilters: false,
+			}
+		});
+		$("#flatIncetiveTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+		$('#bulkpackIncetiveTable').tablesorter({
+			widgets: ["zebra", "filter"],
+			widgetOptions: {
+				filter_external: '.bulkpackIncentive_scheme_search',
+				filter_columnFilters: false,
+			}
+		});
+		$("#bulkpackIncetiveTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+		
+		$('#quantitativeSchemeTable').tablesorter({
+			widgets: ["zebra", "filter", ],
+			widgetOptions: {
+				filter_external: '.quantitative_scheme_search',
+				filter_columnFilters: false,
+			}
+		});
+		$("#quantitativeSchemeTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+	});
+</script>
+<script>
+	
+	
+	
+	function freezeColumn(id, colNo) {
+		$('#' + id).addClass("frezedIcon frezedCell");
+		$("#addOrgTable tbody tr").each(function (index) {
+			$("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+			$("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+		});
+		$('#' + id + ' #freeze').show();
+		$('#' + id + ' #unfreeze').hide();
+	}
+	
+	function unfreezeColumn(id, colNo) {
+		$('#' + id).removeClass("frezedIcon frezedCell");
+		$("#addOrgTable tbody tr").each(function (index) {
+			$("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+			$("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+		});
+		$('#' + id + ' #unfreeze').show();
+		$('#' + id + ' #freeze').hide();
+	}
+	
+	function toggleFreeze(divid, inputid, colid, colNo) {
+		var checkbox = document.getElementById(inputid);
+		
+		if (checkbox.checked == true) {
+			$("#"+divid+" thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+			$("#"+divid+" tbody tr").each(function (index) {
+				$("#"+divid+" tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+				$("#"+divid+" tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+			});
+			$('#' + colid + ' #freeze').show();
+			$('#' + colid + ' #unfreeze').hide();
+		} else {
+			$("#"+divid+" thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+			$("#"+divid+" tbody tr").each(function (index) {
+				$("#"+divid+" tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+				$("#"+divid+" tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+			});
+			$('#' + colid + ' #unfreeze').show();
+			$('#' + colid + ' #freeze').hide();
+		}
+	}
+	
+	function showHideColumns(divid, inputid, colNo) {
+		var checkbox_val = [];
+		var checkbox = document.getElementById(inputid);
+		if (checkbox.checked == true) {
+			$('.'+inputid).hide();
+		}else{
+			$('.'+inputid).show();
+		}
+		$("#"+divid+" input:checkbox[class=colCheck]").each(function () {
+			if(!$(this).is(':checked')){
+				checkbox_val.push($(this).attr("id"))
+			}
+		});
+		checkbox_str = checkbox_val.join(',');
+		if(divid == 'operationalBlock'){
+			$('#'+divid+',#show_columns').val(checkbox_str);
+		}else if(divid == 'nonoperationalBlock'){
+			$('#'+divid+',#non_show_columns').val(checkbox_str);
+		}else{
+			$('#'+divid+',#employee_show_columns').val(checkbox_str);
+		}
+		
+	}
+	
+	
+	function addScheme(type) {
+		$('#addUserModal').html('');
+		showLoader();
+		if(type == 1){
+			url = "{% url 'src:add-free-scheme' %}";
+		}else if(type == 2){
+			url = "{% url 'src:add-bonus-scheme' %}";
+		}else if(type == 3){
+			url = "{% url 'src:add-flat-incentive-scheme' %}";
+		}else {
+			url = "{% url 'src:add-bulkpack-incentive-scheme' %}";
+		}
+		$.ajax({
+			url: url,
+			method: 'GET',
+			data: {},
+			success: function (data) {
+				hideLoader();
+				$("#addUserModal").show();
+				$('#addUserModal').html(data);
+				
+				var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+				$("#addUserModalBody").height(mch);
+				$(".selectField").select2();
+				
+				addMultiSelectPlacehoder();
+				
+				
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+	}
+	
+	function addMultiSelectPlacehoder(){
+	
+		$('[name="route_id[]"]').select2({
+			placeholder:"Select Routes"
+		})
+		$('[name="zone_id[]"]').select2({
+			placeholder:"Select Zone"
+		})
+		$('[name="town_id[]"]').select2({
+			placeholder:"Select Town"
+		})
+		$('[name="product_class[]"]').select2({
+			placeholder:"Select Product Class"
+		})
+	}
+	
+	function closeModal() {
+		$("#addUserModal").hide();
+	}
+	
+	
+	
+	$(document).ready(function () {
+		
+		
+		$(window).resize(function () {
+			setHeightWidth();
+		});
+		
+		$(".bonusSchemeContainerBG").scroll(function () {
+			var divTable = $(".bonusSchemeContainerBG");
+			$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+		});
+		
+		
+		$('#addOrgTable').tablesorter({
+			widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+			widgetOptions: {
+				resizable_addLastColumn: true,
+				resizable: false,
+				resizable_widths: ["10%", "5%", "5%", "10%", "10%","10%","10%","10%","10%","10%"],
+				stickyHeaders_attachTo: ".freeprimaryContainerBG",
+				filter_external: '.search',
+				filter_columnFilters: false,
+			}
+		});
+		
+		$("#addOrgTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+		$('#BulkpackIncentiveSchemeTable').tablesorter({
+			widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+			widgetOptions: {
+				resizable_addLastColumn: true,
+				resizable: false,
+				resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%","10%","10%","10%"],
+				stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+				filter_external: '.search',
+				filter_columnFilters: false,
+			}
+		});
+		$("#BulkpackIncentiveSchemeTable tbody tr").click(function () {
+			$(this).addClass("selected").siblings().removeClass("selected");
+		});
+		
+		
+		
+		$(".primaryContainerBG").scroll(function () {
+			var divTable = $(".primaryContainerBG");
+			$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+		});
+		
+		$(".bonusSchemeContainerBG").scroll(function () {
+			var divTable = $(".bonusSchemeContainerBG");
+			$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+		});
+		
+	});
+	
+	$(document).ready(function () {
+		var checkbox_val = ["store_name","role","contact_person","contact_no","outstanding_amount"];
+		checkbox_str = checkbox_val.join(',');
+		$('#operationalBlock,#show_columns').val(checkbox_str);
+		
+		$("#operationalBlock .colCheck").change(function () {
+			if ($("#operationalBlock .colCheck:not(:checked)").length == $("#operationalBlock .colCheck").length) {
+                //do something
+                $("#operationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+            	$("#operationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+		
+		var checkbox_val = ["store_name","role","contact_person","contact_no"];
+		checkbox_str = checkbox_val.join(',');
+		$('#nonoperationalBlock,#non_show_columns').val(checkbox_str);
+		
+		$("#nonoperationalBlock .colCheck").change(function () {
+			if ($("#nonoperationalBlock .colCheck:not(:checked)").length == $("#nonoperationalBlock .colCheck").length) {
+                //do something
+                $("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+            	$("#nonoperationalBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+		
+		var checkbox_val = ["employee_name","employee_role","employee_dep_org","employee_platform", "employee_last_sign_in"];
+		checkbox_str = checkbox_val.join(',');
+		$('#employeesBlock,#employee_show_columns').val(checkbox_str);
+		
+		$("#employeesBlock .colCheck").change(function () {
+			if ($("#employeesBlock .colCheck:not(:checked)").length == $("#employeesBlock .colCheck").length) {
+                //do something
+                $("#employeesBlock .iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+            	$("#employeesBlock .iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+	});
+	
+	function handleSchemeTabChange(element,table_section,target,table_target, id){
+		$('.table_block').hide();
+		$('#'+table_section).show();
+		
+		$('.short-details').hide();
+		$('.userTable').hide();
+		$('.customisedTab2').removeClass('activeTab');
+		$('#'+table_target).show();
+		$('.'+target).show();
+		$('.action_section').hide();
+		$('#'+target).show();
+		$(element).addClass('activeTab');
+		
+		if(table_section == "bonus_scheme_table"){
+			$('#flatIncentiveSchemeUserTable').tablesorter({
+				widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+				widgetOptions: {
+					resizable_addLastColumn: true,
+					resizable: false,
+					resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%"],
+					stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+					filter_external: '.bonus_scheme_search',
+					filter_columnFilters: false,
+				}
+			});
+		}
+		
+	}
+	
+	
+	function handleBonusSchemeTabChange(element,table,bonus_scheme_type,searchbar){
+		
+		$('.customisedTab3').removeClass('activeTab');
+		$('.bonus_scheme_table').hide();
+		$('.scheme_searchbar').hide();
+		$('#'+table).show();
+		$('#'+searchbar).show();
+		$(element).addClass('activeTab');
+		
+		refreshBonusSchemeTable(bonus_scheme_type);
+		refreshSchemeToolbar(bonus_scheme_type);
+	}
+	
+	function viewBifurcation(type,user_id,scheme_id){
+		
+		if(type == "bulkpack"){
+			var url = "{% url 'src:user-bulkpack-incentive-bifurcations' 'user_id' 'scheme_id' %}";
+			url = url.replace('user_id',user_id).replace('scheme_id',scheme_id);
+		}else if(type == "quantitative"){
+			var url = "{% url 'src:user-quantitative-scheme-bifurcations' 'user_id' 'scheme_id' %}";
+			url = url.replace('user_id',user_id).replace('scheme_id',scheme_id);
+		}
+		$.ajax({
+			url: url,
+			method: 'GET',
+			success: function (data) {
+				$.confirm({
+					title: '<p style="font-size:15px;">Bifurcation</p>',
+					content:' ' + data,
+					theme:'material',
+					animation:'zoom',
+					buttons: {
+						cancel: function () {
+						},
+					},
+				});
+				
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+		
+	}
+	function freeSchemeUsers(id){
+		showLoader();
+		var url = "{% url 'src:free-scheme-users' 1 %}";
+		url = url.replace(1,parseInt(id));
+		$.ajax({
+			url: url,
+			method: 'GET',
+			success: function (data) {
+				hideLoader();
+				$('#freeSchemeUserBlock').html(data);
+				$('#addOrgTable').tablesorter({
+					widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+					widgetOptions: {
+						resizable_addLastColumn: true,
+						resizable: false,
+						resizable_widths: ["10%", "5%", "5%", "10%", "10%","10%","10%","10%","10%","10%"],
+						stickyHeaders_attachTo: ".primaryContainerBG",
+						filter_external: '.search',
+						filter_columnFilters: false,
+					}
+				});
+				
+			},
+			error: function (err) {
+				hideLoader();
+				console.log(err)
+			}
+		});
+	}
+	
+	
+	
+	
+	function getSchemeUsers(bonus_scheme_type,id){
+		
+		showLoader();
+		if (bonus_scheme_type == "free_scheme"){
+			var url = "{% url 'src:free-scheme-users' '1' %}";
+		}else if (bonus_scheme_type == "flat_incentive"){
+			var url = "{% url 'src:flat-incentive-users' '1' %}";
+			url = url.replace('1',id);
+		}else if (bonus_scheme_type == "bulkpack_incentive"){
+			var url = "{% url 'src:bulkpack-incentive-users' '1' %}";
+			url = url.replace('1',id);
+		}else if (bonus_scheme_type == "quantitative_scheme"){
+			var url = "{% url 'src:quantitative-incentive-users' '1' %}";
+			url = url.replace('1',id);
+		}
+ 		
+
+		$.ajax({
+			url: url,
+			method: 'GET',
+			success: function (data) {
+				hideLoader();
+				$('#ajax-div').html(data);
+				if (bonus_scheme_type == "flat_incentive"){
+					$('#flatIncentiveSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+				}else if (bonus_scheme_type == "bulkpack_incentive"){
+					$('#bulkpackIncentiveSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%","10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+					
+				}else if (bonus_scheme_type == "quantitative_scheme"){
+					
+					$('#quantitativeSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%","10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+					
+				} else {
+				    freeSchemeUsers(id);
+				}   
+				
+				
+			},
+			error: function (err) {
+				hideLoader();
+				console.log(err)
+			}
+		});
+	}
+
+	
+	
+	function refreshBonusSchemeTable(bonus_scheme_type){
+		
+		showLoader();
+		if (bonus_scheme_type == "flat_incentive_scheme"){
+			var url = "{% url 'src:latest-flat-incentive-users' %}";
+		}else if (bonus_scheme_type == "bulkpack_incentive_scheme"){
+			var url = "{% url 'src:latest-bulkpack-incentive-users' %}";
+		}else if (bonus_scheme_type == "quantitative_scheme"){
+			var url = "{% url 'src:latest-quantitative-incentive-users' %}";
+		}
+		
+		$.ajax({
+			url: url,
+			method: 'GET',
+			success: function (data) {
+				hideLoader();
+				$('#ajax-div').html(data);
+				if (bonus_scheme_type == "flat_incentive_scheme"){
+					$('#flatIncentiveSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+				}else if (bonus_scheme_type == "bulkpack_incentive_scheme"){
+					$('#bulkpackIncentiveSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%","10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+					
+				}else if (bonus_scheme_type == "quantitative_scheme"){
+					
+					$('#quantitativeSchemeUserTable').tablesorter({
+						widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+						widgetOptions: {
+							resizable_addLastColumn: true,
+							resizable: false,
+							resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%","10%","10%","10%","10%"],
+							stickyHeaders_attachTo: ".bonusSchemeContainerBG",
+							filter_external: '.bonus_scheme_search',
+							filter_columnFilters: false,
+						}
+					});
+					
+				}    
+				
+				
+			},
+			error: function (err) {
+				hideLoader();
+				console.log(err)
+			}
+		});
+		
+		
+		
+	}
+	function refreshSchemeToolbar(bonus_scheme_type){
+		
+		var flat_incentive_scheme_toolbar = `
+		<input class="searchTable bonus_scheme_search" placeholder="Search" type="search" data-column="all">
+		
+		<div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+		<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_distributor_name" id="flat_distributor_name" data-id="1"
+		onclick="showHideColumns('operationalBlock', this.id,2)"
+		/>
+		<label class="mb-0" for="flat_distributor_name">Distributor</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_town" id="flat_town" data-id="2"
+		onclick="showHideColumns('operationalBlock', this.id, 2)"
+		/>
+		<label class="mb-0" for="flat_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_state" id="flat_state" data-id="3"
+		onclick="showHideColumns('operationalBlock', this.id, 3)"
+		/>
+		<label class="mb-0" for="flat_state">State</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_applied_on_vriant" id="flat_applied_on_vriant" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="flat_applied_on_vriant">Applied on variant</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_incentive" id="flat_incentive" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="flat_incentive">Discount Value</label>
+		</a>
+		
+		
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="flat_created_date" id="flat_created_date" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="flat_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+		
+		<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+		<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_distributor_name" id="lock_flat_distributor_name" data-id="1"
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_distributor_name',1)" />
+		<label class="mb-0" for="lock_flat_distributor_name">Distributor Name</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_town" id="lock_flat_town" data-id="2" 
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_town',2)" />
+		<label class="mb-0" for="lock_flat_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_state"
+		id="lock_flat_state" data-id="3"  
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_state',3)" />
+		<label class="mb-0" for="lock_flat_state">State</label>
+		</a>
+			<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_applied_on_vriant" id="lock_flat_applied_on_vriant" data-id="4"
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_applied_on_vriant',5)" />
+		<label class="mb-0" for="lock_flat_applied_on_vriant">Applied on variant</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_incentive" id="lock_flat_incentive" data-id="4"
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_incentive',5)" />
+		<label class="mb-0" for="lock_flat_incentive">Discount Value</label>
+		</a>
+		
+	
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="flat_created_date" id="lock_flat_created_date" data-id="4"
+		onclick="toggleFreeze('flatIncentiveSchemeUserTable', this.id,'flat_created_date',5)" />
+		<label class="mb-0" for="lock_flat_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+		`;
+
+
+		var bulkpack_incentive_scheme_toolbar = `
+		<input class="searchTable bonus_scheme_search" placeholder="Search" type="search" data-column="all">
+
+		<div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+		<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bulkpack_distributor_name" id="bulkpack_distributor_name" data-id="1"
+		onclick="showHideColumns('operationalBlock', this.id,2)"
+		/>
+		<label class="mb-0" for="bulkpack_distributor_name">Distributor Name</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bulkpack_town" id="bulkpack_town" data-id="2"
+		onclick="showHideColumns('operationalBlock', this.id, 2)"
+		/>
+		<label class="mb-0" for="bulkpack_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bulkpack_state" id="bulkpack_state" data-id="3"
+		onclick="showHideColumns('operationalBlock', this.id, 3)"
+		/>
+		<label class="mb-0" for="bulkpack_state">State</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bulkpack_unit" id="bulkpack_unit" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bulkpack_unit">Unit</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bulkpack_created_date" id="bulkpack_created_date" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bulkpack_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+
+		<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+		<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bulkpack_distributor_name" id="lock_bulkpack_distributor_name" data-id="1"
+		onclick="toggleFreeze('bulkpackIncentiveSchemeUserTable', this.id,'bulkpack_distributor_name',1)" />
+		<label class="mb-0" for="lock_bulkpack_distributor_name">Distributor Name</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bulkpack_town" id="lock_bulkpack_town" data-id="2" 
+		onclick="toggleFreeze('bulkpackIncentiveSchemeUserTable', this.id,'bulkpack_town',2)" />
+		<label class="mb-0" for="lock_bulkpack_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bulkpack_state"
+		id="lock_bulkpack_state" data-id="3"  
+		onclick="toggleFreeze('bulkpackIncentiveSchemeUserTable', this.id,'bulkpack_state',3)" />
+		<label class="mb-0" for="lock_bulkpack_state">State</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bulkpack_unit" id="lock_bulkpack_unit" data-id="4"
+		onclick="toggleFreeze('bulkpackIncentiveSchemeUserTable', this.id,'bulkpack_unit',5)" />
+		<label class="mb-0" for="lock_bulkpack_unit">Unit</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bulkpack_created_date" id="lock_bulkpack_created_date" data-id="4"
+		onclick="toggleFreeze('bulkpackIncentiveSchemeUserTable', this.id,'bulkpack_created_date',5)" />
+		<label class="mb-0" for="lock_bulkpack_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+		`;
+
+
+		var quantitative_scheme_toolbar = `
+		<input class="searchTable bonus_scheme_search" placeholder="Search" type="search" data-column="all">
+		<div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+		<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_distributor_name" id="bonus_distributor_name" data-id="1"
+		onclick="showHideColumns('operationalBlock', this.id,2)"
+		/>
+		<label class="mb-0" for="bonus_distributor_name">Distributor Name</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_town" id="bonus_town" data-id="2"
+		onclick="showHideColumns('operationalBlock', this.id, 2)"
+		/>
+		<label class="mb-0" for="bonus_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_state" id="bonus_state" data-id="3"
+		onclick="showHideColumns('operationalBlock', this.id, 3)"
+		/>
+		<label class="mb-0" for="bonus_state">State</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_on_order_of" id="bonus_on_order_of" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bonus_on_order_of">On Order Of</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_free_product_variant" id="bonus_free_product_variant" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bonus_free_product_variant">Free Product variant</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_free_quantity" id="bonus_free_quantity" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bonus_free_quantity">Free Product Qty</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colCheck" name="bonus_created_date" id="bonus_created_date" data-id="4"
+		onclick="showHideColumns('operationalBlock', this.id, 5)"
+		/>
+		<label class="mb-0" for="bonus_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+
+		<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+		<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+		<div class="dropdown-menu dropdown-menu-right logoutContainer"
+		aria-labelledby="dropdownMenuButton">
+		
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_distributor_name" id="lock_bonus_distributor_name" data-id="1"
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_distributor_name',1)" />
+		<label class="mb-0" for="lock_bonus_distributor_name">Distributor Name</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_town" id="lock_bonus_town" data-id="2" 
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_town',2)" />
+		<label class="mb-0" for="lock_bonus_town">Town</label>
+		</a>
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_state"
+		id="lock_bonus_state" data-id="3"  
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_state',3)" />
+		<label class="mb-0" for="lock_bonus_state">State</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_on_order_of" id="lock_bonus_on_order_of" data-id="4"
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_on_order_of',5)" />
+		<label class="mb-0" for="lock_bonus_on_order_of">on Order Of</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_free_product_variant" id="lock_bonus_free_product_variant" data-id="4"
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_free_product_variant',5)" />
+		<label class="mb-0" for="lock_bonus_free_product_variant">Free product Variant</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_free_quantity" id="lock_bonus_free_quantity" data-id="4"
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_free_quantity',5)" />
+		<label class="mb-0" for="lock_bonus_bonus_quantity">Free Product Qty</label>
+		</a>
+		
+		<a class="dropdown-item columnHideItem">
+		<input type="checkbox" class="colFreezeCheck" name="bonus_created_date" id="lock_bonus_created_date" data-id="4"
+		onclick="toggleFreeze('quantitativeSchemeUserTable', this.id,'bonus_created_date',5)" />
+		<label class="mb-0" for="lock_bonus_created_date">Created Date</label>
+		</a>
+		
+		</div>
+		</div>
+		`;
+
+		if (bonus_scheme_type == "flat_incentive_scheme"){
+			$('#bonus_scheme_toolbar').html(flat_incentive_scheme_toolbar);
+		}else if (bonus_scheme_type == "bulkpack_incentive_scheme"){
+			$('#bonus_scheme_toolbar').html(bulkpack_incentive_scheme_toolbar);
+		}else if (bonus_scheme_type == "quantitative_scheme"){
+			$('#bonus_scheme_toolbar').html(quantitative_scheme_toolbar);
+		}
+
+	}
+
+</script>
+{% endblock %}

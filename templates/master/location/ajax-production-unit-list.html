@@ -1,0 +1,177 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Production Units &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('production_unit')"></button>
+                        
+                        
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'production_unit_name',1)"
+                                    />
+                                    <label class="mb-0" for="">Production Unit Name</label>
+                                </a>
+                                
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'production_unit_address',1)"
+                                    />
+                                    <label class="mb-0" for="">Address</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="production_unit_name" data-id="1"
+                                onclick="toggleFreeze(this.id,'production_unit_name',1)" />
+                                <label class="mb-0" for="production_unit_name">Production Unit Name</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="production_unit_address" data-id="2"
+                                onclick="toggleFreeze(this.id,'production_unit_address',2)" />
+                                <label class="mb-0" for="production_unit_address">Address</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="production_unit_name">
+                        Production Unit Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="production_unit_address">
+                        Address
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if production_units %}
+                {% for production_unit in production_units %}
+                <tr>
+                    <td class="production_unit_name">{{ production_unit.production_unit_name }} ({{ production_unit.production_unit_code }})
+                        
+                    </td>
+                    <td class="production_unit_address">{{ production_unit.production_unit_address }}</td>
+                    <td >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="javascript:void(0)"
+                                onclick="editMaster('production_unit','{{ production_unit.id }}')" >
+                                <img
+                                src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+
+                                
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ production_unit.id }}"
+                                    {% if production_unit.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateProductionUnitStatus('{{ production_unit.id }}', '{{ production_unit.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+     
+function updateProductionUnitStatus(production_unit_id,status){
+    showLoader();
+    if ($('#is_active_' + production_unit_id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        url = "{% url 'src:update-production-unit-status' %}";
+        url = url.replace(1,parseInt(production_unit_id))
+        $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                production_unit_id: production_unit_id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        getList('production_unit');
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+  
+</script>

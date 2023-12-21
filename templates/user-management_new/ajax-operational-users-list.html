@@ -1,0 +1,54 @@
+{% load static %}
+{% if users %}
+{% for user in users %}
+<tr  {% if forloop.first %} class="odd" {% endif %}>
+    <td class="sap_id" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.emp_sap_id %}{{user.emp_sap_id}}{% endif %}</td>
+    <td class="store_name" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.store_name %} {{ user.store_name|capfirst }} {% else %} - {% endif %}</td>
+    <td class="role" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.role_name %} {{ user.role_name|title }} {% else %} - {% endif %}</td>
+    <td class="contact_person" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.first_name %} {{ user.first_name|title }} {% if user.middle_name %} {{ user.middle_name|title }} {% endif %} {% if user.last_name %} {{ user.last_name|title }} {% endif %} {% else %} - {% endif %}</td>
+    <td class="contact_no" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.primary_contact_number %} {{ user.primary_contact_number }} {% else %} - {% endif %}</td>
+    <td class="outstanding_amount" onclick="getUserShortDetails('{{ user.id }}', 'ajaxUserShortDetail')">{% if user.outstanding_amount.outstanding_amount %} {{ user.outstanding_amount.outstanding_amount }} {% else %} - {% endif %}</td>
+    <td width="20%">
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                {% if user.is_tagged == 1 %}
+                <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}')"><img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" /></a>
+                {% else %}
+                <img src="{% static 'img/svg/viewonmapgray.svg' %}" class="tableRowIcon" />
+                {% endif %}
+                <a href="javascript:void(0)" onclick="viewUserRolePermission('{{ user.id }}')"><img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" /></a>
+                 <a href="javascript:void(0)"onclick="resetUserPassword('{{ user.id }}')" >
+                    <img src="{% static 'img/svg/changePassword.svg' %}" />
+                </a>
+                <a href="javascript:void(0)" onclick="perviousPage('{{ user.id }}', '1')"><img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" /></a>
+                <div class="labelContainerOP">
+                    <label class="switch">
+                        <input type="checkbox" class="checkbox" name="is_active"
+                        id="is_active_{{ user.id }}"
+                        {% if user.status == 1 %} checked="" {% else %}
+                        {% endif %}
+                        onclick="updateStatus('{{ user.id }}', '{{ user.status }}', 'operational')">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+
+{% if page_loading_type == '1' %}
+<tr id="operational_loading" style="display: none;">
+    <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+    </td>
+</tr>
+{% endif %}
+{% else %}
+<tr>
+    <td colspan="6" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+<script>
+    $('#total_pages').val('{{total_pages}}');
+    $('#total_count').html('{{usercount}}');
+</script>

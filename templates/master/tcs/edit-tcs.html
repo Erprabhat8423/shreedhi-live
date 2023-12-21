@@ -1,0 +1,134 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/townw.png' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit TCS</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="edittcsForm" method="POST" autocomplete="off" action="" aria-label="Zone">
+                    <input type="hidden" name="tcs_id" value="{{tcs.id}}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>TCS details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="updateTcs('{{tcs.id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Add TCS</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField numeric" type="text" placeholder="TCS value in lakh *" value="{{tcs.tcs_value}}" name="tcs" />
+                        <label class="error_msg float-right" id="zone_error"></label>
+                    </div>
+                </div>
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>TCS in Percentage</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="TCS in Percentage *" value="{{tcs.tcs_percentage}}" name="tcs_persent" onkeypress="return validateFloatKeyPress(this,event);"  />
+                        <label class="error_msg float-right" id="zone_error"></label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    function updateTcs(id) {
+        var question = "Town Mapping will be Updated. Do you want to proceed?";
+		$.confirm({
+			title: 'Confirm!',
+			content: question,
+			buttons: {
+				confirm: function () {
+                        showLoader();
+                        if(validateZoneForm()){
+                            hideLoader();
+                            return false;
+                        }else{
+                            url = "{% url 'src:edit-tcs' '1' %}";
+                            url = url.replace('1',id)
+
+                            $.ajax({
+                                url: url,
+                                method: 'POST',
+                                data: $('#edittcsForm').serialize(),
+                                success: function (data) {
+                                    hideLoader();
+                                    if(data.flag==true){
+                                        $("#addProductModal").html('');
+                                        $("#addProductModal").hide();
+                                        getList('tcs')
+                                        openToaster("success", data.message);
+                                    }else{
+                                        openToaster("danger", data.message);
+                                    }
+                                },
+                                error: function (err) {
+                                    hideLoader();
+                                    console.log(err)
+                                }
+                            }).always(function() {
+                                // hideLoader();
+                            });
+                        } 
+                    },
+				cancel: function () {
+					
+				}
+			}
+		});
+    }
+   
+    function validateZoneForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        if($.trim($('[name="tcs"]').val()) == ""){
+            $('[name="tcs"]').parent().find('.error_msg').text('Please enter TCS value in lakh');
+            $('[name="tcs"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="tcs_persent"]').val()) == ""){
+            $('[name="tcs_persent"]').parent().find('.error_msg').text('Please enter TCS in Percentage');
+            $('[name="tcs_persent"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+       
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+</script>

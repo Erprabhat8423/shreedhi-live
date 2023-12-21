@@ -1,0 +1,161 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Order Timing Slots &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable timeslot_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconEditNew" onclick="editMaster('timeSlot')"></button>
+                        
+                        <!-- <div class="dropdown" style="display: inline-block;">
+                            <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <input type="hidden" name="show_columns" id="show_columns" value="" >
+                            <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                </div>
+                            </div> -->
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'timeslot_start_time',2)"
+                                    />
+                                    <label class="mb-0" for="timeslot_start_time">Start Time</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'timeslot_end_time',2)"
+                                    />
+                                    <label class="mb-0" for="timeslot_end_time">End Time</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'timeslot_timing_order',2)"
+                                    />
+                                    <label class="mb-0" for="timeslot_timing_order">Window</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="timeslot_start_time" data-id="1"
+                                onclick="toggleFreeze(this.id,'timeslot_start_time',1)" />
+                                <label class="mb-0" for="timeslot_start_time">Start Time</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_timeslot_end_time" data-id="1"
+                                onclick="toggleFreeze(this.id,'timeslot_end_time',1)" />
+                                <label class="mb-0" for="lock_timeslot_end_time">End Time</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_timeslot_timing_order" data-id="1"
+                                onclick="toggleFreeze(this.id,'timeslot_timing_order',1)" />
+                                <label class="mb-0" for="lock_timeslot_timing_order">Window</label>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="timeslot_start_time">
+                        Start Time
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="timeslot_end_time">
+                        End Time
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="timeslot_timing_order">
+                        Window
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if timeslots %}
+                {% for timeslot in timeslots %}
+                <tr>
+                    <td class="timeslot_start_time">{{ timeslot.start_timing }}</td>
+                        <td class="timeslot_end_time">{{ timeslot.end_timing }}</td>
+                        <td class="timeslot_end_time">{{ timeslot.timing_order }}</td>
+                        <td class="text-left">
+                            {% if forloop.counter > 1 %}
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ timeslot.id }}"
+                                    {% if timeslot.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStatus('{{ timeslot.id }}', '{{ timeslot.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            {% endif %}
+                        </td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="loading" style="display: none;">
+                            <td class="text-center" colspan="2">
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+    </script>

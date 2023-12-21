@@ -1,0 +1,65 @@
+{% load helper_tags %}
+{% load static %}
+{% if today_order_status > 0 %}
+{% if users_list %}
+<table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+    <thead>
+        <tr>
+            <th style="text-align: center;">Sr.No.</th>
+            <th>Party Name/Routes(Vehicle No.)</th>
+            <th>Challans</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users_list %}
+         <tr>
+             <th style="text-align: center;">{{forloop.counter}}.</th>
+             <th>{{user.store_name}}({{ user.name }}/{{user.user_sap_id}})</th>
+             <td>
+             </td>
+         </tr>
+         {% for vehicles in user.vehicle_detail %}
+         <tr>
+             <td>
+             </td>
+             <td>
+                {{vehicles.route_name}}<span style="color: #3498db;">({{vehicles.registration_number}})</span>  
+             </td>
+             <td>
+                {% if vehicles.challan_invoice_pdf %}
+                <a href="{{vehicles.challan_invoice_pdf }}"download>Download Challan</a>
+                {% else %}
+                <span id="CHALLAN_{{ user.user_id }}_{{vehicles.vehicle_id}}"><a href="javascript:void(0)"
+                onclick="downloadGatepassChallan('{{ user.user_id }}','{{vehicles.vehicle_id}}','challan', 'CHALLAN')">Generate Challan</a>
+                </span>
+                {% endif %} 
+             </td>
+         </tr>
+         {% endfor %}
+         {% endfor %}
+     </tbody>
+</table>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+<script>
+$('.iconExport').show();
+{% if all_challan_invoice_pdf %}
+$('#CHALLAN_ALL').html('<a class="dropdown-item logoutItem" href="{{ all_challan_invoice_pdf }}" download>Download All Challans  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+{% else %}
+$('#CHALLAN_ALL').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllGatepassChallans(`challan`, `CHALLAN`,0)">Generate All Challans&nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+{% endif %}
+{% for production_all_invoices_pdfs in production_all_invoices_pdf %}
+    {% if production_all_invoices_pdfs.url %}
+    $('#CHALLAN_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem" href="{{ production_all_invoices_pdfs.url }}" download>Download {{production_all_invoices_pdfs.organization_name}} Challans  <img src="static/img/svg/PDF.svg" class="logoutIcons" /></a>');
+    {% else %}
+    $('#CHALLAN_{{production_all_invoices_pdfs.id}}').html('<a class="dropdown-item logoutItem"  href="javascript:void(0)" onclick="downloadAllGatepassChallans(`challan`, `CHALLAN`,{{production_all_invoices_pdfs.id}})">Generate {{production_all_invoices_pdfs.organization_name}} Challans&nbsp;&nbsp;<img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>');
+    {% endif %}
+{% endfor %}
+</script>
+{% else %}
+<script>
+    $('.iconExport').hide();
+</script>
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}

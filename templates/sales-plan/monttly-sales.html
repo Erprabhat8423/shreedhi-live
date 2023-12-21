@@ -1,0 +1,267 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+    {% load static %}
+    {% block style %}
+        <link rel="stylesheet" href="{% static 'css/sales-planning.css' %}">
+            
+    {% endblock %}
+
+
+<div class="row px-3 py-2" id="containerHeight">
+    <div class="col-md-12 col-12 primaryContainer h-100 px-0 mb-2 " id="mainbox">
+        <div class="col-sm-12 px-0 " id="topRow">
+            <div class="row">
+                <div class="col-sm-4 px-0">
+                    <a href="#" title="" class="accent-zone-color font-18 icon-cover-back"><i class="fa fa-angle-left "></i></a>
+                    <h6 class="dark-blue-color d-inline-block ml-2 font-wt-b">Creates Sales Plan</h6>
+                </div>
+                <div class="col-sm-8 px-0">
+                    <div class="row">
+                        <div class="col-sm-3 px-2">
+                                <input class="inputField widthSetter" type="text" placeholder="Enter Name" id="" name="" maxlength="50">
+                                <label class="error_msg float-right" id=""></label>
+                        </div>
+                        <div class="col-sm-3 px-0">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Financial Yearly</option>
+                                <option value="Select">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 px-2">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Interval</option>
+                                <option value="Select">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 px-0">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Pre-fill data?</option>
+                                <option value="Select">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row add-slaes-plan-slection" style="justify-content: flex-end;">
+                <ul class="">
+                    <li>PPM (Ltr)</li>
+                    <li>Butter (Ltr)</li>
+                    <li>Dahi (Ltr)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table monthly-sale" >
+            <table class="table  table-hover  w-100">
+                <thead>
+                    <tr>
+                        <th><span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>/<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span></th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody >
+    
+                        <tr class="zone-title-layer-tr">
+                            <td class="zone-title-layer"colspan="14">Etawah</td>
+                        </tr>
+                        <tr>
+                            <td>Etawah</td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td>
+                                <div class="clear"><i class="fa fa-angle-left mr-2"></i>clear</div>
+                                    <div class="vlaue_ofsale">2000</div>
+                                </td>
+                            <td> <div class="total-value-vrt">2000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                        </tr>
+                        <tr>
+                            <td>Auraiya</td>
+                            <td><div class="vlaue_ofsale">2000 <div class="copy">copy<i class="fa fa-angle-right ml-2"></i></div></div></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Mainpuri</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total</td>
+                            <td>41000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td>2000</td>
+                            <td></td>
+                        </tr>
+    
+                        <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Agra</td></tr>
+                        <tr>
+                            <td>Agra</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+                        <tr>
+                            <td>Firozabad</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+                        <tr class="total">
+                            <td >Total</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+    
+                        <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Aligarh</td></tr>
+                        <tr>
+                            <td>Aligarh</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+                        <tr>
+                            <td>Etah</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+                        <tr class="total">
+                            <td >Total</td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                            <td><div class=""></div></td>
+                        </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="14"><button class="btn-2blue float-right"> Save & Proceed</button></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>      
+</div>
+
+ 
+
+
+
+
+  
+   
+{% endblock %}

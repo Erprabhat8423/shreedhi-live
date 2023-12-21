@@ -1,0 +1,587 @@
+{% load static %}
+<style>
+    .centered{
+        top: 40%!important;
+    }
+</style>
+
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">            
+            <div class="col-md-12 p-md-4">
+                <form id="addForm" method="POST" autocomplete="off" action="" aria-label="">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="mt-md-2">Send Notification &nbsp;&nbsp;</h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveNotification()">
+                                Send
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input name="user_type" value="0" type="radio" onchange="handleUserType()" checked=""> <label class="mb-0" for="user_collector">Users</label>      
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input name="user_type" value="1" type="radio" onchange="handleUserType()" > <label class="mb-0" for="user_collector">Employees</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" id="distributorSection">
+                    <div class="col-md-6 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Route</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField" data-placeholer="Select Route"  name="route_id[]" style="width: 100% !important;" onchange="routeTownOptions(this);" multiple>
+                                    <option value="all">All</option>
+                                    {% for route in routes %}
+                                    <option value="{{route.id}}">{{route.route}}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="col-md-6 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Town</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField" data-placeholer="Select Town"  name="town_id[]" style="width: 100% !important;" onchange="selectTownAllOption(this);" multiple>
+                                    |<option value="">Select</option>
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Search Distributo/Superstockist</b><span id="count-div"></span></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField"  name="customer_id[]" style="width: 100% !important;" multiple>
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" id="employeeSection" style="display: none;">
+                    
+                    <div class="col-md-6 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Role</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField" data-placeholer="Select Role"  name="role_id[]" style="width: 100% !important;" onchange="selectRoleAllOption(this);" multiple>
+                                    <option value="all">All</option>
+                                    {% for role in roles %}
+                                    <option value="{{role.id}}">{{role.role_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="col-md-6 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Town</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField" data-placeholer="Select Town"  name="employee_town_id[]" style="width: 100% !important;" onchange="selectEmployeeTownAllOption(this);" multiple>
+                                    <option value="all">All</option>
+                                    {% for town in towns %}
+                                    <option value="{{town.id}}">{{town.town}}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Search Employees</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <select class="inputField selectField"  name="employee_id[]" style="width: 100% !important;" multiple="">
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Notification Type</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <select class="inputField selectField"  name="notification_type" style="width: 100% !important;" onchange="getNotificationType(this.value)">
+                                    <option value="">Select</option>
+                                    <!--<option value="0">SMS Notification</option>-->
+                                    <option value="1">Push Notification</option>
+                                    <option value="2">Email Notification</option>
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                            
+                            <div class="col-md-6" style="display: none;" id="sender_id_div">
+                                <select class="inputField selectField"  name="sender_id" style="width: 100% !important;">
+                                    <option value="">Select sender id</option>
+                                    {% for sms_sender_id in sms_sender_ids%}
+                                    <option value="{{sms_sender_id}}">{{sms_sender_id}}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-3" id="heading_div" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Heading</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="text" class="inputField" placeholder="Heading" id="heading" name="heading" maxlength="100">
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        <br clear="all">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Image</b></h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="file" class="inputField" placeholder="Image" id="activity_image" name="activity_image" accept="image/*" onchange="handleFileUpload(this)">
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-3" id="customer_sp_section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 style="display: inline-block; font-size:0.9rem"><b>Message</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <textarea class="inputField txt" placeholder="Message" id="message" name="message" maxlength="250" rows="5"></textarea>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+
+           
+
+        </div>
+        
+    </div>
+    
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+    
+    function handleFileUpload(input){
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            console.log(file);
+            var sizeKB = file.size / 1024;
+            filename = file.name;
+            if(sizeKB > 200){
+                openToaster('warning','Image Size should be less than 200KB');
+                $(input).val(null);
+            }else{
+                var ext = filename.split(".");
+                ext = ext[ext.length-1].toLowerCase();      
+                var arrayExtensions = ["jpg" , "jpeg", "png"];
+                if (arrayExtensions.lastIndexOf(ext) == -1) {
+                    openToaster('warning','Please upload valid Image(JPG,JPEG,PNG)');
+                    $(input).val(null);
+                }
+            }
+        }
+    }
+    function getNotificationType(type){
+        if (type > 0 ) {
+            $('#heading_div').show();
+            $('#sender_id_div').hide();
+        } else {
+            $('#heading_div').hide();
+            $('#sender_id_div').show();
+        }
+    }
+    
+    function handleUserType() {
+        user_type = $('input[name=user_type]:checked').val();
+        if (user_type == 1) {
+            $('#employeeSection').show();
+            $('#distributorSection').hide();
+        } else {
+            $('#distributorSection').show();
+            $('#employeeSection').hide();
+        }
+    }
+    
+    
+    function routeTownOptions(element){
+        if($(element).val() != null){
+            route_ids = $(element).val().join();
+            if(route_ids == "all" || route_ids.includes("all")){
+                $('[name="route_id[]"] > option').prop("selected","selected");
+                var wanted_option = $('[name="route_id[]"] option[value="all"]');
+                wanted_option.prop('selected', false);
+                $('[name="route_id[]"]').trigger('change.select2');
+            }else{
+                url = "{% url 'src:get-route-town-options' %}";
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data:{'route_ids':route_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                    success: function (data) {
+                        $('[name="town_id[]"]').html(data)
+                        $('[name="town_id[]"]').select2();
+                        addMultiSelectPlacehoder();
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+                getUserList();
+                
+            }
+        }else{
+            $('[name="town_id[]"]').html('')
+        }
+        
+    }
+    
+    
+    function selectRoleAllOption(element){
+        if($(element).val() != null){
+            role_ids = $(element).val().join();
+            if(role_ids == "all" || role_ids.includes("all")){
+                $('[name="role_id[]"] > option').prop("selected","selected");
+                var wanted_option = $('[name="role_id[]"] option[value="all"]');
+                wanted_option.prop('selected', false);
+                $('[name="role_id[]"]').trigger('change.select2');
+                
+                addMultiSelectPlacehoder();
+                
+            }else{
+                getUserList();
+            }
+        }
+    }
+    
+    function selectEmployeeTownAllOption(element){
+        if($(element).val() != null){
+            employee_town_ids = $(element).val().join();
+            if(employee_town_ids == "all" || employee_town_ids.includes("all")){
+                $('[name="employee_town_id[]"] > option').prop("selected","selected");
+                var wanted_option = $('[name="employee_town_id[]"] option[value="all"]');
+                wanted_option.prop('selected', false);
+                $('[name="employee_town_id[]"]').trigger('change.select2');
+                
+                addMultiSelectPlacehoder();
+                
+            }else{
+                getUserList();
+            }
+        }
+    }
+    
+    function selectTownAllOption(element){
+        if($(element).val() != null){
+            town_ids = $(element).val().join();
+            if(town_ids == "all" || town_ids.includes("all")){
+                $('[name="town_id[]"] > optgroup option').prop("selected","selected");
+                var wanted_option = $('[name="town_id[]"] option[value="all"]');
+                wanted_option.prop('selected', false);
+                $('[name="town_id[]"]').trigger('change.select2');
+                
+                addMultiSelectPlacehoder();
+                
+            }else{
+                getUserList();
+            }
+        }
+    }
+    
+    
+    function getUserList(){
+        user_type = $('input[name=user_type]:checked').val();
+        
+        if($('[name="role_id[]"]').val() == null){
+            role_ids = '';
+        }else{
+            role_ids = $('[name="role_id[]"]').val().join();
+        }
+        
+        if($('[name="route_id[]"]').val() == null){
+            route_ids = '';
+        }else{
+            route_ids = $('[name="route_id[]"]').val().join();
+        }
+        
+        if($('[name="town_id[]"]').val() == null){
+            town_ids = '';
+        }else{
+            town_ids = $('[name="town_id[]"]').val().join();
+        }
+        if($('[name="employee_town_id[]"]').val() == null){
+            employee_town_ids = '';
+        }else{
+            employee_town_ids = $('[name="employee_town_id[]"]').val().join();
+        }
+        
+        
+        // showLoader();
+        url = "{% url 'src:notification/get-users-option' %}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data:{
+                'type':user_type,
+                'role_ids':role_ids,
+                'route_ids':route_ids,
+                'town_ids':town_ids,
+                'employee_town_ids':employee_town_ids,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function (data) {
+                user_type = $('input[name=user_type]:checked').val();
+                if(user_type == 0){
+                    $('[name="customer_id[]"]').html(data.options)
+                }else{
+                    $('[name="employee_id[]"]').html(data.options)
+                }
+                
+                if(parseFloat(data.customer_count) > 0){
+                    $('#count-div').html('<strong>('+data.user_count+')</strong>')
+                }else{
+                    $('#count-div').html('')
+                }
+                
+                $(".selectField").select2();
+                
+                addMultiSelectPlacehoder();
+                
+                hideLoader();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    
+    
+    $(document).ready(function(){
+        $('.selectField').select2();
+    });
+    
+    $('#addForm').submit(function(e){
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            url = "{% url 'src:send-notification' %}";
+            $.ajax({
+                url: url ,
+                method: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        
+                        openToaster("success", data.message);
+                        setTimeout(function(){ window.location.reload(); }, 500);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        }
+    });
+    
+    
+    function saveNotification() {
+        $('#addForm').submit();
+    }
+    
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        $('.select2-container').css("border", "");
+        
+        var user_type = $("input[name='user_type']:checked").val();
+        
+        if(user_type == 0){
+            // if($('[name="route_id[]"]').val() == "" || $('[name="route_id[]"]').val() == null){
+                //     $('[name="route_id[]"]').parent().find('.error_msg').text('Please select route');
+                //     $('[name="route_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                //     error = error + 1;
+                //     console.log('Please select route')
+                // }
+                // if($('[name="town_id[]"]').val() == "" || $('[name="town_id[]"]').val() == null){
+                    //     $('[name="town_id[]"]').parent().find('.error_msg').text('Please select town');
+                    //     $('[name="town_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                    //     error = error + 1;
+                    //     console.log('Please select town')
+                    // }
+                    if($('[name="customer_id[]"]').val() == "" || $('[name="customer_id[]"]').val() == null){
+                        $('[name="customer_id[]"]').parent().find('.error_msg').text('Please select customer');
+                        $('[name="customer_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                        error = error + 1;
+                        console.log('Please select customer')
+                    }
+                }else{
+                    
+                    // if($('[name="role_id[]"]').val() == "" || $('[name="role_id[]"]').val() == null){
+                        //     $('[name="role_id[]"]').parent().find('.error_msg').text('Please select role');
+                        //     $('[name="role_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                        //     error = error + 1;
+                        // }
+                        // if($('[name="employee_town_id[]"]').val() == "" || $('[name="employee_town_id[]"]').val() == null){
+                            //     $('[name="employee_town_id[]"]').parent().find('.error_msg').text('Please select town');
+                            //     $('[name="employee_town_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                            //     error = error + 1;
+                            // }
+                            
+                            if($('[name="employee_id[]"]').val() == "" || $('[name="employee_id[]"]').val() == null){
+                                $('[name="employee_id[]"]').parent().find('.error_msg').text('Please select employee');
+                                $('[name="employee_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                                error = error + 1;
+                            }
+                        }
+                        if($('[name="notification_type"]').val() == "" || $('[name="notification_type"]').val() == null){
+                            $('[name="notification_type"]').parent().find('.error_msg').text('Please select notification type');
+                            $('[name="notification_type"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                            error = error + 1;
+                            
+                        }
+                        var notification_type = $("select[name='notification_type']").val();
+                        console.log(notification_type)
+                        if(notification_type == '0'){
+                            if($('[name="sender_id"]').val() == "" || $('[name="sender_id"]').val() == null){
+                                $('[name="sender_id"]').parent().find('.error_msg').text('Please select SMS Sender ID');
+                                $('[name="sender_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                                error = error + 1;
+                                console.log('ease select SMS Sender ID')
+                            }
+                        }else{
+                            if($('[name="heading"]').val() == "" || $('[name="heading"]').val() == null){
+                                $('[name="heading"]').parent().find('.error_msg').text('Please enter heading');
+                                $('[name="heading"]').css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                                error = error + 1;
+                                console.log('pease select heading')
+                            }
+                        }
+                        
+                        if($('[name="message"]').val() == "" || $('[name="message"]').val() == null){
+                            $('[name="message"]').parent().find('.error_msg').text('Please enter message');
+                            $('[name="message"]').css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                            error = error + 1;
+                        }
+                        console.log(error)
+                        if(error > 0){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }
+                    
+                    function getDateFormat(date){
+                        var dateTemp = date.split('/');
+                        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+                        return date
+                    }
+                    
+                    
+                </script>

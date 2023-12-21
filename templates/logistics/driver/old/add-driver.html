@@ -1,0 +1,139 @@
+{% load static %}
+
+<style>
+    .padding-0{
+    padding-right:0;
+    padding-left:0;
+}
+
+</style>
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%; height: 250px;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/driver.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add New Driver</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addDriverForm" method="POST" autocomplete="off" action="" aria-label="Product">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveDriver()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    
+                    <div class="col-md-12">
+                        <div class="row mt-md-3">
+                            <div class="col-md-6 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>First name</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField alpha" type="text" placeholder="First name*" id="first_name" name="first_name" maxlength="10" />
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 padding-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 style="display: inline-block; font-size:0.7rem"><b>Last name</b></h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="inputField alpha" type="text" placeholder="Last name*" id="last_name" name="last_name" maxlength="10" />
+                                        <label class="error_msg float-right" id=""></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+   
+function saveDriver() {
+        showLoader();
+        if(validateDriverForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:add-driver' %}",
+                method: 'POST',
+                data: $('#addDriverForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        
+                        openToaster("success", data.message);
+                        setTimeout(function(){ window.location.reload(); }, 500);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateDriverForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        $('.select2-container').css("border", "");
+        
+        if($('[name="first_name"]').val() == ""){
+            $('[name="first_name"]').parent().find('.error_msg').text('Please enter first name.');
+            error = error + 1;
+        }
+
+        if($('[name="last_name"]').val() == ""){
+            $('[name="last_name"]').parent().find('.error_msg').text('Please enter last name.');
+            error = error + 1;
+        }
+       
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+  
+    
+</script>

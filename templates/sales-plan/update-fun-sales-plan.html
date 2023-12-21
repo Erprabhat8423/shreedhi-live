@@ -1,0 +1,545 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+    {% load static %}
+    {% block style %}
+        <link rel="stylesheet" href="{% static 'css/sales-planning.css' %}">
+        <style>
+             .quertely-sales .clear{ right: 7%;}
+            .quertely-sales .copy{ right: 7%;}
+            .yearly-sales .clear{ right: 2%;}
+            .yearly-sales .copy{ right: 1%;}
+            .vlaue_ofsale{text-align: center;}
+            .activeCls{
+                color: #fff;
+                font-weight: 700;
+                background-color: rgb(0, 115, 224);
+                display: inline-block !important;
+            }
+            .updatsection_tab{
+   
+             }
+            .updatsection_tab:nth-child(even) {
+                border-left: 1px solid lightgray;
+                border-right: 1px solid lightgray;
+            }
+
+        </style>
+            
+    {% endblock %}
+
+
+<div class="row px-3 py-2" id="containerHeight">
+    <div class="col-md-12 col-12 primaryContainer h-100 px-0 mb-2 " id="mainbox">
+        <div class="col-sm-12 px-0 " id="topRow">
+            <div class="row">
+                <div class="col-sm-4 px-0">
+                    <a href="#" title="" class="accent-zone-color font-18 icon-cover-back"><i class="fa fa-angle-left "></i></a>
+                    <h6 class="dark-blue-color d-inline-block ml-2 font-wt-b">Creates Sales Plan</h6>
+                </div>
+                <div class="col-sm-8 px-0">
+                    <div class="row">
+                        <div class="col-sm-3 px-2">
+                                <input class="inputField " type="text" placeholder="Enter Name" id="" name="" maxlength="50">
+                                <label class="error_msg float-right" id=""></label>
+                        </div>
+                        <div class="col-sm-3 px-0">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Financial Yearly</option>
+                                <option value="Select">Select</option>
+                            </select>
+                        </div>
+                        <!-- <div class="col-sm-3 px-2">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Interval</option>
+                                <option value="Select" class="selectIntervalSection_tab" onclick="handleTabChange(this,'YearlySalePlan')">Yearly</option>
+                                <option value="Select" class="selectIntervalSection_tab" onclick="handleTabChange(this,'QuarterlySalePlan')">Quarterly</option>
+                                <option value="Select" class="selectIntervalSection_tab" onclick="handleTabChange(this,'MonthlySalePlan')">Monthly</option>
+                            </select>
+                        </div> -->
+                        <div class="col-sm-3 px-2">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Interval</option>
+                                <option value="Select" class="selectIntervalSection_tab" onclick="showDayvisesale()">Yearly</option>
+                                <option value="Select" class="selectIntervalSection_tab"  onclick="showDayvisesale()">Quarterly</option>
+                                <option value="Select" class="selectIntervalSection_tab"  onclick="showDayvisesale()">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 px-0">
+                            <select class="inputField selectField w-100 All "  name="" id="">
+                                <option value="All">Pre-fill data?</option>
+                                <option value="Select">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row add-slaes-plan-slection" style="justify-content: flex-end;">
+                <ul class="">
+                    <li class="updatsection_tab" onclick="handleTabChange(this,'PPMSalePlan')">PPM (Ltr)</li>
+                    <li class="updatsection_tab" onclick="handleTabChange(this,'ButterSalePlan')">Butter (Ltr)</li>
+                    <li class="updatsection_tab" onclick="handleTabChange(this,'DahiSalePlan')">Dahi (Ltr)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="updatsection" id="PPMSalePlan" style="display:block;">
+            <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table yearly-sales selectIntervalSection " id="showTabledayvise" style="display: block;" >
+                <table class="table  table-hover  w-100" >
+                    <thead>
+                        <tr>
+                            <th>
+                                <span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>
+                                /<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span>
+                            
+                            </th>
+                            <th>(Apr/2020-Mar/2021)</th>
+                            <th> Total  </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="zone-title-layer-tr">
+                            <td class="zone-title-layer"colspan="3">Etawah</td>
+                        </tr>
+                        <tr>
+                            <td>Etawah</td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td>
+                                <div class="total-value-vrt">6000
+                                <span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Auraiya</td>
+                            <td><div class="vlaue_ofsale">2000 </td> 
+                            <td> 
+                                <div class="total-value-vrt">4000
+                                    <span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mainpuri</td>
+                            <td><div class="vlaue_ofsale">2000</div></td>
+                            <td> <div class="total-value-vrt">6000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Agra</td></tr>
+                        <tr>
+                            <td>Agra</td>
+                            <td><div class=""></div></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Firozabad</td>
+                            <td><div class=""></div></td>
+                            <td></td>
+                        </tr>
+                        <tr class="total">
+                            <td >Total</td>
+                            <td><div class=""><input type="number"></div></td>
+                            <td></td>
+                        </tr>
+                        <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="3">Aligarh</td></tr>
+                        <tr>
+                            <td>Aligarh</td>
+                            <td><div class=""></div></td>
+                            
+                            
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Etah</td>
+                            <td><div class=""></div></td>
+                            
+                            <td></td>
+                        </tr>
+                        <tr class="total">
+                            <td >Total</td>
+                            <td><div class=""></div></td>
+                            
+                            <td></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><button class="btn-2blue float-right"> Save & Proceed</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table quertely-sales selectIntervalSection" id="showPieChartdayvise" style="display: none;">
+                <table class="table  table-hover  w-100">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>
+                                /<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span>
+                                
+                                
+                            </th>
+                            <th>Jan-Mar</th>
+                            <th>Apr-jun</th>
+                            <th>Jul-Sep</th>
+                            <th>Oct-Dec</th>
+                            
+                            <th> Total 
+                                
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                        <tbody>
+                            <tr class="zone-title-layer-tr">
+                                <td class="zone-title-layer"colspan="6">Etawah</td>
+                            </tr>
+                            <tr>
+                                <td>Etawah</td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td>
+                                    <div class="vlaue_ofsale">2000  <div class="clear"><i class=" ml-1 fa fa-angle-left mr-1"></i>clear</div></div>
+                                </td>
+                                <td> <div class="total-value-vrt">8000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                            </tr>
+                            <tr>
+                                <td>Auraiya</td>
+                                <td><div class="vlaue_ofsale">2000 <div class="copy">copy<i class=" mr-1 fa fa-angle-right ml-1"></i></div></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                                <td> <div class="total-value-vrt"> 2000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                            </tr>
+                            <tr>
+                                <td>Mainpuri</td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td> <div class="total-value-vrt"> 8000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><div class=""></div></td>
+                            </tr>
+        
+                            <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="6">Agra</td></tr>
+                            <tr>
+                                <td>Agra</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Firozabad</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+                            <tr class="total">
+                                <td >Total</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+        
+                            <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Aligarh</td></tr>
+                            <tr>
+                                <td>Aligarh</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Etah</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+                            <tr class="total">
+                                <td >Total</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6"><button class="btn-2blue float-right"> Save & Proceed</button></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+            </div>
+            <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table monthly-sale selectIntervalSection" id="MonthlySalePlan" style="display: none;">
+                <table class="table  table-hover  w-100">
+                    <thead>
+                        <tr>
+                            <th><span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>/<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span></th>
+                            <th>Apr</th>
+                            <th>May</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Aug</th>
+                            <th>Sep</th>
+                            <th>Oct</th>
+                            <th>Nov</th>
+                            <th>Dec</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+        
+                            <tr class="zone-title-layer-tr">
+                                <td class="zone-title-layer"colspan="14">Etawah</td>
+                            </tr>
+                            <tr>
+                                <td>Etawah</td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td><div class="vlaue_ofsale">2000</div></td>
+                                <td>
+                                    <div class="clear"><i class="fa fa-angle-left mr-2"></i>clear</div>
+                                        <div class="vlaue_ofsale">2000</div>
+                                    </td>
+                                <td> <div class="total-value-vrt">2000<span class="d-inline-block float-right"><i class="fas fa-times-circle "></i></span></div></td>
+                            </tr>
+                            <tr>
+                                <td>Auraiya</td>
+                                <td><div class="vlaue_ofsale">2000 <div class="copy">copy<i class="fa fa-angle-right ml-2"></i></div></div></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Mainpuri</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total</td>
+                                <td>41000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td>2000</td>
+                                <td></td>
+                            </tr>
+        
+                            <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Agra</td></tr>
+                            <tr>
+                                <td>Agra</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+                            <tr>
+                                <td>Firozabad</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+                            <tr class="total">
+                                <td >Total</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+        
+                            <tr class="zone-title-layer-tr"><td class="zone-title-layer"colspan="14">Aligarh</td></tr>
+                            <tr>
+                                <td>Aligarh</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+                            <tr>
+                                <td>Etah</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+                            <tr class="total">
+                                <td >Total</td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                                <td><div class=""></div></td>
+                            </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="14"><button class="btn-2blue float-right"> Save & Proceed</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="updatsection" id="ButterSalePlan" style="display:none;">
+        <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table "  style="display:none;">   
+            Butter
+            </div>
+        </div>  
+        <div class="updatsection" id="DahiSalePlan" style="display:none;">
+        <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table " >   
+            Butter
+            </div>
+        </div> 
+    </div>      
+</div>
+
+ 
+<script>
+    function showDayvisesale() {
+      var x = document.getElementById("showPieChartdayvise");
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+    
+      var x = document.getElementById("showTabledayvise");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+    
+      } else {
+        x.style.display = "none";
+      }
+     
+    }
+    </script>
+<script>
+    function handleTabChange(element,target){
+     $('.updatsection_tab').removeClass('activeCls');
+     $(element).addClass('activeCls');
+ 
+     $('.updatsection').hide();
+     $('#'+target).show();
+    }
+
+ </script>
+
+
+
+  
+   
+{% endblock %}

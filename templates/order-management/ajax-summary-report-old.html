@@ -1,0 +1,244 @@
+{% load static %}
+{% load helper_tags %}
+
+{% if today_order_status > 0 %}
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="background-color: #4d86bf; color: #ffffff;"> PARTICULARS  </th>
+            {% if product_classes %}
+            {% for product_variant in product_classes %}
+            {% if product_variant.product_variant_list %}
+            {% for product in product_variant.product_variant_list %}
+            <th style="text-align:center; background-color: #4d86bf; color: #ffffff;"> {{product.variant_name}}  </th>
+            {% endfor %}
+            <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.product_variant_total|floatformat:2 }}</th>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </tr>
+    </thead>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL QUANTITY W/O SCHEME (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_quantity_wo_scheme|floatformat:2}}  </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_quantity_wo_scheme_crate_sum|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL SCHEME QUANTITY (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_scheme_quantity|floatformat:2}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_scheme_quantity_crate_sum|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL BONUS SCHEME QUANTITY (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_bonus_scheme_quantity|floatformat:2}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_bonus_scheme_quantity_crate_sum|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL EMPLOYEE SALE (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_employee_sale_quantity|floatformat:2}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_employee_sale_crate_sum|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">FOC QTY (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_foc_quantity|floatformat:2}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_foc_quantity_crate_sum|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL QUANTITY WITH SCHEME (LTR/KG)</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{ product.total_product_quantity_with_scheme|floatformat:2}} </th>
+        {% endfor %}
+        <th style="text-align:center; font-weight: bolder; font-size: 13px; background-color: #4d86bf; color: #ffffff;">{{ product_variant.total_product_quantity_with_scheme|floatformat:2 }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td ></td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <td></td>
+        {% endfor %}
+        <td></td>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL POUCH W/O SCHEME</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_pouch_wo_scheme}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_pouch_wo_scheme_crate_sum }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL SCHEME POUCH</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_pouch_scheme}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_pouch_scheme_crate_sum }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">BONUS SCHEME POUCH</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_pouch_bonus_scheme}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_pouch_bonus_scheme_crate_sum }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">EMPLOYEE SALE POUCH</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_pouch_employee_sale}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_employee_sale_crate_sum }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">FOC POUCH</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center;"> {{product.product_total_pouch_foc}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff; font-weight: bolder;">{{ product_variant.total_foc_quantity_crate_sum }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tr>
+        <td style="background-color: #4d86bf; color: #ffffff;">TOTAL VARIANT WISE POUCH</td>
+        {% if product_classes %}
+        {% for product_variant in product_classes %}
+        {% if product_variant.product_variant_list %}
+        {% for product in product_variant.product_variant_list %}
+        <th style="text-align:center; "> {{ product.total_pouch_product_quantity_with_scheme}} </th>
+        {% endfor %}
+        <th style="text-align:center; background-color: #4d86bf; color: #ffffff;">{{ product_variant.total_pouch_product_quantity_with_scheme }}</th>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    <tbody>
+        
+    </tbody>
+</table>
+
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 20%;">
+    <thead>
+        <tr>
+            <th style="text-align:center; background-color: #4d86bf; color: #ffffff;">PARTICULARS</th>
+            <th style="text-align:center; background-color: #4d86bf; color: #ffffff;">QUANTITY</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if products_list %}
+        {% for products in products_list %}
+        <tr>
+            <td style="text-align:center; background-color: #4d86bf; color: #ffffff;">{{ products.product_name }}</td>
+            <td style="text-align:center;">{{ products.total_quantity }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+
+<script>
+    {% if today_order_status == 0 and order_date != today_date %}
+    $("#order_datepicker").css("margin-right","220px");
+    $('#order_exports').hide();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% else %}
+    $("#order_datepicker").css("margin-right","0px");
+    {% if order_date == today_date %}
+    $('#order_exports').hide();
+    {% if today_order_status > 0 %}
+    $('#order_export').show();
+    $('#order_exports').hide();
+    $("#order_datepicker").css("margin-right","0px");
+    {% else %}
+    $("#order_datepicker").css("margin-right","220px");
+    {% endif %}
+    $('#order_export').show();
+    $('#order_exports').hide();
+    
+    {% else %}
+    $('#order_exports').show();
+    $('#order_export').hide();
+    $("#order_datepicker").css("margin-right","0px");
+    {% endif %}
+    {% endif %}
+</script>

@@ -1,0 +1,174 @@
+{% load static %}
+<style>
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}
+	.modal-AddPermission{
+		width: 40%;
+	}	
+</style>
+<div class="modal-AddPermission centered">
+	<div class="modal-header">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-6">
+					<h5 class="mt-md-2">Role Details&nbsp;&nbsp;</h5>
+				</div>
+				<div class="col-md-6 p-md-0"  id="saveRoleSection">
+					<button class="btn btn-close float-right" type="button" onclick="manipulateModal('addPermissionModal','close')"> Close </button>
+					<button class="btn btn-save float-right" type="button" onclick="saveRole()">Save </button>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div class="modal-body p-0" id="addPermissionModalBody">
+		<div class="row h-100">
+			<div class="col-md-12 p-md-0 modalAddPermissionBG">
+				
+				<textarea id="organization_role_options" style="display: none;"></textarea>
+				<form method="POST" id="addRoleForm" autocomplete="off" action="{% url 'src:add-role' %}" aria-label="Add Role">
+					{% csrf_token %}
+					<div class="row mt-md-2">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-1 pr-md-0">
+									<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								</div>
+								<div class="col-md-11">
+									<h6 style="display: inline-block;">
+										<b>Organisation Name</b>
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-11 offset-md-1">
+							<div class="row">
+								<div class="col-md-12 p-md-0">
+									<select class="inputField selectField" name="organization_id" style="width: 100% !important;" onchange="getDepartments(this.value);getOrgRoles(this.value)">
+										<option value="">Select Organization Name</option>
+										{% for organization in organizations %}
+										<option value="{{organization.id}}">{{organization.organization_name}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-md-2">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-1 pr-md-0">
+									<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								</div>
+								<div class="col-md-11">
+									<h6 style="display: inline-block;">
+										<b>Department Name</b>
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-11 offset-md-1 p-md-0">
+									<select class="inputField selectField" name="department_id" style="width: 100%;">
+										<option value="">Select Department Name</option>
+										
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row mt-md-2">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-1 pr-md-0">
+									<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								</div>
+								<div class="col-md-11">
+									<h6 style="display: inline-block;">
+										<b>Role Name</b>
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-12">
+									<input class="inputField widthSetter" type="text" placeholder="Enter Role Name"
+									name="role_name" id="dept_role_name" maxlength="50" value="" />
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row mt-md-2">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-1 pr-md-0">
+									<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								</div>
+								<div class="col-md-11">
+									<h6 style="display: inline-block;">
+										<b>Responsibilities</b>
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-12">
+									<textarea name="responsibilities" class="inputField widthSetter" id="responsibilities" cols="10" rows="3" placeholder="Enter role responsibilities"></textarea>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-md-2">
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-1 pr-md-0">
+									<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								</div>
+								<div class="col-md-11">
+									<h6 style="display: inline-block;">
+										<b>Report to</b>
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-11 offset-md-1 p-md-0">
+									<select class="inputField selectField" name="reporting_role_id" style="width: 100%;">
+										<option value="">Select </option>
+									</select>
+									<label class="error_msg float-right"></label>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+					<br clear="all"><br clear="all">
+					
+				</form>
+				
+			</div>
+			
+		</div>
+	</div>
+	
+	
+</div>
+
+

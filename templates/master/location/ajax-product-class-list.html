@@ -1,0 +1,223 @@
+{% load static %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Product Class&nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                        <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('product_class')"></button>
+                        
+                        <!--<div class="dropdown" style="display: inline-block;">-->
+                        <!--    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"-->
+                        <!--    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>-->
+                        <!--    <div class="dropdown-menu dropdown-menu-right logoutContainer"-->
+                        <!--    aria-labelledby="dropdownMenuButton">-->
+                            
+                        <!--    <input type="hidden" name="show_columns" id="show_columns" value="" >-->
+                        <!--    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img-->
+                        <!--        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img-->
+                        <!--            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>-->
+                        <!--        </div>-->
+                        <!--    </div>-->
+                            <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'product_class',1)"
+                                    />
+                                    <label class="mb-0" for="">Product Class</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'product_hsn',3)"
+                                    />
+                                    <label class="mb-0" for="">Product HSN</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'order_of',4)"
+                                    />
+                                    <label class="mb-0" for="">Order Of</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="" 
+                                    onclick="showHideColumns(this,'unit',5)"
+                                    />
+                                    <label class="mb-0" for="">Unit</label>
+                                </a>
+                                
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="product_class" data-id="1"
+                                onclick="toggleFreeze(this.id,'product_class',1)" />
+                                <label class="mb-0" for="product_class">Product Class</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="product_hsn" data-id="1"
+                                onclick="toggleFreeze(this.id,'product_hsn',2)" />
+                                <label class="mb-0" for="product_hsn">Product HSN</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="order_of" data-id="1"
+                                onclick="toggleFreeze(this.id,'order_of',3)" />
+                                <label class="mb-0" for="order_of">Order Of</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="unit" data-id="1"
+                                onclick="toggleFreeze(this.id,'unit',4)" />
+                                <label class="mb-0" for="unit">Unit</label>
+                            </a>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="product_class">
+                        Product Class
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="product_hsn">
+                        Product HSN
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="order_of">
+                        Order Of
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="unit">
+                        Unit
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if product_class %}
+                {% for productClass in product_class %}
+                <tr>
+                    <td class="product_class">{{ productClass.product_class }} </td>
+                    <td class="product_hsn">{{ productClass.product_hsn }} </td>
+                    <td class="order_of">{{ productClass.order_of }} </td>
+                    <td class="unit">{{ productClass.unit }} </td>
+                    <td >
+                        <div class="row">
+                            <div class="col-md-12">
+                                
+                                <a href="javascript:void(0)"
+                                onclick="editMaster('product_class','{{ productClass.id }}')" >
+                                <img
+                                src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+
+                                
+                                
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ productClass.id }}"
+                                    {% if productClass.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updatePproductClassStatus('{{ productClass.id }}', '{{ productClass.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                                
+                               
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+function updatePproductClassStatus(id,status){
+    showLoader();
+    if ($('#is_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        url = "{% url 'src:update-product-class-status' %}";
+        url = url.replace(1,parseInt(id))
+        $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        getList('product_class');
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+
+</script>

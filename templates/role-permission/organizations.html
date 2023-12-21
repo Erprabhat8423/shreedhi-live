@@ -1,0 +1,833 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row">
+                        <!--<div class="col-md-8 offset-md-4 p-md-0">-->
+                            <!--    <ul class="tabBar pull-right p-0 marginTop1rem">-->
+                                <!--        <li class="customisedTab activeTab">Organizations</li>-->
+                                <!--        <li class="customisedTab">Organizational Chart</li>-->
+                                <!--    </ul>-->
+                                <!--</div>-->
+                            </div>
+                            <div class="row mb-2 mt-2" id="secondRow">
+                                <div class="col-md-12 p-md-0 text-right">
+                                    <input class="search searchTable search" placeholder="Search" type="search" data-column="all">
+                                    <button type="button" class="btn iconBox iconAddOrg" onclick="addOrganization()"
+                                    data-toggle="modal" data-target="#addOrganisationModal"></button>
+                                    <div class="dropdown" style="display: inline-block;">
+                                        <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                        aria-labelledby="dropdownMenuButton">
+                                        
+                                        <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                        <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                            src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                            <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                                src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                            <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                            aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item columnHideItem">
+                                                <input type="checkbox" class="colCheck" name="org_name" id="org_name" data-id="1"
+                                                onclick="showHideColumns(this.id,2)"
+                                                />
+                                                <label class="mb-0" for="org_name">Organization Name</label>
+                                            </a>
+                                            
+                                            <a class="dropdown-item columnHideItem">
+                                                <input type="checkbox" class="colCheck" name="landline_no" id="landline_no" data-id="2"
+                                                onclick="showHideColumns(this.id, 2)"
+                                                />
+                                                <label class="mb-0" for="landline_no">Landline No.</label>
+                                            </a>
+                                            <a class="dropdown-item columnHideItem">
+                                                <input type="checkbox" class="colCheck" name="mobile_no" id="mobile_no" data-id="3"
+                                                onclick="showHideColumns(this.id, 3)"
+                                                />
+                                                <label class="mb-0" for="mobile_no">Mobile No.</label>
+                                            </a>
+                                            <a class="dropdown-item columnHideItem">
+                                                <input type="checkbox" class="colCheck" name="email_id" id="email_id" data-id="4"
+                                                onclick="showHideColumns(this.id, 4)"
+                                                />
+                                                <label class="mb-0" for="email_id">Email id</label>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                        <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                        aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colFreezeCheck" name="org_name" id="lock_org_name" data-id="1"
+                                            onclick="toggleFreeze(this.id,'org_name',1)" />
+                                            <label class="mb-0" for="lock_org_name">Organization Name</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colFreezeCheck" name="landline_no"
+                                            id="lock_landline_no" data-id="2" 
+                                            onclick="toggleFreeze(this.id,'landline_no',2)" />
+                                            <label class="mb-0" for="lock_landline_no">Landline no.</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colFreezeCheck" name="mobile_no"
+                                            id="lock_mobile_no" data-id="3"  
+                                            onclick="toggleFreeze(this.id,'mobile_no',3)" />
+                                            <label class="mb-0" for="lock_mobile_no">Mobile No.</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colFreezeCheck" name="email_id" id="lock_email_id" data-id="4"
+                                            onclick="toggleFreeze(this.id,'email_id',4)" />
+                                            <label class="mb-0" for="lock_email_id">Email id</label>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="tableBox">
+                    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                        <input type="hidden" name="page" id="page" value="2" />
+                        <input type="hidden" name="page_status" id="page_status" value="0" />
+                        <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                        <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                        style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="org_name" id="org_name">
+                                    Organization Name
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="landline_no" id="landline_no">Landline no<i
+                                    class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="mobile_no" id="mobile_no">Mobile no<i
+                                    class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="email_id" id="email_id">Email id<i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+                            {% if organizations %}
+                            {% for organization in organizations %}
+                            <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                                <td class="org_name" onclick="getOrganizationRecord('{{ organization.id }}')">{{ organization.organization_name | title }}</td>
+                                <td class="landline_no" onclick="getOrganizationRecord('{{ organization.id }}')">
+                                    {% if organization.landline_country_code %}{{ organization.landline_country_code }}{% endif %}{% if organization.landline_state_code %}{{ organization.landline_state_code }}{% endif %}{% if organization.landline_number %}{{ organization.landline_number }}{% else %} - {% endif %}</td>
+                                    <td class="mobile_no" onclick="getOrganizationRecord('{{ organization.id }}')">
+                                        {% if organization.mobile_country_code %}{{ organization.mobile_country_code }}{% endif %}{% if organization.mobile_number %}{{ organization.mobile_number }}
+                                        {% else %} - {% endif %}</td>
+                                        <td class="email_id" onclick="getOrganizationRecord('{{ organization.id }}')">{% if organization.email%}{{ organization.email}}
+                                            {% else %} - {% endif %}</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <a href="javascript:void(0)"
+                                                        onclick="editOrganization('{{ organization.id }}')" data-toggle="modal"
+                                                        data-target="#addOrganisationModal"><img
+                                                        src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                                                        <div class="col-md-5">
+                                                            <label class="switch">
+                                                                <input type="checkbox" class="checkbox" name="is_active"
+                                                                id="is_active_{{ organization.id }}"
+                                                                {% if organization.status == 1 %} checked="" {% else %}
+                                                                {% endif %}
+                                                                onclick="updateOrganizationStatus('{{ organization.id }}', '{{ organization.status }}')">
+                                                                <span class="slider round"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            <tr id="loading" style="display: none;">
+                                                <td class="text-center" colspan="12"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                                                </td>
+                                            </tr>
+                                            <!-- <tr>
+                                                <td colspan="3" style="text-align: center;">
+                                                    {% include 'layout/paginator.html' with page=organizations %}
+                                                </td>
+                                            </tr> -->
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="5" style="text-align: center;">No Record Found...</td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 h-100">
+                        <div class="primaryContainerBG h-100" id="detailsBox">
+                            <div class="row" id="detailsBoxFirst" style="display: block;">
+                                <div class="col-md-12 p-md-0">
+                                    <h6><b>{{ organization_details.organization_name | title }} </b></h6>
+                                </div>
+                                <div class="col-md-12 p-md-0 mt-md-3">
+                                    <div class="row mb-md-2">
+                                        <div class="col-md-6 p-md-0">
+                                            <div class="row">
+                                                <div class="col-md-2 p-md-0">
+                                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />
+                                                </div>
+                                                <div class="col-md-10 p-md-0">
+                                                    <h6 class="smallText">Landline No.</h6>
+                                                    <h6 class="largeText">
+                                                        {% if organization_details.landline_country_code %}{{ organization_details.landline_country_code }}{% endif %}{% if organization_details.landline_state_code %}{{ organization_details.landline_state_code }}{% endif %}{% if organization_details.landline_number %}{{ organization_details.landline_number }}
+                                                        {% else %} N/A
+                                                        {% endif %}</h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 p-md-0">
+                                                <div class="row">
+                                                    <div class="col-2 p-0">
+                                                        <img src="{% static 'img/svg/mobile_no.svg' %}" class="profileIconSize" />
+                                                    </div>
+                                                    <div class="col-md-10 p-md-0">
+                                                        <h6 class="smallText">Mobile No.</h6>
+                                                        <h6 class="largeText">
+                                                            {% if organization_details.mobile_country_code %}{{ organization_details.mobile_country_code }}{% endif %}{% if organization_details.mobile_number %}{{ organization_details.mobile_number }}
+                                                            {% else %} N/A
+                                                            {% endif %}</h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-md-2">
+                                                <div class="col-md-6 p-md-0">
+                                                    <div class="row">
+                                                        <div class="col-2 p-0">
+                                                            <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                                        </div>
+                                                        <div class="col-md-10 p-md-0">
+                                                            <h6 class="smallText">Email Id</h6>
+                                                            <h6 class="largeText">
+                                                                {% if organization_details.email %}{{ organization_details.email }}
+                                                                {% else %} N/A {% endif %}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 p-md-0">
+                                                        <div class="row">
+                                                            <div class="col-md-2 p-md-0">
+                                                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                                                            </div>
+                                                            <div class="col-md-10 p-md-0">
+                                                                <h6 class="smallText">No. of Departments</h6>
+                                                                <h6 class="largeText">{{ departments.count }}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-md-2">
+                                                    <div class="col-md-12 p-md-0">
+                                                        <div class="row">
+                                                            <div class="col-md-1 p-md-0">
+                                                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                                            </div>
+                                                            <div class="col-md-11 p-md-0">
+                                                                <h6 class="smallText">Address</h6>
+                                                                <h6 class="largeText">
+                                                                    {% if organization_details.address %}{{ organization_details.address }}
+                                                                    {% else %} N/A {% endif %} {% if organization_details.pincode %},
+                                                                    {{ organization_details.pincode }} {% endif %}
+                                                                </h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-divider w-100"></div>
+                                            <div class="col-md-12 p-md-0">
+                                                <div class="row mb-2">
+                                                    <div class="col-md-6 p-md-0">
+                                                        <h6 class="m-md-0 mt-md-2"><b>Departments</b></h6>
+                                                    </div>
+                                                    <div class="col-md-6 p-md-0">
+                                                        <button type="button" class="btn btn-addDept"
+                                                        onclick="addDepartment('{{ organization_details.id }}', '{{ organization_details.organization_name }}', '{{ organization_details.landline_country_code }}', '{{ organization_details.landline_state_code }}', '{{ organization_details.landline_number }}')"
+                                                        data-toggle="modal" data-target="#addDeptModal">
+                                                        Add Department
+                                                        <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row" id="detailsBoxSecond">
+                                        <div class="col-md-12 p-md-0">
+                                            {% if departments %}
+                                            {% for department in departments %}
+                                            <div class="row deptRow">
+                                                <div class="col-md-6 p-md-0">
+                                                    <h6 class="deptRowHead"><b style="color: black;">{{ department.department_name | title }}</b></h6>
+                                                </div>
+                                                <div class="col-md-6 text-right">
+                                                    <a href="javascript:void(0)"
+                                                    onclick="editDepartment('{{ department.id }}', '{{ organization_details.id }}', '{{ organization_details.organization_name }}', '{{ department.department_name }}')"
+                                                    data-toggle="modal" data-target="#addDeptModal"><img
+                                                    src="{% static 'img/svg/editcopy.svg' %}" /></a>
+                                                </div>
+                                                <table class="w-100">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="smallText">Landline No.</span><br />
+                                                                <span
+                                                                class="largeText">{% if department.landline_country_code %}{{ department.landline_country_code }}{% endif %}{% if department.landline_state_code %}{{ department.landline_state_code }}{% endif %}{% if department.landline_number %}{{ department.landline_number }} 
+                                                                {% else %} - {% endif %}{% if department.extension_number %}{{ department.extension_number }} {% endif %}</span>
+                                                            </td>
+                                                            
+                                                            <td>
+                                                                <span class="smallText">Mobile No.</span><br />
+                                                                <span
+                                                                class="largeText">{% if department.mobile_country_code %}{{ department.mobile_country_code }}{% endif %}{% if department.mobile_number %}{{ department.mobile_number }}
+                                                                {% else %} - {% endif %}</span>
+                                                            </td>
+                                                            
+                                                            <td>
+                                                                <span class="smallText">Email ID</span><br />
+                                                                <span class="largeText">{% if department.email %}{{ department.email }}
+                                                                    {% else %} - {% endif %}</span>
+                                                                </td>
+                                                                
+                                                                <td class="text-center">
+                                                                    <label class="switch">
+                                                                        <input type="checkbox" class="checkbox" name="is_active"
+                                                                        id="department_is_active_{{ department.id }}"
+                                                                        {% if department.status == 1 %} checked="" {% else %} {% endif %}
+                                                                        onclick="updateDepartmentStatus('{{ department.id }}', '{{ department.status }}', '{{ organization_details.id }}')">
+                                                                        <span class="slider round"></span>
+                                                                    </label>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                {% endfor %}
+                                                {% else %}
+                                                <p style="text-align: center;">No Record Found...</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- *************************************Modal********************************** -->
+                            <div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">
+                                
+                            </div>
+                            <div class="overlayModal" id="addDeptModal" data-keyboard="false" data-backdrop="static">
+                                
+                            </div>
+                            <!-- *************************************Modal********************************** -->
+                            {% endblock content %}
+                            {% block script %}
+                            <script type="text/javascript">
+                                $(document).ready(function () {
+                                    var prevTop = 0;
+                                    
+                                    $('.commonTableBg').on('scroll', function () {
+                                        var page = $('#page').val();
+                                        var totalPages = $('#total_pages').val();
+                                        
+                                        var currentTop = $(this).scrollTop();
+                                        if (prevTop !== currentTop) {
+                                            prevTop = currentTop;
+                                            if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                                                
+                                                if($('#page_status').val() == 0 && page  <= totalPages){
+                                                    $('#loading').show(); 
+                                                    $('#page_status').val('1');
+                                                    $.ajax({
+                                                        url: "{% url 'src:ajax-organization-lists' %}",
+                                                        method: 'GET',
+                                                        data: { page:page },
+                                                        success: function (data) {
+                                                            setTimeout(() => {
+                                                                $('#tablebody').find('tr:last').prev().after(data);
+                                                                $('#page').val(parseInt(page)+1);
+                                                                $('#loading').hide();
+                                                                $('#page_status').val('0');
+                                                                $('#addOrgTable').trigger('update');
+                                                            }, 2000);
+                                                        },
+                                                        error: function (err) {
+                                                            alert(err.message);
+                                                            window.location.reload();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    })
+                                    
+                                });
+                            </script>
+                            <script>
+                                function exports(type){
+                                    var columns = $('#show_columns').val();
+                                    if(columns == ''){
+                                        openToaster("danger", "Please select at-least one column");
+                                    } else {
+                                        if(type == 'excel'){
+                                            var url = "{% url 'src:export-organizations-to-xlsx' 'columns' %}";
+                                            url = url.replace('columns',columns);
+                                            window.location.href = url;
+                                        } else {
+                                            var url = "{% url 'src:export-organizations-to-pdf' 'columns' %}";
+                                            url = url.replace('columns',columns);
+                                            window.location.href = url;
+                                        }
+                                    }
+                                    
+                                }
+                                function freezeColumn(id, colNo) {
+                                    $('#' + id).addClass("frezedIcon frezedCell");
+                                    $("#addOrgTable tbody tr").each(function (index) {
+                                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+                                    });
+                                    $('#' + id + ' #freeze').show();
+                                    $('#' + id + ' #unfreeze').hide();
+                                }
+                                
+                                function unfreezeColumn(id, colNo) {
+                                    $('#' + id).removeClass("frezedIcon frezedCell");
+                                    $("#addOrgTable tbody tr").each(function (index) {
+                                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+                                    });
+                                    $('#' + id + ' #unfreeze').show();
+                                    $('#' + id + ' #freeze').hide();
+                                }
+                                
+                                function toggleFreeze(inputid, colid, colNo) {
+                                    var checkbox = document.getElementById(inputid);
+                                    
+                                    if (checkbox.checked == true) {
+                                        $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+                                        $("#addOrgTable tbody tr").each(function (index) {
+                                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+                                        });
+                                        $('#' + colid + ' #freeze').show();
+                                        $('#' + colid + ' #unfreeze').hide();
+                                    } else {
+                                        $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+                                        $("#addOrgTable tbody tr").each(function (index) {
+                                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+                                        });
+                                        $('#' + colid + ' #unfreeze').show();
+                                        $('#' + colid + ' #freeze').hide();
+                                    }
+                                }
+                                
+                                function showHideColumns(inputid, colNo) {
+                                    var checkbox_val = [];
+                                    var checkbox = document.getElementById(inputid);
+                                    if (checkbox.checked == true) {
+                                        $('.'+inputid).hide();
+                                    }else{
+                                        $('.'+inputid).show();
+                                    }
+                                    $("input:checkbox[class=colCheck]").each(function () {
+                                        if(!$(this).is(':checked')){
+                                            checkbox_val.push($(this).attr("id"))
+                                        }
+                                    });
+                                    checkbox_str = checkbox_val.join(',');
+                                    $('#show_columns').val(checkbox_str);
+                                }
+                                
+                                $(document).ready(function () {
+                                    setHeightWidth();
+                                    
+                                    $('#addOrgTable').tablesorter({
+                                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                                        widgetOptions: {
+                                            resizable_addLastColumn: true,
+                                            resizable: false,
+                                            resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                                            stickyHeaders_attachTo: ".primaryContainerBG",
+                                            filter_external: '.search',
+                                            filter_columnFilters: false,
+                                        }
+                                    });
+                                    $("#addOrgTable tbody tr").click(function () {
+                                        $(this).addClass("selected").siblings().removeClass("selected");
+                                    });
+                                    $(".deptRow").click(function () {
+                                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                                    });
+                                    
+                                    
+                                    $(".primaryContainerBG").scroll(function () {
+                                        var divTable = $(".primaryContainerBG");
+                                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                                    });
+                                    
+                                    $(".mobileCode").mask("+00");
+                                    $(".phoneCode").mask("000");
+                                    $(".landLineNo").mask("00000000");
+                                    $(".mobileNo").mask("0000000000");
+                                    $(".pincode").mask("000000");
+                                });
+                                
+                                $(document).ready(function () {
+                                    var checkbox_val = ["org_name","landline_no","mobile_no","email_id"];
+                                    checkbox_str = checkbox_val.join(',');
+                                    $('#show_columns').val(checkbox_str);
+                                    
+                                    $(".colCheck").change(function () {
+                                        if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                                            //do something
+                                            $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                                        } else {
+                                            $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                                        }
+                                    });
+                                    
+                                    $(".colFreezeCheck").change(function () {
+                                        if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                                            //do something
+                                            $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                                        } else {
+                                            $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                                        }
+                                    });
+                                });
+                                
+                                $(window).resize(function () {
+                                    setHeightWidth();
+                                });
+                                
+                                $(document).on('click', '.pagination a', function (event) {
+                                    event.preventDefault();
+                                    var page = $(this).attr('href').split('page=')[1];
+                                    
+                                    $('li').removeClass('active');
+                                    $(this).parent().addClass('active');
+                                    ajaxOrganizationList(page);
+                                });
+                            </script>
+                            
+                            <script>
+                                function addOrganization() {
+                                    $('#addOrganisationModal').html('');
+                                    $('#addDeptModal').html('');
+                                    showLoader();
+                                    $.ajax({
+                                        url: "{% url 'src:add-organization' %}",
+                                        method: 'GET',
+                                        data: {},
+                                        success: function (data) {
+                                            if(typeof data.flag !== "undefined" && !data.flag){
+                                                hideLoader();
+                                                $('#addOrganisationModal').modal('toggle');
+                                                openToaster("danger", data.message);
+                                            }else{
+                                                hideLoader();
+                                                $("#addOrganisationModal").show();
+                                                $('#addOrganisationModal').html(data);
+                                            }
+                                        },
+                                        error: function (err) {
+                                            console.log(err)
+                                        }
+                                    });
+                                }
+                                
+                                function editOrganization(id) {
+                                    $('#addOrganisationModal').html('');
+                                    $('#addDeptModal').html('');
+                                    showLoader();
+                                    $.ajax({
+                                        url: "{% url 'src:edit-organization' %}",
+                                        method: 'GET',
+                                        data: {
+                                            id: id
+                                        },
+                                        success: function (data) {
+                                            if(typeof data.flag !== "undefined" && !data.flag){
+                                                hideLoader();
+                                                $('#addOrganisationModal').modal('toggle');
+                                                openToaster("danger", data.message);
+                                            }else{
+                                                hideLoader();
+                                                $("#addOrganisationModal").show();
+                                                $('#addOrganisationModal').html(data);
+                                            }
+                                        },
+                                        error: function (err) {
+                                            console.log(err)
+                                        }
+                                    });
+                                }
+                                
+                                function getOrganizationRecord(id) {
+                                    $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+                                        //showLoader();
+                                        $.ajax({
+                                            url: "{% url 'src:get-organization-record' %}",
+                                            method: 'GET',
+                                            data: {
+                                                id: id
+                                            },
+                                            success: function (data) {
+                                                //hideLoader();
+                                                $('#detailsBox').html(data);
+                                                $('#addOrgTable').tablesorter({
+                                                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                                                    widgetOptions: {
+                                                        resizable_addLastColumn: true,
+                                                        resizable: false,
+                                                        resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                                                        stickyHeaders_attachTo: ".primaryContainerBG",
+                                                        filter_external: '.search',
+                                                        filter_columnFilters: false,
+                                                    }
+                                                });
+                                                $("#addOrgTable tbody tr").click(function () {
+                                                    $(this).addClass("selected").siblings().removeClass("selected");
+                                                });
+                                                $(".deptRow").click(function () {
+                                                    $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                                                });
+                                                
+                                                
+                                                $(".primaryContainerBG").scroll(function () {
+                                                    var divTable = $(".primaryContainerBG");
+                                                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                                                });
+                                                
+                                            },
+                                            error: function (err) {
+                                                console.log(err)
+                                            }
+                                        });
+                                    }
+                                    
+                                    function updateOrganizationStatus(id, active_status) {
+                                        if ($('#is_active_' + id).prop("checked") == true) {
+                                            is_active = 1;
+                                            status = 'Unblock';
+                                        } else {
+                                            is_active = 0;  
+                                            status = 'Block';
+                                        }
+                                        
+                                        showLoader();
+                                        $.ajax({
+                                            url: "{% url 'src:update-organization-status' %}",
+                                            method: 'POST',
+                                            data: {
+                                                id: id,
+                                                is_active: is_active,
+                                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                                            },
+                                            success: function (data) {
+                                                if(typeof data.flag !== "undefined" && !data.flag){
+                                                    hideLoader();
+                                                    openToaster("danger", data.message);
+                                                    if ($('#is_active_' + id).prop("checked") == true) {
+                                                        $('#is_active_' + id).prop("checked",false);
+                                                    }else{
+                                                        $('#is_active_' + id).prop("checked",true); 
+                                                    }
+                                                }else{
+                                                    if (data.error == false) {
+                                                        hideLoader();
+                                                        openToaster("success", data.message);
+                                                        ajaxOrganizationList('1');
+                                                    }
+                                                }
+                                            },
+                                            error: function (err) {
+                                                console.log(err)
+                                            }
+                                        });
+                                    }
+                                    
+                                    function addDepartment(organization_id, organization_name, country_code, code, landline) {
+                                        showLoader();
+                                        $('#addOrganisationModal').html('');
+                                        $('#addDeptModal').html('');
+                                        
+                                        $.ajax({
+                                            url: "{% url 'src:add-department' %}",
+                                            method: 'GET',
+                                            data: { organization_id: organization_id, organization_name: organization_name, country_code: country_code, code: code, landline: landline },
+                                            success: function (data) {
+                                                if(typeof data.flag !== "undefined" && !data.flag){
+                                                    hideLoader();
+                                                    $('#addDeptModal').modal('toggle');
+                                                    openToaster("danger", data.message);
+                                                }else{
+                                                    hideLoader();
+                                                    $("#addDeptModal").show();
+                                                    $('#addDeptModal').html(data);
+                                                }
+                                            },
+                                            error: function (err) {
+                                                console.log(err)
+                                            }
+                                        });
+                                    }
+                                    
+                                    function editDepartment(id, organization_id, organization_name, department_name) {
+                                        $('#addOrganisationModal').html('');
+                                        $('#addDeptModal').html('');
+                                        showLoader();
+                                        $.ajax({
+                                            url: "{% url 'src:edit-department' %}",
+                                            method: 'GET',
+                                            data: {
+                                                id: id,
+                                                organization_id: organization_id,
+                                                organization_name:organization_name,
+                                                department_name: department_name
+                                            },
+                                            success: function (data) {
+                                                if(typeof data.flag !== "undefined" && !data.flag){
+                                                    hideLoader();
+                                                    $('#addDeptModal').modal('toggle');
+                                                    openToaster("danger", data.message);
+                                                }else{
+                                                    hideLoader();
+                                                    $("#addDeptModal").show();
+                                                    $('#addDeptModal').html(data);
+                                                }
+                                            },
+                                            error: function (err) {
+                                                console.log(err)
+                                            }
+                                        });
+                                    }
+                                    
+                                    function updateDepartmentStatus(id, is_active, organization_id) {
+                                        if ($('#department_is_active_' + id).prop("checked") == true) {
+                                            is_active = 1;
+                                            status = 'Unblock';
+                                        } else {
+                                            is_active = 0;
+                                            status = 'Block';
+                                        }
+                                        
+                                        //showLoader();
+                                        $.ajax({
+                                            url: "{% url 'src:update-department-status' %}",
+                                            method: 'POST',
+                                            data: {
+                                                id: id,
+                                                is_active: is_active,
+                                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                                            },
+                                            success: function (data) {
+                                                //hideLoader();
+                                                if(typeof data.flag !== "undefined" && !data.flag){
+                                                    hideLoader();
+                                                    openToaster("danger", data.message);
+                                                    if ($('#department_is_active_' + id).prop("checked") == true) {
+                                                        $('#department_is_active_' + id).prop("checked",false);
+                                                    }else{
+                                                        $('#department_is_active_' + id).prop("checked",true); 
+                                                    }
+                                                }else{
+                                                    if (data.error == false) {
+                                                        openToaster("success", data.message);
+                                                        getOrganizationRecord(organization_id);
+                                                    }
+                                                }
+                                            },
+                                            error: function (err) {
+                                                console.log(err)
+                                            }
+                                        });
+                                    }
+                                    
+                                    function ajaxOrganizationList(page) {
+                                        $('#ajax-div').html('');
+                                        // showLoader();
+                                        $.ajax({
+                                            url: "{% url 'src:ajax-organization-list' %}",
+                                            method: 'GET',
+                                            data: { page:page },
+                                            success: function (data) {
+                                                hideLoader();
+                                                $('#ajax-div').html(data);
+                                                
+                                                $('#addOrgTable').tablesorter({
+                                                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                                                    widgetOptions: {
+                                                        resizable_addLastColumn: true,
+                                                        resizable: false,
+                                                        resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                                                        stickyHeaders_attachTo: ".primaryContainerBG",
+                                                        filter_external: '.search',
+                                                        filter_columnFilters: false,
+                                                    }
+                                                });
+                                                $("#addOrgTable tbody tr").click(function () {
+                                                    $(this).addClass("selected").siblings().removeClass("selected");
+                                                });
+                                                $(".deptRow").click(function () {
+                                                    $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                                                });
+                                                
+                                                
+                                                $(".primaryContainerBG").scroll(function () {
+                                                    var divTable = $(".primaryContainerBG");
+                                                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                                                });
+                                                
+                                            },
+                                            error: function (err) {
+                                                alert(err.message);
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                    
+                                </script>
+                                {% endblock %}

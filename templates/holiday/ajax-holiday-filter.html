@@ -1,0 +1,54 @@
+{% load static %}
+
+{% if holidays %}
+{% for holiday in holidays %}
+<tr>
+    <td>
+        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+            {{holiday.month_name}}
+        </div>
+        <ul>
+            {% for month_holiday in holiday.month_holidays %}
+            <li class="holidays-row">
+                <div class="row">
+                    <div class="col-sm-4 col-4 px-0 holidays_name"  onclick="getHolidayCalendar('{{ month_holiday.id }}','{{current_month}}','{{current_year}}')">{{month_holiday.holiday}}</div>
+                    <div class="col-sm-5 col-5 px-0 holidays_date"  onclick="getHolidayCalendar('{{ month_holiday.id }}','{{current_month}}','{{current_year}}')"> 
+                        <span class="d-inline-block ml-1">{{ month_holiday.start_date|date:'d M' }} {{ month_holiday.start_date|date:'D' }} - {{ month_holiday.end_date|date:'d M' }} {{ month_holiday.end_date|date:'D' }} ,</span>
+                        <span class="d-inline-block ml-1">{{month_holiday.start_date|date:'Y'}}</span>
+                    </div>
+                    <div class="col-sm-3 col-3 px-0 ">
+                        <div class="row float-right">
+                            <label class="switch">
+                                <input type="checkbox" class="checkbox" name="is_active"
+                                id="is_active_{{ holiday.id }}"
+                                {% if holiday.status == 1 %} checked="" {% else %}
+                                {% endif %}
+                                onclick="updateHolidayStatus('{{ month_holiday.id }}', '{{ month_holiday.status }}')">
+                                <span class="slider round"></span>
+                            </label>
+                            
+                            <a href="#" class="ml-2" onclick="editHoliday('{{ month_holiday.id }}')">
+                                <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                            </a> 
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 px-0 grey-color d-block font-11">
+                    {{month_holiday.description|safe}}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+{% endfor %}
+
+{% else %}
+<tr>
+    <td colspan="4" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+
+<script>
+    $('#total_holidays').text('('+{{total_holidays}}+')')
+</script>

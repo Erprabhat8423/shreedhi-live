@@ -1,0 +1,99 @@
+{% load static %}
+<style type="text/css">
+    #ajax_map {
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+  <div class="modal-AddUser centered">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2"><img src="/static/img/svg/address.svg" class="profileIconSize"> Geo Tagged Location &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                  <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                    Close
+                </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+  <div id="ajax_map" style="height: 500px;"></div>
+  </div>
+</div>
+<script>
+    $(document).ready(function () {
+      // Asynchronously Load the map API 
+      var script = document.createElement('script');
+      script.src = "//maps.googleapis.com/maps/api/js?libraries=places&key={{google_app_key}}&callback=initMap";
+      document.body.appendChild(script);
+    });
+    function initMap() {
+    var map;
+    var bounds = new google.maps.LatLngBounds();
+    var mapOptions = {
+      mapTypeId: 'roadmap'
+    };
+    
+    // Display a map on the web page
+    map = new google.maps.Map(document.getElementById("ajax_map"), mapOptions);
+    map.setTilt(50);
+    
+    // Multiple markers location, latitude, and longitude
+    var markers = [
+     {% if user_coordinates.latitude %}
+    ["{{user_coordinates.latitude}}", "{{user_coordinates.longitude}}", "{{user_coordinates.first_name}} {{user_coordinates.middle_name}} {{user_coordinates.last_name}}"],
+     {% endif %}
+    ];
+    
+    // Info window content
+    var infoWindowContent = [
+    {% if user_coordinates.latitude %}
+    ['<div class="info_content" style="padding:20px;line-height: 23px;background:#089000;color: #fff; border-radius:10px;">' +
+      '<h3 style="border-bottom:1px solid #ddd; margin:0 1px 7px 0;"><i class="fa fa-user"></i> {{user_coordinates.store_name}}</h3>' +
+      '<p>Name: {{user_coordinates.first_name}} {{user_coordinates.middle_name}} {{user_coordinates.last_name}}</p>' +
+      '<p>Latitude: {{user_coordinates.latitude}}, Longitude: {{user_coordinates.longitude}}</p>' +
+      '</div>'],
+      {% endif %}
+      ];
+      
+      // Add multiple markers to map
+      var infoWindow = new google.maps.InfoWindow(), marker, i;
+      
+      // Place each marker on the map  
+      for( i = 0; i < markers.length; i++ ) {
+        var position = new google.maps.LatLng(markers[i][0], markers[i][1]);
+        bounds.extend(position);
+        marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          title: markers[i][2],
+          icon: 'static/img/png/geo.gif'
+        });
+        
+        // Add info window to marker    
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infoWindow.setContent(infoWindowContent[i][0]);
+            infoWindow.open(map, marker);
+          }
+        })(marker, i));
+        
+        // Center the map to fit all markers on the screen
+        map.fitBounds(bounds);
+      }
+      
+      // Set zoom level
+      var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+        this.setZoom(16);
+        google.maps.event.removeListener(boundsListener);
+      });
+      
+    }
+      // Load initialize function
+      
+    </script>

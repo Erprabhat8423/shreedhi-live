@@ -1,0 +1,214 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<div class="modal-AddUsers centered" style="width: 50%!important;margin-bottom: 300px;">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0 modalOrgBG">
+                <div class="transformImage" style="margin-top:50px;">
+                    <img src="{% static 'img/svg/crates.svg' %}" class="w-50" style="height:100px !important;" />
+                    <h4 class="modalColHead" style="margin-top:20px;">Dispatch /Receive Crates</h4>
+                                 </div>
+            </div>
+
+            <div class="col-md-9 p-md-4">
+                <form name="crate_reg" method="POST" autocomplete="off" action="" aria-label="Organisation">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Crate details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="savecrate();">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                                onclick="manipulateModal('addUserModal','close')">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>User List*</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField " style="width: 100% !important;"
+                            name="user_id" id="user_id">
+                            <option value=""> Select User</option>
+                            {% for user in user_list %}
+                            <option value="{{ user.id }}">{{ user.first_name }} {{user.last_name}}({{user.emp_sap_id}})</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id="user_error"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>Crate Type*</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField" name="crates_type" id="crates_type">
+                                        <option value="Dispatch" selected>Dispatch</option>
+                                        <option value="Receive">Receive</option>
+                                    </select>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/PDF.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>Date*</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                             <input class="inputField" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" placeholder="Crate_Date" name="crate_date" id="crate_date" value="{{today_date}}" onchange="" readonly>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>Normal Crates</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                             <input class="inputField normal" type="text" placeholder="No of normal crate" id="normalno" name="normalno" data-mask="0000"oninput="this.value = this.value.replace(/[^0-9.]/g, '');" maxlength="5" />
+                                    <label class="error_msg float-right" id="normal_error"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 style="display: inline-block;">
+                                        <b>Jumbo Crates</b>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                             <input class="inputField jumbo" type="text" placeholder="No of jumbo crate" id="jumbono"
+                                        name="jumbono"   data-mask="0000" maxlength="5" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/ readonly >
+                                    <label class="error_msg float-right" id="jumbo_error"></label>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script>
+$(document).ready(function () {
+            $("#crate_date").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                dateFormat: 'yy-mm-dd' 
+            });
+        });
+function savecrate(){
+    var error = 0;
+    var z = document.forms["crate_reg"]["crates_type"].value;
+    var a = document.forms["crate_reg"]["user_id"].value;
+
+    document.getElementById('user_error').innerHTML = '';
+    if (a.trim() == null || a.trim() == "") {
+        var error = 1;
+            document.getElementById('user_error').innerHTML = 'Please select user*';
+            $('#user_error').css("border", "1px solid #db8305");
+    }
+    var b = document.forms["crate_reg"]["jumbono"].value;
+    var c = document.forms["crate_reg"]["normalno"].value;
+    document.getElementById('normal_error').innerHTML = '';
+    document.getElementById('jumbo_error').innerHTML = '';
+    if (b==null && c==null || b == "" && c == "") {
+        var error = 1;
+            document.getElementById('jumbo_error').innerHTML = 'Please fill at least one jumbo or normal';
+            $('#jumbo_error').css("border", "1px solid #db8305");
+    }
+    var a = document.forms["crate_reg"]["user_id"].value;
+    var b = document.forms["crate_reg"]["jumbono"].value;
+    var c = document.forms["crate_reg"]["normalno"].value;
+    document.getElementById('user_error').innerHTML = '';
+    document.getElementById('normal_error').innerHTML = '';
+    document.getElementById('jumbo_error').innerHTML = '';
+    if( a.trim() == null || a.trim() == "" && b==null && c==null || b == "" && c == ""){
+        var error = 1;
+        document.getElementById('user_error').innerHTML = 'Please select user*';
+        $('#user_error').css("border", "1px solid #db8305");
+        document.getElementById('normal_error').innerHTML = 'Please fill normal crate ';
+        $('#normal_error').css("border", "1px solid #db8305");
+        document.getElementById('jumbo_error').innerHTML = 'Please fill jumbo crate ';
+        $('#jumbo_error').css("border", "1px solid #db8305");
+    }
+    if (error == 0) {
+        var question = "This data can't edited after upload. Do you want to proceed?";
+        $.confirm({
+			title: 'Confirm!',
+			content: question,
+			buttons: {
+				confirm: function () {
+					$.ajax({
+                    url: "{% url 'src:save-crate' %}",
+                    method: 'POST',
+                    data: {
+                        user_id: $('#user_id').val(),
+                        crates_type: $('#crates_type').val(),
+                        crate_date: $('#crate_date').val(),
+                        normalno: $('#normalno').val(),
+                        jumbono: $('#jumbono').val(),
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function (data) {
+                        if (data.error == false) {
+                            $("#addUserModal").hide();
+                            $("body").removeClass("modal-open");
+                            $(".modal-backdrop").remove();
+                            openToaster("success", data.message);
+                            getCratesReport();
+                        } else {
+                            $(".text-danger").html('');
+                            openToaster("danger",data.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                        window.location.reload();
+                    }
+                });
+					
+				},
+				cancel: function () {
+					
+				}
+			}
+		});
+            
+        }
+}
+</script>

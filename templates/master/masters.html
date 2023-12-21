@@ -1,0 +1,1001 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<style>
+    .padding_0{
+        padding-left: 0;
+        padding-right: 0;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-3">
+        <div class="row mb-2">
+            <div class="col-md-12 p-md-0">
+                <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+            </div>
+        </div>
+        <div class="row">
+            
+            <div class="col-12 mb-3 col-md-12 padding_0  h-100">
+                <div class="nonprimaryContainerBG h-100">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0">
+                            <h6><b>Master list &nbsp;&nbsp;</b></h6>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="master_search searchTable" style="width: 100% !important;" placeholder="Search" type="search" data-column="all">
+                        </div>
+                    </div>
+                    <div class="row" id="tableBox">
+                        <div class="col-md-12 nonprimaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" >
+                            <table id="masterTable" class="table table-borderless table-striped table-hover mt-0"
+                            style="width: 100%;">
+                            <thead>
+                                <tr>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr class="odd selected" data-role ="zone">
+                                    <td onclick="getList('zone')">Zones</td>
+                                </tr>
+                                
+                                <tr data-role ="town">
+                                    <td onclick="getList('town')">Towns</td>
+                                </tr>
+                                
+                                <!--<tr  data-role ="main_route">-->
+                                <!--    <td onclick="getList('main_route')">Routes</td>-->
+                                <!--</tr>-->
+                                <tr  data-role ="route">
+                                    <td onclick="getList('route')">Routes</td>
+                                </tr>
+                                <tr  data-role ="timeSlot">
+                                    <td onclick="getList('timeSlot')">Order Timing Slots</td>
+                                </tr>
+
+                                <tr  data-role ="packaging_type">
+                                    <td onclick="getList('packaging_type')">Packaging Type</td>
+                                </tr>
+                                <tr  data-role ="containers">
+                                    <td onclick="getList('containers')">Containers</td>
+                                </tr>
+                                <tr  data-role ="product_class">
+                                    <td onclick="getList('product_class')">Product Class</td>
+                                </tr>
+                                <tr  data-role ="production_unit">
+                                    <td onclick="getList('production_unit')">Production Unit</td>
+                                </tr>
+                                <tr  data-role ="incentive_slab">
+                                    <td onclick="getList('incentive_slab')">Incentive Slab</td>
+                                </tr>
+                                <tr  data-role ="banks">
+                                    <td onclick="getList('banks')">Banks</td>
+                                </tr>
+                                <tr  data-role ="tcs">
+                                    <td onclick="getList('tcs')">TCS</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+<div class="col-md-9" id="ajaxMaster">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>Zones &nbsp;&nbsp;</b></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row" >
+                        <div class="col-md-12 p-md-0 text-right">
+                            <input class="searchTable zone_search" placeholder="Search" type="search" data-column="all">
+                            <button type="button" class="btn iconBox iconAddNew" onclick="addMaster('zone')"></button>
+                            
+                            <!-- <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">-->
+                                
+                                <!--  <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                    </div>
+                                </div> -->
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="" 
+                                        onclick="showHideColumns(this,'zone_name',2)"
+                                        />
+                                        <label class="mb-0" for="zone_name">Zone name</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="" 
+                                        onclick="showHideColumns(this,'state_name',2)"
+                                        />
+                                        <label class="mb-0" for="state_name">State name</label>
+                                    </a>
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_zone_name" data-id="1"
+                                    onclick="toggleFreeze(this.id,'zone_name',1)" />
+                                    <label class="mb-0" for="lock_zone_name">Zone name</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_state" data-id="1"
+                                    onclick="toggleFreeze(this.id,'state',1)" />
+                                    <label class="mb-0" for="lock_state">State name</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12 pr-md-0 h-100" id="masterListTable">
+        <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+            
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+            
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="zone_name">
+                        Zone name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="state_name">
+                        State name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if zones %}
+                {% for zone in zones %}
+                <tr>
+                    <td class="zone_name">{{ zone.zone }}<br> 
+                        <a href="javascript:;" onclick="showZoneTowns('{{ zone.id }}')">view towns</a></td>
+                        
+                        <td class="state_name">{{ zone.state_name }}</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <a href="javascript:void(0)"
+                                    onclick="editMaster('zone','{{ zone.id }}')" >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" />
+                                </a> </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="2"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addProductModal" style="display: none;">
+    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+<script type="text/javascript">
+    
+    
+    $(document).ready(function () {
+        var prevTop = 0;
+        $('#detailsBox').on('scroll', function () {
+            
+            var page = $('#page').val();
+            var totalPages = $('#total_variant_pages').val();
+            console.log(page)
+            console.log(totalPages)
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    
+                    if($('#page_status').val() == 0 && page  <= totalPages){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        
+                        selected_product_id = $('.selected').data('product-id');
+                        url = "{% url 'src:ajax-product-variant-lists' 1 %}";
+                        url = url.replace(1,parseInt(selected_product_id))
+                        
+                        $.ajax({
+                            url: url,
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+<script>
+    
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('.' + colid + ' #freeze').show();
+            $('.' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('.' + colid + ' #unfreeze').show();
+            $('.' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(element, el_class, colNo) {
+        var checkbox_val = [];
+        var checkbox = $(element);
+        if ($(element).is(':checked')) {
+            $('.'+el_class).hide();
+        }else{
+            $('.'+el_class).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        
+        
+        
+        
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["org_name","landline_no","mobile_no","email_id"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    
+    $('#masterTable').tablesorter({
+        widgets: ["zebra", "filter"],
+        widgetOptions: {
+            filter_external: '.master_search',
+            filter_columnFilters: false,
+        }
+    });
+    
+    $("#masterTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    
+    
+    $('#addOrgTable').tablesorter({
+        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+        widgetOptions: {
+            resizable_addLastColumn: true,
+            resizable: false,
+            resizable_widths: ["33%","33%","33%"],
+            stickyHeaders_attachTo: ".primaryContainerBG",
+            filter_external: '.zone_search',
+            filter_columnFilters: false,
+        }
+    });
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    
+    $(".primaryContainerBG").scroll(function () {
+        var divTable = $(".primaryContainerBG");
+        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+    });
+    
+</script>
+
+<script>
+    
+    
+    
+    
+    
+    function getList(master_type){
+        $('.table-striped tbody tr').removeClass("selected");
+        $('[data-role="'+master_type+'"]').addClass("selected");
+        url = '';
+        showLoader();
+        if(master_type == "zone"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-zone-master-list' %}"
+        }else if(master_type == "town"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-town-master-list' %}"
+        }else if(master_type == "main_route"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-main-route-master-list' %}"
+        }else if(master_type == "route"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-route-master-list' %}"
+        }else if(master_type == "timeSlot"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-time-slot-master-list' %}"
+        }else if(master_type == "packaging_type"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-packaging-type-master-list' %}"
+        }else if(master_type == "containers"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-containers-master-list' %}"
+        }else if(master_type == "product_class"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-product-class-master-list' %}"
+        }else if(master_type == "production_unit"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-production-unit-list' %}"
+        }else if(master_type == "incentive_slab"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-incentive-slab-list' %}"
+        }else if(master_type == "banks"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-banks' %}"
+        }else if(master_type == "tcs"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-tcs-list' %}"
+        }
+
+        
+        if(url != ""){
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    hideLoader();
+                    $('#ajaxMaster').html(data);
+                    
+                    if(master_type == "zone"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "town"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "main_route"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "route"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "timeSlot"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.timeslot_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "packaging_type"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["50%","50%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "containers"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "product_class"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["20%","20%","20%","20%","20%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "production_unit"){
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["20%","20%","20%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }else if(master_type == "tcs"){
+                    $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["33%","33%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.zone_search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                    }
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+        
+    }
+    
+    
+    function addMaster(master_type) {
+        url = "";
+        
+        $('#addProductModal').html('');
+        if(master_type == "zone"){
+            url = "{% url 'src:add-zone' %}"
+        }else if(master_type == "town"){
+            url = "{% url 'src:add-town' %}"
+        }else if(master_type == "main_route"){
+            url = "{% url 'src:add-main-route' %}"
+        }else if(master_type == "route"){
+            url = "{% url 'src:add-route' %}"
+        }else if(master_type == "packaging_type"){
+            url = "{% url 'src:add-packaging-type' %}"
+        }else if(master_type == "containers"){
+            url = "{% url 'src:add-containers' %}"
+        }else if(master_type == "product_class"){
+            url = "{% url 'src:add-product-class' %}"
+        }else if(master_type == "production_unit"){
+            url = "{% url 'src:add-production-unit' %}"
+        }else if(master_type == "incentive_slab"){
+            url = "{% url 'src:add-incentive-slab' %}"
+        }else if(master_type == "bank"){
+            url = "{% url 'src:add-bank-details' %}"
+        }else if(master_type == "tcs"){
+            url = "{% url 'src:add-tcs' %}"
+        }
+        
+        if(url != ""){
+            showLoader();
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    function editMaster(master_type,id) {
+        url = "";
+        $('#addProductModal').html('');
+        if(master_type == "zone"){
+            url = "{% url 'src:edit-zone' '1' %}";
+        }else if(master_type == "town"){
+            url = "{% url 'src:edit-town' '1' %}";
+        }else if(master_type == "main_route"){
+            url = "{% url 'src:edit-main-route' '1' %}";
+        }else if(master_type == "route"){
+            url = "{% url 'src:edit-route' '1' %}";
+        }else if(master_type == "timeSlot"){
+            url = "{% url 'src:edit-time-slot' %}";
+        }else if(master_type == "packaging_type"){
+            url = "{% url 'src:edit-packaging-type' '1' %}"
+        }else if(master_type == "containers"){
+            url = "{% url 'src:edit-containers' '1' %}"
+        }else if(master_type == "product_class"){
+            url = "{% url 'src:edit-product-class' '1' %}"
+        }else if(master_type == "production_unit"){
+            url = "{% url 'src:edit-production-unit' '1' %}"
+        }else if(master_type == "incentive_slab"){
+            url = "{% url 'src:edit-incentive-slab' '1' %}"
+        }else if(master_type == "bank"){
+            url = "{% url 'src:edit-bank-details' '1' %}"
+        }else if(master_type == "tcs"){
+            url = "{% url 'src:edit-tcs' '1' %}"
+        }
+        
+        url = url.replace('1',id)
+        
+        if(url != ""){
+            showLoader();
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    function updateStatus(id, active_status) {
+        if ($('#is_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.error == false) {
+                    hideLoader();
+                    openToaster("success", data.message);
+                    getList('timeSlot');
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function showZoneTowns(zone_id){
+        showLoader();
+        url = "{% url 'src:get-zone-towns' 1 %}";
+        url = url.replace(1,parseInt(zone_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    
+                    html = `<table class="table table-hover">
+                        <thead>
+                            <tr><th>Town</th></tr>
+                        </thead>
+                        <tbody>`;
+                            $.each(data.towns, function(key,value){
+                                html += `<tr><td>`+value.town+`</td></tr>`;
+                            });
+                            html += `
+                        </tbody>
+                    </table>`;
+                    
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Zones Towns</p>',
+                        content:' ' + html,
+                        theme:'material',
+                        animation:'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+                    
+                }else{
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    
+                }
+                
+                
+                
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+    
+    
+    function showRouteTowns(route_id){
+        showLoader();
+        url = "{% url 'src:get-route-towns' 1 %}";
+        url = url.replace(1,parseInt(route_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    
+                    html = `<table class="table table-hover">
+                        <thead>
+                            <tr><th>Town</th> <th>Order</th></tr>
+                        </thead>
+                        <tbody>`;
+                            $.each(data.towns, function(key,value){
+                                html += `<tr><td>`+value.town_name+`</td> <td>`+value.order_index+`</td></tr>`;
+                            });
+                            html += `
+                        </tbody>
+                    </table>`;
+                    
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Town Details</p>',
+                        content:' ' + html,
+                        theme:'material',
+                        animation:'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+                    
+                }else{
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    
+                }
+                
+                
+                
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+    
+    function showSubRoutes(route_id){
+        showLoader();
+        url = "{% url 'src:get-sub-route' 1 %}";
+        url = url.replace(1,parseInt(route_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    
+                    html = `<table class="table table-hover">
+                        <thead>
+                            <tr><th>Sub Route Name</th> <th>Code</th></tr>
+                        </thead>
+                        <tbody>`;
+                            $.each(data.routes, function(key,value){
+                                html += `<tr><td>`+value.route+`</td> <td>`+value.route_code+`</td></tr>`;
+                            });
+                            html += `
+                        </tbody>
+                    </table>`;
+                    
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Sub Route Details</p>',
+                        content:' ' + html,
+                        theme:'material',
+                        animation:'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+                    
+                }else{
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    
+                }
+                
+                
+                
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+    
+    
+</script>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% load static %}
+<style>
+    small{
+        font-size: 11px;
+    }
+</style>
+<div class="row" style="height: 85%;">
+    <div class="col-md-12 p-0">
+        <div class="row">
+            <div class="col-md-2 p-md-0">
+                {% if order_details.profile_image %}
+                <img src="{{ order_details.profile_image }}" style="width: 100%; height:82px;">
+                {% else %}
+                <img src="{% static 'img/svg/profile.svg' %}" style="width: 100%; height:82px;">
+                {% endif %}
+            </div>
+            <div class="col-md-10 p-md-0">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6><b>{{order_details.store_name}}({{order_details.user_name}}) </b></h6>
+                        <h6 class="smallText"><span style="color: #0052a0;">{% if order_details.user_address.address_line_1 %} {{order_details.user_address.address_line_1}},{% endif %} {% if order_details.user_address.address_line_2 %} {{order_details.user_address.address_line_2}},{% endif %} {{order_details.user_address.state_name}}, {{order_details.user_address.country_name}},{{order_details.user_address.pincode}}</h6>
+                        </div>
+                        <div class="col-md-4 p-md-0 text-right">
+                            <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;<span
+                            style="font-size: 1.2rem;">{{ order_details.user_details.outstanding_amount }}</span>
+                            <h6 class="smalltext lightGrey">Outstanding Amt.</h6>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-3">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/order_No.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Order No.</h6>
+                                    <h6 class="largeText"> {{order_details.order_code}} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/route.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Sub Route</h6>
+                                    <h6 class="largeText"> {{order_details.route_name}} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/status.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Status</h6>
+                                    <h6 class="largeText">{% if role_id == 0 %} {% if order_details.order_status == 1 %} Intiate {% elif order_details.order_status == 2 %} Forward {% elif order_details.order_status == 3 %} Approved {% elif order_details.order_status == 4 %} Delivered  {% endif %} {% else %} {% if order_details.order_status == 4 %} Delivered {% elif order_details.order_status == 3 %} Approved {% elif order_details.status == 0 %}{% if order_details.order_status == 1 and order_details.level_id == 2 %} Intiate {% elif order_details.order_status == 2 %} Forward {% else %} Pending for Approval {% endif %} {% else %} Pending for Approval {% endif %} {% endif %} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/modifiedDate_time.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Date/Time</h6>
+                                    <h6 class="largeText"> {{ order_details.order_date  | date:"d/m/Y h:i A" }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/modifiedDate_time.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Modified Date</h6>
+                                    <h6 class="largeText"> {% if order_details.updated_at %} {{ order_details.updated_at  | date:"d/m/Y h:i A" }} {% else %} - {% endif %} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/shift.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Shift</h6>
+                                    <h6 class="largeText"> {{order_details.order_shift_name}} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Mode of Payment</h6>
+                                    <h6 class="largeText"> {{order_details.mode_of_payment}} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Payment Amount</h6>
+                                    <h6 class="largeText"> {{order_details.amount_to_be_paid}} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Created/Updated</h6>
+                                    <h6 class="largeText">{% if order_details.platfrom_created %} {{order_details.platfrom_created}}{% endif %}/{% if order_details.platform_updated %} {{order_details.platform_updated}}{% endif %} </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="header" style="width: 40%;">Product/Variant</th>
+                                <th class="header">Quantity</th>
+                                <th class="header">Rate <img src="{% static 'img/svg/order/rupee_w.svg' %}" class="profileIconSize" /></th>
+                                <th class="header">Amount <img src="{% static 'img/svg/order/rupee_w.svg' %}" class="profileIconSize" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if order_item_list %}
+                            {% for order_item in order_item_list %}
+                            <tr>
+                                <td>{{ order_item.product_name }}/{{ order_item.product_variant_name }}
+                                        {% if order_item.free_scheme > 0 %}
+                                        <br/>
+                                        <small style="color: orange;">
+                                        - {{order_item.free_schemes}}
+                                        </small>
+                                        {% endif %}
+                                        {% if order_item.flat_schemes > 0 %}
+                                        <br/>
+                                        <small style="color: #0073e0;">
+                                        - {{order_item.flat_scheme}}
+                                        </small>
+                                        {% endif %}
+                                    
+                                </td>
+                                <td>{{ order_item.quantity }} {% if order_item.packaging_type == '0' %} {{order_item.product_container_type}} {% else %} {{order_item.product_packaging_type_name}} {% endif %}</td>
+                                <td>{{ order_item.rate }}</td>
+                                <td>{{ order_item.amount }}</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th colspan="3" style="text-align:right">Total Amount</th>
+                                <th>{{ order_details.order_total_amount  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            {% if total_incentive > 0 %}
+                            <tr>
+                                <th colspan="3" style="text-align:right">Total Discount</th>
+                                <th>{{ total_incentive  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" style="text-align:right">Final Invoice Amount</th>
+                                <th>{{ find_order_amount  }} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize"></th>
+                            </tr>
+                            {% endif %}
+                            {% if quantitative_scheme %}
+                            <tr>
+                                <th colspan="4">
+                                    <h6>Bonus Scheme</h6>
+                                    <div class="col-md-12 p-0">
+                                        {% if quantitative_scheme %}
+                                        <small style="color: orange;">
+                                            {{quantitative_scheme}}
+                                        </small>
+                                        <br/>
+                                        {% endif %}
+                                        {% if flat_scheme %}
+                                        <small style="color: orange;">
+                                            {{flat_scheme}}
+                                        </small>
+                                        <br/>
+                                        {% endif %}
+                                        {% if bulk_scheme %}
+                                        <small style="color: orange;">
+                                            {{bulk_scheme}}
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                </th>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>

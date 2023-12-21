@@ -1,0 +1,214 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/sales-planning.css' %}">
+<style>
+    .span-p-a{
+        display: inline-block;
+        float: right;
+    }
+    .span-plan{
+        display: block;
+        font-weight: 700;
+        color:#69b6ff;
+    }
+    
+    
+    .span-actual{
+        color:#ff9600;
+        margin-top: 16px;
+        display: block;
+        font-weight: 700;
+    }
+    .edit-zone-towntable table tbody tr td:last-child{
+        text-align: left;
+        padding-right:  10px !important;
+        padding-left: 24px !important;
+        max-width: 140px;
+        min-width: 140px;
+        width: 10%;
+    }
+    .total td{
+        padding: 2px 6px !important;
+    }
+    
+</style>
+{% endblock %}
+
+
+<div class="row px-3 py-2" id="containerHeight">
+    
+    <div class="col-md-12 col-12 primaryContainer h-100 px-0 mb-2 " id="mainbox">
+        <form id="salesPlanForm" method="POST" autocomplete="off" >
+            {% csrf_token %}
+            
+            <div class="col-sm-12 px-0 " id="topRow">
+                <div class="row">
+                    <div class="col-sm-4 px-0">
+                        <a href="{% url 'src:sales-plan' %}" title="" class="accent-zone-color font-18 icon-cover-back"><i class="fa fa-angle-left "></i></a>
+                        <h6 class="dark-blue-color d-inline-block ml-2 font-wt-b">Sales Plan</h6>
+                    </div>
+                    <div class="col-sm-8 px-0">
+                        <div class="row">
+                            <div class="col-sm-3 px-2">
+                                <input class="inputField widthSetter" type="text" placeholder="Enter Name" id="session" name="session" value="{{sales_plan.session}}" maxlength="50">
+                                <label class="error_msg float-right" id=""></label>
+                            </div>
+                            <div class="col-sm-3 px-0">
+                                <select class="inputField selectField w-100 All "  name="financial_year" id="financial_year">
+                                    {% for financial_year in financial_years %}
+                                    <option value="{{financial_year.id}}" {% if financial_year.id == sales_plan.financial_year_id|add:'0' %}selected{% endif %}>{{financial_year.financial_year}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-3 px-2">
+                                <select class="inputField selectField w-100 All" name="plan_interval" onchange="handleIntervalChange(this.value)">
+                                    <option value="monthly" {% if 'monthly' == sales_plan.plan_interval %}selected{% endif %}>Monthly</option>
+                                    <option value="quarterly" {% if 'quarterly' == sales_plan.plan_interval %}selected{% endif %}>Quarterly</option>
+                                    <option value="yearly" {% if 'yearly' == sales_plan.plan_interval %}selected{% endif %}>Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3 px-0">
+                                <select class="inputField selectField w-100 All "  name="" id="">
+                                    <option value="All">Pre-fill data?</option>
+                                    <option value="Select">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row add-slaes-plan-slection" style="justify-content: flex-end;">
+                    <ul class="">
+                        {% for product_class in product_classes %}
+                        <li class="updatsection_tab  {% if sales_plan.product_class_id|add:'0' == product_class.id %} activeCls {% endif %}" onclick="handleTabChange('{{product_class.id}}',this)">{{product_class.product_class}} (Ltr)</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <input type="hidden" name="product_class_id" value="{{sales_plan.product_class_id}}">
+            
+            <div class="primaryContainerBG h-100 commonTableBg edit-zone-towntable" >
+                <table class="table  table-hover  w-100 ">
+                    <thead>
+                        <tr>
+                            <th><span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>/<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span></th>
+                            {% for financial_month in financial_months %}
+                            <th id="month_name_{{financial_month.month}}">{{financial_month.month_name}}</th>
+                            {% endfor %}
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for zone in zones %}
+                        <tr class="zone-title-layer-tr">
+                            <td class="zone-title-layer"colspan="14">{{zone.zone}}</td>
+                        </tr>
+                        {% for town in zone.towns %}
+                        <tr>
+                            <td>
+                                <span> {{town.town}}</span>
+                                <span class="span-p-a"> 
+                                    <b class="span-plan">(P)</b>
+                                    <b class="span-actual">(A)</b>
+                                </span>
+                            </td>
+                            {% for town_financial_month in town.town_financial_months %}
+                            <td>
+                                <div>
+
+                                    <input type="text" value="{{town_financial_month.month_planned_quantity|floatformat:2}}" name="quantity_{{town.id}}_{{town_financial_month.month}}" id="month_value_{{town.id}}_{{town_financial_month.month}}" data-zone = "{{zone.id}}" data-month="{{town_financial_month.month}}" class="inputField vlaue_ofsale month_value_{{zone.id}}_{{town_financial_month.month}}" onkeyup="showCopyButton(this);calculateMonthlyRowTotal(this);calculateMonthlyColumnTotal('{{zone.id}}','{{town_financial_month.month}}');" onkeypress="return validateFloatKeyPress(this,event);">
+                                     
+                                    <div class="copy" onclick="copyValues(this)" style="display: none;">copy<i class="fa fa-angle-right ml-2"></i></div>
+                                    {% if forloop.last %}
+                                    <div class="clear" onclick="clearValues(this)" style="display: none;"><i class="fa fa-angle-left mr-2"></i>clear</div>
+                                    {% endif %}
+                                </div>
+                                <div class="vlaue_ofsale-actual profit">{{town_financial_month.month_actual_quantity|floatformat:2}}</div>
+                            </td>
+                            {% endfor %}
+                            
+                            <td > 
+                                <div >{{town.town_month_planned_total|floatformat:2}} <b class="grey-color">Ltr</b>
+                                    <span>
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                    </span>
+                                </div>
+                                <div class="clearfix" style="margin: 14px 0 2px 0">
+                                    <div class="d-inline-block">
+                                        <span class="d-block total-actual-value">{{town.town_month_actual_total|floatformat:2}}</span>
+                                        <b class="font-9 grey-color">Till Today</b>
+                                    </div>
+                                    {% if town.town_month_actual_total > town.town_month_planned_total %}
+                                    <span class="increment-total-actual-value float-right">
+                                        <i class="fa fa-arrow-up mr-1 vrt-mdl"></i> {{town.quantity_difference|floatformat:2}}
+                                    </span>
+                                    {% else %}
+
+                                    <span class="decrement-total-actual-value float-right">
+                                        <i class="fa fa-arrow-down mr-1 vrt-mdl"></i> {{town.quantity_difference|floatformat:2}}
+                                     </span>
+
+                                    {% endif %}
+                                </div>
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                        
+                        <tr class="total">
+                            <td class="total-value-vrt">Total</td>
+                            {% for zone_month in zone.months %}
+                            <td class="font-11" > 
+                                {% if zone_month.month_actual_quantity > zone_month.month_planned_quantity %}
+                                <span class="d-inline-block increment-icon ">
+                                    <i class="fas fa-arrow-circle-up font-16"></i>
+                                </span>
+                                <span class="d-inline-block">
+                                    <b class="d-block accent-zone-color">{{zone_month.month_planned_quantity|floatformat:2}}</b>
+                                    <b class="d-block profit" style="margin-top: -2px;">{{zone_month.quantity_difference|floatformat:2}}</b>
+                                </span> 
+                                {% else %}
+
+                                <span class="d-inline-block decrement-icon">
+                                    <i class="fas fa-arrow-circle-down font-16"></i>
+                               </span>
+                               <span class="d-inline-block ">
+                                   <b class="d-block accent-zone-color">{{zone_month.month_planned_quantity|floatformat:2}}</b>
+                                   <b class="d-block loss" style="margin-top: -2px;">{{zone_month.quantity_difference|floatformat:2}}</b>
+                               </span>
+
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                            <td class="final_total_{{zone.id}} total-value-vrt"></td>
+                        </tr>
+                        
+                        {% endfor %}
+                        
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="14"><button class="btn-2blue float-right" type="button" onclick="saveSalesPlan()"> Save & Proceed</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+        </form>  
+    </div>    
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}

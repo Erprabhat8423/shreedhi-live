@@ -1,0 +1,62 @@
+{% load static %}
+{% load helper_tags %}
+
+{% if today_order_status > 0 %}
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+    <tr>
+            <th style="width: 10%; text-align: center;"> Customer Code  </th>
+            <th style="width: 40%;"> Name of Distributor/SS  </th>
+            <th> Invoice Amount  </th>
+            <th> Amount to be paid  </th>
+            <th> Outstanding Amount  </th>
+            <th> Security Amount  </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if orders %}
+        {% for order in orders %}
+        <tr>
+            <td style="text-align: center;">{{ order.emp_sap_id }}</td>
+            <td>{{ order.store_name }}({{ order.user_name }})</td>
+            <td>{{ order.invoice_amount }}</td>
+            <td>{{ order.amount_to_be_paid }}</td>
+            <td>{{ order.outstanding_amount }}</td>
+            <td>{{ order.security_amount }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+
+<script>
+    {% if today_order_status == 0 and order_date != today_date %}
+    $("#order_datepicker").css("margin-right","220px");
+    $('#order_exports').hide();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% else %}
+    $("#order_datepicker").css("margin-right","0px");
+    {% if order_date == today_date %}
+    $('#order_exports').hide();
+    {% if today_order_status > 0 %}
+    $('#order_export').show();
+    $('#order_exports').hide();
+    $("#order_datepicker").css("margin-right","0px");
+    {% else %}
+    $("#order_datepicker").css("margin-right","220px");
+    {% endif %}
+    $('#order_export').show();
+    $('#order_exports').hide();
+    
+    {% else %}
+    $('#order_exports').show();
+    $('#order_export').hide();
+    $("#order_datepicker").css("margin-right","0px");
+    {% endif %}
+    {% endif %}
+</script>

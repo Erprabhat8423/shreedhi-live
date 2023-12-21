@@ -1,0 +1,684 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+    .table td, .table th{
+        padding:0.65rem!important;
+    }
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-3 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-9 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <input class="search searchTable search" style="width: 30%;" placeholder="Search" type="search" name="search" id="order_search" data-column="all" >
+                            <button type="button" class="btn iconBox iconAddDriver" onclick="addDriver()" ></button>
+                            <!-- <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                    </div>
+                                </div> -->
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="driver_name" id="driver_name" data-id="1"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="driver_name">Driver name</label>
+                                    </a>
+                                    
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="assigned_vehicle" id="assigned_vehicle" data-id="4"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="assigned_vehicle">Assigned Vehicle</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="driver_name" id="lock_driver_name" data-id="1"
+                                    onclick="toggleFreeze(this.id,'driver_name',1)" />
+                                    <label class="mb-0" for="lock_driver_name">Driver name/label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name="assigned_vehicle" id="lock_assigned_vehicle" data-id="4"
+                                        onclick="toggleFreeze(this.id,'assigned_vehicle',7)" />
+                                        <label class="mb-0" for="lock_assigned_vehicle">Assigned Vehicle</label>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                    <input type="hidden" name="page" id="page" value="2" />
+                    <input type="hidden" name="page_status" id="page_status" value="0" />
+                    <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                    <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                    style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th class="driver_name" id="driver_name">
+                                Driver name
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+
+                            <th class="primary_contact" id="primary_contact">
+                                Primary Contact
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            
+                            <th class="assigned_vehicle" id="assigned_vehicle">Assigned vehicle<i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+
+                            <th class="employee_last_sign_in" id="employee_last_sign_in">Last Login<i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablebody">
+                        {% if drivers %}
+                        {% for driver in drivers %}
+                        <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                            <td class="driver_name" onclick="getDiverShortDetails('{{ driver.id }}')">{{ driver.first_name }} {{ driver.middle_name }} {{ driver.last_name }}</td>
+                            <td class="primary_contact" onclick="getDiverShortDetails('{{ driver.id }}')">{{ driver.primary_contact_number }}</td>
+                            <td class="assigned_vehicle" onclick="getDiverShortDetails('{{ driver.id }}')">{{ driver.assigned_vehicle }}</td>
+                            <td class="employee_last_sign_in" onclick="getDiverShortDetails('{{ driver.id }}')">{% if driver.last_login %} {{ driver.last_login }} {% else %} - {% endif %}</td>
+
+                            <td>
+                                <div class="row">
+                                    
+                                    <div class="col-md-3">
+                                        <a href="javascript:void(0)"
+                                        onclick="editDriverBasic('{{ driver.id }}')" ><img
+                                        src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                                        <div class="col-md-5">
+                                            <label class="switch">
+                                                <input type="checkbox" class="checkbox" name="is_active"
+                                                id="is_active_{{ driver.id }}"
+                                                {% if driver.status == 1 %} checked="" {% else %}
+                                                {% endif %}
+                                                onclick="updateDriverStatus('{{ driver.id }}', '{{ driver.status }}')">
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr id="loading" style="display: none;">
+                                <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 h-100">
+        <div class="primaryContainerBG h-100" id="detailsBox">
+            
+            {% if first_driver %}
+            <div class="row" style="height: 85%;">
+                <div class="col-md-12 p-0">
+                    <div class="row">
+                        <div class="col-md-2 p-md-0">
+                            {% if first_driver.profile_image and first_driver.profile_image != 'None' %}
+                            <img src="{{ first_driver.profile_image }}" style="width: 100%;">
+                            {% else %}
+                            <img src="{% static 'img/svg/profile.svg' %}" style="width: 100%; height: 60%;">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10 p-md-0">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6><b>{{first_driver.first_name}} {{first_driver.middle_name}} {{first_driver.last_name}} </b></h6>
+                                    <h6 class="smallText"><span style="color: #0052a0;">{{first_driver.first_name}}</span> | {{first_driver.role_name | capfirst}}</h6>
+                                </div>
+                                <div class="col-md-4 p-md-0 text-right">
+                                    <h5>{% if user.last_login is not None %}{% if user.auth_token is None %}WEB{% else %}APP{% endif %}{% endif %}&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}"></h5>
+                                    {% if first_driver.last_ip %}{{first_driver.last_ip}}{% endif %}
+                                </div>
+                            </div>
+                            <br clear="all">
+                            <div class="row">
+                                <div class="col-md-1 p-md-0">
+                                    <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-md-6 p-md-0">
+                                    <h6 class="smallText">Contact No.</h6>
+                                    <h6 class="largeText"> {{first_driver.primary_contact_number}}</h6>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0 mt-md-3">
+                            <div class="row mb-md-2">
+                                <div class="col-md-3 p-md-0">
+                                    <div class="row">
+                                        <div class="col-md-2 p-md-0">
+                                            <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-10">
+                                            <h6 class="smallText">Gender</h6>
+                                            <h6 class="largeText">{% if first_driver.gender %}{{first_driver.gender | capfirst }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Email ID(Personal)</h6>
+                                            <h6 class="largeText">{{ first_driver.personal_email }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Blood Group</h6>
+                                            <h6 class="largeText">{% if first_driver.blood_group %}{{first_driver.blood_group}}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-md-2">
+                                <div class="col-md-12 p-md-0">
+                                    <div class="row">
+                                        <div class="col-1 p-0">
+                                            <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-11 p-md-0">
+                                            <h6 class="smallText">Correspondance Address</h6>
+                                            <h6 class="largeText">{% if first_driver.address_line_1 %}{% if first_driver.address_line_1 %} {{first_driver.address_line_1}},{% endif %} {% if first_driver.address_line_2 %} {{first_driver.address_line_2}},{% endif %} {{first_driver.state_name}}, {{first_driver.country_name}},{{first_driver.pincode}}{% else %}-{% endif %}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-md-2">
+                                <div class="col-md-12 p-md-0">
+                                    <div class="row">
+                                        <div class="col-1 p-0">
+                                            <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-11 p-md-0">
+                                            <h6 class="smallText">Permanent Address</h6>
+                                            <h6 class="largeText">{% if first_driver.address_line_1 %}{% if first_driver.address_line_1 %} {{first_driver.address_line_1}},{% endif %} {% if first_driver.address_line_2 %} {{first_driver.address_line_2}},{% endif %} {{first_driver.state_name}}, {{first_driver.country_name}},{{first_driver.pincode}}{% else %}-{% endif %}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="row mb-md-2">
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Father Name</h6>
+                                            <h6 class="largeText">{% if first_driver.father_name %}{{first_driver.father_name }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+            
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Mother Name</h6>
+                                            <h6 class="largeText">{% if first_driver.mother_name %}{{first_driver.mother_name }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 p-md-0">
+                                    <div class="row">
+                                        <div class="col-2 p-0">
+                                            <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                                        </div>
+                                        <div class="col-md-10 p-md-0">
+                                            <h6 class="smallText">Date Of Birth</h6>
+                                            <h6 class="largeText">{% if first_driver.date_of_birth %}{{first_driver.date_of_birth }}{% else %}-{% endif %}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="dropdown-divider w-100"></div>
+                <!-- <div class="col-sm-12 text-center p-0">
+                    <h6 class="m-0" onclick="viewEmployeeDetails('{{first_driver.id }}')" style="cursor: pointer;">
+                        <u>More Info</u></h6>
+                    </div>
+                </div> -->
+                {% else %}
+                <p style="text-align: center;">No Record Found...</p>
+                {% endif %}
+            </div>
+    </div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" style="display: none;">
+    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+
+<script>
+    
+    
+    function addDriver() {
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-driver' %}",
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+                $(".date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                $("#date_of_birth").datepicker({
+                    weekStart: 1,
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+10",
+                    daysOfWeekHighlighted: "6,0",
+                    autoclose: true,
+                    todayHighlight: true,
+                    dateFormat: 'dd/mm/yy',
+                });
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editDriverBasic(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-driver-basic' 1 %}";
+        url = url.replace(1,id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+                $(".date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                $("#date_of_birth").datepicker({
+                    weekStart: 1,
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+10",
+                    daysOfWeekHighlighted: "6,0",
+                    autoclose: true,
+                    todayHighlight: true,
+                    dateFormat: 'dd/mm/yy',
+                });
+
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+    function editOfficialDriver(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-driver-official' 1 %}";
+        url = url.replace(1,id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+
+                $("#date_of_joining").datepicker({
+                    weekStart: 1,
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+10",
+                    daysOfWeekHighlighted: "6,0",
+                    autoclose: true,
+                    todayHighlight: true,
+                    dateFormat: 'dd/mm/yy',
+                });
+
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    
+    function exports(type){
+        var columns     = $('#show_columns').val();
+        var town_id     = $('#town_id').val();
+        if(town_id){ town_id = town_id; }else{ town_id = '0' }
+        var route_id    = $('#route_id').val();
+        if(route_id){ route_id = route_id; }else{ route_id = '0' }
+        var search      = $('#order_search').val();
+        if(search){ search = search; }else{ search = '0' }
+        var order_dates  = $('#order_datepicker').val();
+        if(order_dates){ 
+            order_dates = order_dates.split('/');
+            order_dates = order_dates[2]+'-'+order_dates[1]+'-'+order_dates[0]
+        }else{ order_dates = '0' }
+        
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-order-to-xlsx' 'columns' 1 1 'search' 'order_dates' %}";
+                url = url.replace('columns',columns).replace('1',town_id).replace('1',route_id).replace('search',search).replace('order_dates',order_dates);
+                console.log(url);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-order-to-pdf' 'columns' 1 1 'search' 'order_dates' %}";
+                url = url.replace('columns',columns).replace('1',town_id).replace('1',route_id).replace('search',search).replace('order_dates',order_dates);
+                window.location.href = url;
+            }
+        }
+        
+    }
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra","filter",  "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["30%","15%","15%","15%","15%","15%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["order_id","distributor_ss","shift","route","amount","status","order_date"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked"));              
+    });
+    //deselect "checked all", if one of the listed checkbox product is unchecked amd select "checked all" if all of the listed checkbox product is checked
+    $('.checkbox').change(function(){ //".checkbox" change 
+    if($('.checkbox:checked').length == $('.checkbox').length){
+        $('.checked_all').prop('checked',true);
+    }else{
+        $('.checked_all').prop('checked',false);
+    }
+    console.log($('.checkbox:checked').length);
+});
+
+
+function updateDriverStatus(id, active_status) {
+    if ($('#is_active_' + id).prop("checked") == true) {
+        is_active = 1;
+        status = 'Unblock';
+    } else {
+        is_active = 0;  
+        status = 'Block';
+    }
+    
+    $.ajax({
+        url: "{% url 'src:update-driver-status' %}",
+        method: 'POST',
+        data: {
+            id: id,
+            is_active: is_active,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (data) {
+            if (data.error == false) {
+                hideLoader();
+                openToaster("success", data.message);
+            }
+        },
+        error: function (err) {
+            console.log(err)
+        }
+    });
+}
+
+
+function getDiverShortDetails(id) {
+   url =  "{% url 'src:driver-short-details' 1 %}";
+   url = url.replace(1,parseInt(id))
+    $.ajax({
+        url:url,
+        method: 'GET',
+        success: function (data) {
+            $('#detailsBox').html(data);
+        },
+        error: function (err) {
+            console.log(err)
+        }
+    });
+    }
+    
+</script>
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

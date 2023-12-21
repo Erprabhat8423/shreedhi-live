@@ -1,0 +1,36 @@
+{% load static %}
+
+<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Employee Name</th>
+            <th>Day start</th>
+            <th>Day end</th>
+            <th>Total working hours</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{user.name}}</td>
+            <td>{{user.start_time}}
+                <!-- <br>
+                <b>{{user.store_name}}</b>  -->
+                <!--<a href="javascript:void(0)">-->
+                <!--    <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">-->
+                <!--</a>-->
+            </td>
+            <td>
+                {% if user.end_time is not None %}
+                {{user.end_time}}
+                <!--<a href="javascript:void(0)">-->
+                <!--    <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">-->
+                <!--</a>-->
+                {% endif %}
+            </td>
+            <td>{{user.working_hours|floatformat:2}} Hours</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+

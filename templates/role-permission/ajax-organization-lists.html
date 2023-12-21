@@ -1,0 +1,33 @@
+{% load static %}
+{% for organization in organizations %}
+<tr>
+    <td class="org_name" onclick="getOrganizationRecord('{{ organization.id }}')">{{ organization.organization_name }}</td>
+    <td class="landline_no" onclick="getOrganizationRecord('{{ organization.id }}')">
+        {% if organization.landline_country_code %}{{ organization.landline_country_code }}{% endif %}{% if organization.landline_state_code %}{{ organization.landline_state_code }}{% endif %}{% if organization.landline_number %}{{ organization.landline_number }}
+        {% else %} - {% endif %}</td>
+        <td class="mobile_no" onclick="getOrganizationRecord('{{ organization.id }}')">
+            {% if organization.mobile_country_code %}{{ organization.mobile_country_code }}{% endif %}{% if organization.mobile_number %}{{ organization.mobile_number }}
+            {% else %} - {% endif %}</td>
+            <td class="email_id" onclick="getOrganizationRecord('{{ organization.id }}')">{% if organization.email %}{{ organization.email }}
+                {% else %} - {% endif %}</td>
+                <td>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="javascript:void(0)"
+                            onclick="editOrganization('{{ organization.id }}')" data-toggle="modal"
+                            data-target="#addOrganisationModal"><img
+                            src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ organization.id }}"
+                                    {% if organization.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateOrganizationStatus('{{ organization.id }}', '{{ organization.is_active }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}

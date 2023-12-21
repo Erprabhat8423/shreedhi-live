@@ -1,0 +1,130 @@
+{% load static %}
+
+<div class="md-modal centered">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="vehicle_id" id="vehicle_id" value="{{ vehicle.id }}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Route & Driver &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/order/route.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Route
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" style="width: 100% !important;" name="route_id" id="route_id">
+                                    <option value="">Select</option>
+                                    {% for route in routes %}
+                                    <option value="{{route.id}}" {% if route.id == vehicle.route_id %}selected{% endif %}  >{{route.route}}</option>
+                                    {% comment %} <option value="{{route.id}}" {% if route.id == vehicle.route_id %}selected{% endif %}  {% if route.id != vehicle.route_id and route.vehicle_route_id is not None  %}disabled{% endif %}>{{route.route}}</option> {% endcomment %}
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Driver
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" style="width: 100% !important;" name="driver_id" id="driver_id">
+                                    <option value="">Select</option>
+                                    {% for driver in drivers %}
+                                    <option value="{{driver.id}}" {% if driver.id == vehicle.driver_id %}selected{% endif %}>{{driver.first_name}} {{driver.middle_name}} {{driver.last_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        
+        var vehicle_id = "{{vehicle.id}}";
+        
+        $('#addBasicDetailsForms').submit(function(e){
+            showLoader();
+            if(validateBasicForm()){
+                hideLoader();
+                return false;
+            }else{
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                
+                url = "{% url 'src:edit-vehicle-route' '1' %}";
+                url = url.replace('1',vehicle_id)
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            $('#addUserModal').html('');
+                            $('#addUserModal').hide();
+                            openToaster("success", data.message);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                            
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                
+                
+            }
+            
+        });
+        
+        function validateBasicForm(){
+            error = 0;
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+            
+        }
+    </script>
+    
+    

@@ -1,0 +1,271 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/sales-planning.css' %}">
+{% endblock %}
+
+
+<div class="row px-3 py-2" id="containerHeight">
+    
+    
+        <div class="col-md-12 col-12 primaryContainer h-100 px-0 mb-2 " id="mainbox">
+
+            <form id="salesPlanForm" method="POST" autocomplete="off" >
+                {% csrf_token %}
+                
+            <div class="col-sm-12 px-0 " id="topRow">
+                <div class="row">
+                    <div class="col-sm-4 px-0">
+                        <a href="{% url 'src:sales-plan' %}" title="" class="accent-zone-color font-18 icon-cover-back"><i class="fa fa-angle-left "></i></a>
+                        <h6 class="dark-blue-color d-inline-block ml-2 font-wt-b">Creates Sales Plan</h6>
+                    </div>
+                    
+                    
+                    <div class="col-sm-8 px-0">
+                        <div class="row">
+                            <div class="col-sm-3 px-2">
+                                <input class="inputField " type="text" placeholder="Enter Name" id="session" name="session" maxlength="50">
+                                <label class="error_msg float-right" id=""></label>
+                            </div>
+                            <div class="col-sm-3 px-0">
+                                <select class="inputField selectField w-100 All "  name="financial_year" id="financial_year">
+                                    {% for financial_year in financial_years %}
+                                    <option value="{{financial_year.id}}">{{financial_year.financial_year}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-3 px-2">
+                                <select class="inputField selectField w-100 All" name="plan_interval" onchange="handleIntervalChange(this.value)">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3 px-0">
+                                <select class="inputField selectField w-100 All "  name="" id="">
+                                    <option value="All">Pre-fill data?</option>
+                                    <option value="Select">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row add-slaes-plan-slection" style="justify-content: flex-end;">
+                    <ul class="">
+                        {% for product_class in product_classes %}
+                        <li class="updatsection_tab  {% if forloop.first %} activeCls {% endif %}" onclick="handleTabChange('{{product_class.id}}',this)">{{product_class.product_class}} (Ltr)</li>
+                        
+                        {% if forloop.first %}
+                        <input type="hidden" name="product_class_id" value="{{product_class.id}}">
+                        {% endif %}
+                        
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            
+            <div class="primaryContainerBG h-100 commonTableBg sales-plan-deta-table " id="ajaxIntervalView">
+                <table class="table  table-hover  w-100 monthly-sale">
+                    <thead>
+                        <tr>
+                            <th><span class="accent-zone-color d-inline-block" style="margin-right: 4px;"> Zone</span>/<span class="dark-town-color d-inline-block" style="margin-left: 4px ; font-weight: 500;">Town</span></th>
+                            {% for financial_month in financial_months %}
+                            <th id="month_name_{{financial_month.month}}">{{financial_month.month_name}}</th>
+                            {% endfor %}
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {% for zone in zones %}
+                        <tr class="zone-title-layer-tr">
+                            <td class="zone-title-layer"colspan="14">{{zone.zone}}</td>
+                        </tr>
+                        {% for town in zone.towns %}
+                        <tr>
+                            <td>{{town.town}}</td>
+                            {% for financial_month in financial_months %}
+                            <td>
+                                <div> 
+                                    <input type="text" name="quantity_{{town.id}}_{{financial_month.month}}" id="month_value_{{town.id}}_{{financial_month.month}}" data-zone = "{{zone.id}}" data-month="{{financial_month.month}}" class="inputField vlaue_ofsale month_value_{{zone.id}}_{{financial_month.month}}" onkeyup="showCopyButton(this);calculateMonthlyRowTotal(this);calculateMonthlyColumnTotal('{{zone.id}}','{{financial_month.month}}');" onkeypress="return validateFloatKeyPress(this,event);"> 
+                                    <div class="copy" onclick="copyValues(this)" style="display: none;">copy<i class="fa fa-angle-right ml-2"></i></div>
+                                    {% if forloop.last %}
+                                    <div class="clear" onclick="clearValues(this)" style="display: none;"><i class="fa fa-angle-left mr-2"></i>clear</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            {% endfor %}
+                            
+                            <td> <div class="total-value-vrt">0<span class="d-inline-block float-right" onclick="clearValues(this,'all')"><i class="fas fa-times-circle "></i></span></div></td>
+                        </tr>
+                        {% endfor %}
+                        
+                        <tr class="total">
+                            <td class="total-value-vrt">Total</td>
+                            {% for financial_month in financial_months %}
+                            <td id="column_total_{{zone.id}}_{{financial_month.month}}" class="total-value-vrt total_month_value_{{zone.id}}">0</td>
+                            {% endfor %}
+                            <td class="final_total_{{zone.id}} total-value-vrt">0</td>
+                        </tr>
+                        
+                        {% endfor %}
+                        
+                        
+                        
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="14"><button class="btn-2blue float-right" type="button" onclick="saveSalesPlan()"> Save & Proceed</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </form>  
+        </div>  
+      
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    function saveSalesPlan(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-sales-plan' %}",
+            method: 'POST',
+            data: $('#salesPlanForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    openToaster("success", data.message);
+                    url = "{% url 'src:sales-plan' %}";
+                    setTimeout(function(){ window.location.href = url; }, 500);
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            // hideLoader();
+        });
+        
+    }
+    
+    function handleIntervalChange(value){
+        var url = "{% url 'src:sales-plan/add/render-interval-view' 'target_value' %}"
+        url = url.replace('target_value',value);
+        
+        // showLoader();
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                // hideLoader();
+                $('#ajaxIntervalView').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+        
+    }
+    function handleTabChange(id,element){
+        $('.updatsection_tab').removeClass('activeCls');
+        $(element).addClass('activeCls');
+        $('.updatsection').hide();
+        $('[name="product_class_id"]').val(id);
+        
+    }
+    
+    function showCopyButton(element){
+        // show copy btn
+        $('.copy').hide();
+        $(element).parent().find('.copy').show();
+    }
+    function copyValues(element){
+        value = $(element).parent().find('.inputField').val();
+        if(value != ""){
+            
+            // $(element).parent().parent().parent().find('.inputField').val(value);
+            $(element).parent().parent().nextAll('td').find('.inputField').val(value);
+            $(element).hide();
+            $(element).parent().parent().parent().find('.clear').show();
+            
+            calculateMonthlyRowTotal($(element).parent().parent().parent().find('.inputField'));
+        }
+    }
+    function clearValues(element,type=null){
+        
+        if(type == "all"){
+            $(element).parent().parent().parent().find('.inputField').val('');
+        }else{
+            exclude = $(element).parent().parent().parent().find('.inputField:first')
+            $(element).parent().parent().parent().find('.inputField').not(exclude).val('');
+        }
+        
+        $(element).hide();
+        $(element).parent().parent().parent().find('.copy').show();
+        
+        calculateMonthlyRowTotal($(element).parent().parent().parent().find('.inputField'));
+        $('.copy').hide();
+    }
+    
+    function calculateMonthlyRowTotal(element){
+        
+        
+        //calculate
+        
+        total = 0;
+        $(element).parent().parent().parent().find('.inputField').each(function(){
+            if($(this).val() != ""){
+                total = total + parseFloat($(this).val());
+            }
+            
+            zone_id = $(this).data('zone')
+            month = $(this).data('month')
+            calculateMonthlyColumnTotal(zone_id,month);
+            
+        });
+        $(element).parent().parent().parent().find('.total-value-vrt').html(total+`<span class="d-inline-block float-right" onclick="clearValues(this,'all')"><i class="fas fa-times-circle "></i></span>`);
+        
+        calculateMonthlyFinal();
+        
+    }
+    
+    function calculateMonthlyColumnTotal(zone_id,month){
+        column_total = 0;
+        $('.month_value_'+zone_id+'_'+month).each(function(){
+            if($(this).val() != ""){
+                column_total = column_total + parseFloat($(this).val());
+            }
+        });
+        $('#column_total_'+zone_id+'_'+month).text(column_total);
+        
+    }
+    
+    function calculateMonthlyFinal(){
+        {% for zone in zones %}
+        var final_total = 0;
+        $('.total_month_value_'+'{{zone.id}}').each(function(){
+            if($(this).text() != ""){
+                final_total = final_total + parseFloat($(this).text());
+            }
+        });
+        console.log(final_total)
+        $('.final_total_'+'{{zone.id}}').text(final_total);
+        {% endfor %}
+    }
+    
+    
+</script>
+
+
+{% endblock %}

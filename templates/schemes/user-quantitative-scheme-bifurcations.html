@@ -1,0 +1,16 @@
+<table>
+    <thead>
+        <tr>
+            <th>On Order of</th>
+            <th>Container</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bifurcation in bifurcations %}
+        <tr>
+            <td>{{bifurcation.minimum_order_quantity}}</td>
+            <td>{{bifurcation.order_container_name}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

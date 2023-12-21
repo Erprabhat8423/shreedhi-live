@@ -1,0 +1,127 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 25%; padding: 0.3rem; {% if today_order_status > 0 %}  {% else %} margin-right: 220px; {% endif %}" onchange="getReport()" readonly>
+                            {% if today_order_status > 0 and order_regenerate_status > 0 %}
+                            
+                            {% elif today_order_status == 0 %}
+                            
+                            {% elif today_order_status > 0 %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important"></a>
+                            {% endif %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important; display: none;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if today_order_status > 0 %}
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%; text-align: center;"> Customer Code  </th>
+                                <th style="width: 40%;"> Name of Distributor/SS  </th>
+                                <th> Invoice Amount  </th>
+                                <th> Amount to be paid  </th>
+                                <th> Outstanding Amount  </th>
+                                <th> Security Amount  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if orders %}
+                            {% for order in orders %}
+                            <tr>
+                                <td style="text-align: center;">{{ order.emp_sap_id }}</td>
+                                <td>{{ order.store_name }}({{ order.user_name }})</td>
+                                <td>{{ order.invoice_amount }}</td>
+                                <td>{{ order.amount_to_be_paid }}</td>
+                                <td>{{ order.outstanding_amount }}</td>
+                                <td>{{ order.security_amount }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    function getReport(){
+        var order_date      = $('#order_datepicker').val();
+        
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-amount-to-be-paid-report' %}",
+                method: 'GET',
+                data: { order_date:order_date },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('#addOrgTable').tablesorter({
+                widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                widgetOptions: {
+                    // resizable_addLastColumn: true,
+                    resizable: false,
+                    // resizable_widths: ["18.5%", "15.5%", "18.5%", "15.5%", "18%"],
+                    stickyHeaders_attachTo: ".primaryContainerBG",
+                    filter_external: '.search',
+                    filter_columnFilters: false,
+                }
+            });
+            $("#order_datepicker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+            
+        });
+        function exportsInExcel(){
+            var order_date      = $('#order_datepicker').val();
+            if(order_date){ 
+                order_date = order_date.split('/');
+                order_date = order_date[2]+'-'+order_date[1]+'-'+order_date[0]
+            }else{ order_date = '0' }
+            var url = "{% url 'src:export-amount-to-be-paid-report' 'order_date' %}";
+            url = url.replace('order_date',order_date);
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

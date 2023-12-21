@@ -1,0 +1,87 @@
+{% load static %}
+
+<table id="quantitativeSchemeUserTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="bonus_distributor_name" id="bonus_distributor_name">
+                    Dis./SS Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bonus_town" id="bonus_town">Town<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bonus_state" id="bonus_state">State<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th class="bonus_on_order_of" id="bonus_on_order_of">On order of<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bonus_free_product_variant" id="bonus_free_product_variant">Free Product Variant<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bonus_free_quantity" id="bonus_free_quantity">Free Product Qty<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="bonus_created_date" id="bonus_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="bonus_scheme_tablebody">
+            {% if users %}
+            {% for user in users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+                <td class="bonus_distributor_name">
+                    {{user.emp_sap_id}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}})
+                <br>
+                <b>{{user.route_name}}</b>
+                </td>
+                <td class="bonus_town">{{user.town_name}}</td>
+                <td class="bonus_state">{{user.state_name}}</td>
+                <td class="bonus_on_order_of"><a href="javascript:;" onclick="viewBifurcation('quantitative','{{user.user_id}}','{{user.scheme_id}}')"><i class="fa fa-sitemap"></i></a></td>
+                <td class="bonus_free_product_variant">{{user.free_variant_name}}</td>
+                <td class="bonus_free_quantity"></td>
+                <td class="bonus_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+                <td>
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="hidden" id="user_quantitative_scheme_is_active_{{ user.user_id }}" value="{{ user.status }}">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateUserSchemeStatus('{{ user.id }}', this, 'quantitative_scheme')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="nonoperational_loading" style="display: none;">
+                <td class="text-center" colspan="9"></td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>

@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales Port</title>
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}" />
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <script src="{% static 'plugins/jquery/dist/jquery.min.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
+</head>
+
+<body class="overflow-hidden">
+  <div class="container-fluid p-0">
+    <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop"
+      poster="{% static 'img/png/bannerBG.png' %}">
+      <source src="{% static 'img/SalesPortLogin.m4v' %}" type="video/mp4" />
+    </video>
+
+    <header class="viewport-header">
+      <div class="col-sm-3">
+        <div class="row">
+          <div class="col-sm-12">
+            <img src="{% static 'img/png/logo.png' %}" class="mb-5 logo" />
+          </div>
+        </div>
+        {% for message in messages %}
+        {% if 'invalid' in message.tags %}
+        <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        
+        <form method="POST" autocomplete="off" action="{% url 'login' %}" aria-label="Login">
+          {% csrf_token %}
+          {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}" >
+          {% endif %}
+          <div class="row loginBox">
+            <div class="col-sm-12 p-0">
+              <div class="input-group">
+                <input type="text" class="form-control" id="loginInput1" name="username" placeholder="Email Id" />
+              </div>
+              <div class="dropdown-divider m-0"></div>
+
+              <div class="input-group">
+                <input type="password" name="password" class="form-control" id="loginInput2" placeholder="Password" />
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row mt-2">
+            <button class="btn btn-signin" type="submit">Sign In</button>
+          </div>
+        </form>
+        <div class="row mt-3">
+          <div class="col-sm-12 p-0 text-center">
+            <span class="whiteFont"><b>Forgot Password ?</b></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <footer class="footer footer-bottom">
+      <div class="row">
+        <div class="col-sm-10 p-0">
+          <div class="row">
+            <div class="col-sm-8">
+              <span class="footerText lightGrey">&#169;copyright</span>
+              <span class="footerText">
+                2020. <span class="blackFont">A Product of </span><a href="#">Sort String </a><span
+                  class="blackFont">Solutions LLP </span> </span><br class="break" />
+              <span class="hyphen">-</span>
+              <a href="#"><span class="footerText lightGrey">Terms & Conditions</span></a>
+              <a href="#"><span class="footerText lightGrey">- Privacy Poilcy</span></a>
+              <a href="#"><span class="footerText lightGrey">- Help</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2 iconAlignment p-0">
+          <img src="{% static 'img/svg/Facebook.svg' %}" class="socialMediaIcon" />
+          <img src="{% static 'img/svg/Instagram.svg' %}" class="socialMediaIcon" />
+          <img src="{% static 'img/svg/Twitter.svg' %}" class="socialMediaIcon" />
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>

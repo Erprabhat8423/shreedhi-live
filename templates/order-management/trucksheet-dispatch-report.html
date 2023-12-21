@@ -1,0 +1,274 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+.select2-container .select2-selection--single .select2-selection__rendered{
+padding: 0.3rem;
+margin-right:10px;
+text-align: left;
+}
+#topborder th {
+    border-top: 1px solid #e7e7e7 !important;
+}
+.table thead th {
+    vertical-align: top;
+}
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 ">
+                            <select class="inputField selectField" style="width: 20% !important; padding: 0.3rem;" placeholder="Select Route " name="route_code" id="route_code" onchange=" getVehicle();">
+                               {% if routes %}
+                                {% for route in routes %}
+                                <option route_id="{% if route.route_code is not None %}{{route.id}}{% endif %}" value="{{route.id}}" {% if route.id == select_route_id %} selected {% endif %}>{{route.route}} {% if route.route_code is not None %}[{{route.route_code}}]{% endif %} </option>
+                                {% endfor %}
+                                {% else %}
+                                <option value="">Select Route ID</option>
+                                {% endif %}
+                            </select>
+                            <select class="inputField selectField" style="width: 20% !important; padding: 0.3rem;" placeholder="Select Route " name="vehicle_id" id="vehicle_id" onchange=" getTruckSheetDispatchReport();">
+                                {% if vehicles %}
+                                {% for vehicle in vehicles %}
+                                <option value="{{vehicle.id}}" {% if vehicle.id == vehicle_id %} selected {% endif %}>{{vehicle.registration_number}}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option value="">Select Vehicle</option>
+                                {% endif %}
+                            </select>
+                            {% if today_order_status == 0 %}
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 20%; padding: 0.3rem;" onchange="getRouteList(); " readonly>
+                            {% elif today_order_status > 0 and clean_dist_order_ids > 0 %}
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 20%; padding: 0.3rem;" onchange="getRouteList(); " readonly>
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 20%; margin-right: 150px; padding:0.1rem!important"></a>
+                            {% endif %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 20%; margin-right: 150px; padding:0.1rem!important; display: none;"></a>
+                           
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if today_order_status > 0 and clean_dist_order_ids > 0  %}
+                   <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                     <thead>
+                         <tr>
+                            <th colspan="1">Route Name	</th>
+                            <td colspan="1">{{route_name}}</td>
+                            <th style="font-size:24px;text-align:center" colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}">
+                            <b>Truck Loading Sheet</b>
+                            </th>
+                            <th>Date</th>
+                            <td>{{today_date}}</td>
+                        </tr>
+                       <tr>
+                            <th colspan="1">Route Code	</th>
+                            <td colspan="1">{{route_code}}</td>
+                            <th colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}"></b>
+                            </th>
+                            <th>Transporter</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th colspan="1">Type of sheet</th>
+                            <td colspan="1">Normal/Free Samples	</td>
+                            <th colspan="{% with arrlen=product_milk_variant_list|length %} {{ product_without_milk_variant_list|length|add:arrlen|add:'-1' }}{% endwith %}"></b>
+                            </th>
+                            <th>Vehicle Number	</th>
+                            <td>{{registration_number}}</td>
+                        </tr>
+                        <tr id="topborder">
+                                <th>S.No.	</th>
+                                <th>Store Name
+                                (Distributor/Sap Code) </th>
+                                <!--<th>Mobile Number 1	</th>-->
+                                <!--<th>Mobile Number 2	</th>-->
+                                {% if product_milk_variant_list %}
+                                {% for product_variant in product_milk_variant_list %}
+                                <th style="text-align:center"> {{product_variant.variant_name}}  </th>
+                                {% endfor %}
+                                {% endif %}
+                                <th style="text-align:center">TOTAL {{milk_product_class_name.product_class}} CRATES</th>
+                                {% if product_without_milk_variant_list %}
+                                {% for product_variant in product_without_milk_variant_list %}
+                                <th style="text-align:center"> {{product_variant.variant_name}}  </th>
+                                {% endfor %}
+                                {% endif %}
+                            </tr>
+                       </thead> 
+                        {% if indent_lists %}
+                        {% for indent in indent_lists %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{indent.store_name}}({{ indent.first_name }} {{ indent.middle_name }} {{ indent.last_name }}/{{indent.emp_sap_id}})</td>
+                            <!--<td>{{ indent.contact_number1 }}</td>-->
+                            <!--<td>{{ indent.contact_number2 }}</td>-->
+                            {% if indent.milk_items %}
+                            {% for item in indent.milk_items %}
+                            <td style="text-align:center"> {{item.milk_items}}  </td>
+                            {% endfor %}
+                            {% endif %}
+                            <th style="text-align:center"> {{ total_milk_crates|index:forloop.counter0 }}  </th>
+                            {% if indent.without_milk_items %}
+                            {% for item in indent.without_milk_items %}
+                            <td style="text-align:center"> {{item.without_milk_items}}  </td>
+                            {% endfor %}
+                            {% endif %}
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                        <tr>
+                            <td colspan="2" style="text-align: right;">GRAND TOTAL(CRATES)</td>
+                            {% if total_milk_crates_qty %}
+                            {% for total_milk_crates in total_milk_crates_qty %}
+                            <td style="text-align:center">{{total_milk_crates}}</td>
+                            {% endfor %}
+                            {% endif %}
+                            <th></th>
+                            {% if total_without_milk_crates_qty %}
+                            {% for total_without_milk_crates in total_without_milk_crates_qty %}
+                            <td style="text-align:center">{{total_without_milk_crates}}</td>
+                            {% endfor %}
+                            {% endif %}
+                            <th></th>
+                            
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">Scheme in Nos</td>
+                            {% if total_free_milk_pouches %}
+                            {% for total_milk_pouches in total_free_milk_pouches %}
+                            <td style="text-align:center">{{total_milk_pouches}}</td>
+                            {% endfor %}
+                            {% endif %}
+                            <th></th>
+                            {% if total_free_without_milk_pouches_qty %}
+                            {% for total_without_milk_pouches in total_free_without_milk_pouches_qty %}
+                            <td style="text-align:center">{{total_without_milk_pouches}}</td>
+                            {% endfor %}
+                            {% endif %}
+                            <td></td>
+                            
+                        </tr>
+                       
+                     </table>
+                     
+                    {% else %}
+                    <p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    
+    function getRouteList(){
+        $('[name="user_id"]').html('<option value="">Select Route </option>');
+        $('[name="vehicle_id"]').html('<option value="">Select Vehicle</option>');
+        var order_date      = $('#order_datepicker').val();
+        var route_code      = $('#route_code').val();
+        $.ajax({
+                url: "{% url 'src:get-sap-route-list' %}",
+                method: 'GET',
+                data: { order_date:order_date,route_code:route_code },
+                success: function (data) {
+                    $('[name="route_code"]').html(data.options)
+                    $(".selectField").select2();
+                    $('[name="vehicle_id"]').html(data.vehicles_number)
+                    $(".selectField").select2();
+                    getTruckSheetDispatchReport();
+                },
+                error: function (err) {
+              
+                }
+            });
+           
+    };
+    function getVehicle(){
+        $('[name="vehicle_id"]').html('<option value="">Select Vehicle</option>');
+        var route_code      = $('#route_code').val();
+        $.ajax({
+                url: "{% url 'src:get-vehicle-list' %}",
+                method: 'GET',
+                data: {route_code:route_code },
+                success: function (data) {
+                    $('[name="vehicle_id"]').html(data.vehicles_number)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+           
+    };
+    function getTruckSheetDispatchReport(){
+        var order_date      = $('#order_datepicker').val();
+        var route_code      = $('#route_code').val();
+        var vehicle_id      = $('#vehicle_id').val();
+        var route_id      = $('#route_code').find('option:selected').attr("route_id");
+        if(route_code != ''){
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-trucksheet-dispatch-report' %}",
+                method: 'GET',
+                data: { order_date:order_date,route_code:route_code,route_id:route_id,vehicle_id:vehicle_id },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                    $('.iconExports:first').show();
+                    $('#order_datepicker').css("margin-right","0"); 
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }else{
+            $('#ajax-div').html('<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>');
+            $('.iconExports').hide();
+            $('#order_datepicker').css("margin-right","150px"); 
+        }
+        }
+        $(document).ready(function () {
+            $("#order_datepicker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+        });
+        function exportsInExcel(){
+            var order_date      = $('#order_datepicker').val();
+            var vehicle_id      = $('#vehicle_id').val();
+            var route_id      = $('#route_code').find('option:selected').attr("route_id");
+            if(order_date){ 
+                order_date = order_date.split('/');
+                order_date = order_date[2]+'-'+order_date[1]+'-'+order_date[0]
+            }else{ order_date = '0' }
+            var url = "{% url 'src:export-trucksheet-dispatch-report' 'order_date' 'route_id' 'vehicle_id' %}";
+            url = url.replace('order_date',order_date).replace('route_id',route_id).replace('vehicle_id',vehicle_id);
+            window.location.href = url; 
+        }
+    </script>
+    {% endblock %}

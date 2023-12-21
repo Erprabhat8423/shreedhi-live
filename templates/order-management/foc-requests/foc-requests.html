@@ -1,0 +1,751 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/roles&permission.css' %}" />
+<link rel="stylesheet" href="{% static 'css/mediaQuery.css' %}" />
+<style>
+	.subtext{
+		text-decoration: none;
+	}
+	.table td, .table th{
+		padding:0.65rem!important;
+	}
+	.ui-widget.ui-widget-content{
+		z-index: 999999999!important;
+	}
+	.ui-datepicker-prev span,
+	.ui-datepicker-next span {
+		background-image: none !important;
+	}
+	
+	.ui-datepicker-prev:before,
+	.ui-datepicker-next:before {
+		font-family: FontAwesome;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: flex;
+		font-weight: normal;
+		align-items: center;
+		justify-content: center;
+		z-index: 999999999!important;
+	}
+	
+	.ui-datepicker-prev:before {
+		content: "\f100";
+	}
+	
+	.ui-datepicker-next:before {
+		content: "\f101";
+	}
+	.header{
+		background-color: #0073e0;
+		color: #ffffff;
+	}
+	
+	#user_wise_order {
+		width: 100%;
+		height: 200px;
+		border-top:1px solid rgb(223, 223, 223);
+		border-left:1px solid rgb(223, 223, 223);
+		border-bottom:1px solid rgb(223, 223, 223);
+		box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+	}
+	
+	#product_wise_order {
+		width: 100%;
+		height: 200px;
+		border:1px solid rgb(223, 223, 223);
+		box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+	}
+	#weekly {
+		width: 100%;
+		height: 280px;
+		border:1px solid rgb(223, 223, 223);
+		box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+	}
+	.select2-container--default .select2-selection--single .select2-selection__rendered{
+		text-align:left!important;
+	}
+</style>
+{% endblock %}
+
+
+<div class="row" id="containerHeight">
+	<div class="col-md-8 pr-md-0 h-100">
+		<div class="primaryContainer h-100" id="mainbox">
+			<div class="row mb-2" id="topRow">
+				<div class="col-md-5 p-md-0"> 
+					<h6 class="mt-md-3 mb-md-0"><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+				</div>
+				<div class="col-md-7 p-md-0">
+					<div class="row">
+						<div class="col-md-12 offset-md-4 p-md-0">
+							<div class="col-md-4 p-md-2" style="float: left;">
+								{% if role_id == 0 %}
+								<select class="inputField selectField" style="width: 100% !important; padding: 0.3rem;" name="foc_status" id="foc_status" onchange="getfocRecord()">
+									<option value="">All Status</option>
+									<option value="1" {% if foc_status == 1 %} selected {% endif %}>Initiated</option>
+									<option value="2" {% if foc_status == 2 %} selected {% endif %}>Forwarded</option>
+									<option value="3" {% if foc_status == 3 %} selected {% endif %}>Approved</option>
+								</select>
+								{% else %}
+								<input type="hidden" name="foc_status" id="foc_status" />
+								{% endif %}
+							</div>
+							<div class="col-md-4 p-md-2" style="float: left;">
+								<select class="inputField selectField" style="width: 100% !important; padding: 0.3rem;" name="town_id" id="town_id">
+									<option value="">All Town</option>
+									{% for town in towns%}
+									<option value="{{ town.id }}">{{ town.town }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row mb-2 mt-2 manageBlock" id="topRow">
+						<div class="col-md-12 p-md-0 text-right">
+							<select class="inputField selectField" style="width: 30% !important; margin-right: 5px; padding: 0.3rem; text-align: left;" name="user_sap_id" id="user_sap_id" onchange="getfocRecord()">
+								<option value="">Select User</option>
+								{% for user in users_details %}
+								<!-- {{ user.emp_sap_id }}({{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}) -->
+								<option value="{{ user.first_name }}">{{ user.first_name }}</option>
+								{% endfor %}
+							</select>	
+							
+							<input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 25%; padding: 0.3rem;" onchange="getfocRecord()" readonly>
+							{% if role_id == 0 %}
+							<button type="button" class="btn iconBox iconForward" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+							<button type="button" class="btn iconBox iconApproved" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+							{% else %}
+							{% if level_id == 2 %}
+							<button type="button" class="btn iconBox iconForward" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+							{% else %}
+							<button type="button" class="btn iconBox iconApproved" id="forward" data-toggle="modal" data-target="#addOrganisationModal" onclick="updateOrderStatus({{level_id}})" style="display: none;"></button>
+							{% endif %}
+							{% endif %}
+							
+							<!-- <button class="btn iconBox iconAddRoles" onclick="addRole()"></button> -->
+							<div class="dropdown" style="display: inline-block;">
+								<button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+								<div class="dropdown-menu dropdown-menu-right logoutContainer"
+								aria-labelledby="dropdownMenuButton">
+								
+								<input type="hidden" name="show_columns" id="show_columns" value="" >
+								<a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+									src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+									<a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+										src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+									</div>
+								</div>
+								
+								<div class="dropdown" style="display: inline-block;" id="hideColumn">
+									<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="false"></button>
+									<div class="dropdown-menu dropdown-menu-right logoutContainer"
+									aria-labelledby="dropdownMenuButton">
+									
+									<a class="dropdown-item columnHideItem" href="#">
+										<input type="checkbox" onclick="showHideColumns(this.id,2)" class="colCheck" name="roles_name" id="request_by_name_foc" />
+										<label class="mb-0" for="request_by_name_foc">Employee Name</label>
+									</a>
+									<a class="dropdown-item columnHideItem" href="#">
+										<input type="checkbox" onclick="showHideColumns(this.id,2)" class="colCheck" name="org_name" id="user_name_foc" />
+										<label class="mb-0" for="user_name_foc">User Name</label>
+									</a>
+									<a class="dropdown-item columnHideItem" href="#">
+										<input type="checkbox" onclick="showHideColumns(this.id,2)" class="colCheck" name="org_status" id="foc_status_foc" />
+										<label class="mb-0" for="foc_status_foc">Status</label>
+									</a>
+									<a class="dropdown-item columnHideItem" href="#">
+										<input type="checkbox" onclick="showHideColumns(this.id,2)" class="colCheck" name="department" id="created_at_foc" />
+										<label class="mb-0" for="created_at_foc">Created at</label>
+									</a>
+									<a class="dropdown-item columnHideItem" href="#">
+										<input type="checkbox" onclick="showHideColumns(this.id,2)" class="colCheck" name="delivery_date_check" id="foc_delivery_date_foc" />
+										<label class="mb-0" for="foc_delivery_date_foc">Delivery Date</label>
+									</a>
+								</div>
+							</div>
+							<div class="dropdown" style="display: inline-block;" id="lockColumn">
+								<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+								<div class="dropdown-menu dropdown-menu-right logoutContainer"
+								aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colFreezeCheck" name="roles_name" id="lock_roles_name"
+									onclick="toggleFreeze(this.id,'roles_name',1)" />
+									<label class="mb-0" for="lock_roles_name">Employee Name</label>
+								</a>
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colFreezeCheck" name="landline_no" id="lock_org_name"
+									onclick="toggleFreeze(this.id,'org_name',2)" />
+									<label class="mb-0" for="lock_org_name">User Name</label>
+								</a>
+								
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colFreezeCheck" name="landline_no" id="lock_foc_status"
+									onclick="toggleFreeze(this.id,'org_status',2)" />
+									<label class="mb-0" for="lock_foc_status">Status</label>
+								</a>
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colFreezeCheck" name="department" id="lock_department"
+									onclick="toggleFreeze(this.id,'department',3)" />
+									<label class="mb-0" for="lock_department">Created at</label>
+								</a>
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colFreezeCheck" name="department" id="lock_department_delivery"
+									onclick="toggleFreeze(this.id,'delivery_date_check',3)" />
+									<label class="mb-0" for="lock_department_delivery">Delivery Date</label>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" id="tableBox">
+			<div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg">
+				<table id="rolesTable" class="table table-borderless table-striped table-hover mt-0"
+				style="width: 100%;">
+				<thead>
+					<tr>
+						<th class="sorter-false all_checkbox_class" style="border-right:none!important; width:32px!important; min-width: 32px!important;"><input type="checkbox" class="checked_all" id="new_module_1"> </th>
+						<th class="roles_name" id="roles_name">
+							Employee Name
+							<i class="fa fa-fw fa-sort float-right"></i>
+							<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+							<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+						</th>
+						<th class="org_name" id="org_name">User Name<i class="fa fa-fw fa-sort float-right"></i>
+							<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+							<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+						</th>
+						<th class="org_status" id="org_status">Status<i class="fa fa-fw fa-sort float-right"></i>
+							<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+							<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+						</th>
+						<th class="department" id="department">Created at<i class="fa fa-fw fa-sort float-right"></i>
+							<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+							<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+						</th>
+						<th class="delivery_date_check" id="delivery_date_check">Delivery Date<i class="fa fa-fw fa-sort float-right"></i>
+							<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+							<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+						</th>				
+					</tr>
+				</thead>
+				<tbody id="tablebody">
+					{% if foc_requests %}
+					{% for foc_request in foc_requests %}
+					<tr  {% if forloop.first %} class="odd selected" {% endif %} data-userId="{{foc_request.id}}">
+						<td class="sorter-false checked_class" >
+							{% if role_id == 0 and foc_request.foc_status != 3 and foc_request.foc_status != 4 %} 
+							<input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{foc_request.id}}"> 
+							{% else %} 
+							{% if foc_request.status == 0 %}
+							{% if foc_request.foc_status == 1 and foc_request.level_id == 2 %} 
+							<input type="checkbox" class="checkbox " id="new_module_1" name="order_id[]" value="{{foc_request.id}}"> 
+							{% elif foc_request.foc_status == 2 %} 
+							<input type="checkbox" class="checkbox " id="new_module_1" name="order_id[]" value="{{foc_request.id}}"> 
+							{% elif foc_request.foc_status == 3 %} 
+							<input type="checkbox" class="checkbox {{foc_request.status}}" id="new_module_1" name="order_id[]" value="{{foc_request.id}}"> 
+							{% else %}  
+							{% endif %} 
+							{% else %} 
+							<input type="checkbox" disabled checked> 
+							{% endif %}
+							{% endif %}
+						</td> 
+						<td class="roles_name" onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.request_by_name}}</td>
+						<td class="org_name" onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.user_name}}</td>
+						<td class="org_status" ><a href="javascript:void()" onclick="getOrderStatus('{{ foc_request.id }}')">{% if role_id == 0 %} {% if foc_request.foc_status	 == 1 %} Initiated {% elif foc_request.foc_status == 2 %} Forwarded {% elif foc_request.foc_status == 3 %} Approved {% elif foc_request.foc_status == 4 %} Delivered {% else %} {{foc_request.foc_status}}   {% endif %} {% else %} 
+							{% if foc_request.foc_status == 4 %} Delivered {% elif foc_request.foc_status == 3 %}Approved {% elif foc_request.status == 0 %}{% if foc_request.foc_status == 1 and foc_request.level_id == 2 %} Initiated {% elif foc_request.foc_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}</a></td>
+							<td class="department" onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.created_at|date:'d/m/Y H:i'}}</td>
+							<td class="delivery_date_check" onclick="focRequestDetails('{{foc_request.id}}')">{{foc_request.foc_delivery_date|date:'d/m/Y'}}</td>
+						</tr>
+						
+						{% endfor %}
+						<tr id="loading" style="display: none;">
+							<td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+							</td>
+						</tr>
+						{% else %}
+						<tr>
+							<td colspan="5" style="text-align: center;">No Record Found...</td>
+						</tr>
+						{% endif %}
+						
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="col-md-4 h-100" id="ajax-foc-request-detail">
+	
+	<div class="primaryContainerBG h-100 manageBlock" id="detailsBox">
+		<div class="row" id="detailsBoxFirst" style="display: block !important;">
+			
+			
+			{% if last_foc_request %}
+			<div class="col-md-12 p-md-0">
+				<h6><b>{{last_foc_request.user_name}} </b></h6>
+			</div>
+			<div class="col-md-12 p-md-0 mt-md-3">
+				<table class="table table-striped">
+					<thead>
+						<th>Product</th>
+						<th>Quantity</th>
+					</thead>
+					<tbody>
+						{% for last_foc_request_detail in last_foc_request_details %}
+						<tr>
+							<td>{{last_foc_request_detail.product_variant_name}}</td>
+							<td>{{last_foc_request_detail.quantity}}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			
+			
+		</div>
+	</div>
+	
+	{% else %}
+	<div class="col-md-12 p-md-0">
+		<h6><b>No Details found. </b></h6>
+	</div>
+	
+	{% endif %}
+</div>
+</div>
+
+
+</div>
+<!-- ***************************************************************************** -->
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+	
+</div>
+
+{% endblock content %}
+
+
+
+{% block script %}
+
+<script>
+	
+	
+	function exports(type)
+	{
+		var foc_status    = $('#foc_status').val();
+		var user_name   = $('#user_sap_id').val();
+		var columns     = $('#show_columns').val();
+		if(user_name){ user_name = user_name; }else{ user_name = '0' }
+		
+		if(foc_status){ foc_status = foc_status; }else{ foc_status = '0' }
+		
+		var foc_delivery_date  = $('#order_datepicker').val();
+		if(foc_delivery_date){ 
+			foc_delivery_date = foc_delivery_date.split('/');
+			foc_delivery_date = foc_delivery_date[2]+'-'+foc_delivery_date[1]+'-'+foc_delivery_date[0];
+		}
+		else{ 
+			foc_delivery_date = '0' 
+		}
+		
+		
+		if(columns == ''){
+			openToaster("danger", "Please select at-least one column");
+		} else {
+			if(type == 'excel'){
+				var url = "{% url 'src:export-foc-report-to-xlsx' 'columns' 'userName' 'states' 'delvry_time' %}";
+				url = url.replace('columns',columns).replace('userName',user_name).replace('states',foc_status).replace('delvry_time',foc_delivery_date);
+				console.log(url);
+				window.location.href = url;
+			} else {
+				var url = "{% url 'src:export-foc-report-to-pdf'  'columns' 'userName' 'states' 'delvry_time' %}";
+				url = url.replace('columns',columns).replace('userName',user_name).replace('states',foc_status).replace('delvry_time',foc_delivery_date);
+				console.log(url);
+				window.location.href = url;
+			}
+		}
+		
+	}
+	
+	
+	function showHideColumns(inputid, colNo) {
+		var checkbox_val = [];
+		var checkbox = document.getElementById(inputid);
+		if (checkbox.checked == true) {
+			$('.'+inputid).hide();
+		}else{
+			$('.'+inputid).show();
+		}
+		$("input:checkbox[class=colCheck]").each(function () {
+			if(!$(this).is(':checked')){
+				checkbox_val.push($(this).attr("id"))
+			}
+		});
+		checkbox_str = checkbox_val.join(',');
+		$('#show_columns').val(checkbox_str);
+	}
+	
+	function getOrderStatus(order_id){
+		$('#addUserModal').html('');
+		showLoader();
+		$.ajax({
+			url: "{% url 'src:foc-status-details' %}",
+			method: 'GET',
+			data: { order_id:order_id },
+			success: function (data) {
+				hideLoader();
+				$("#addUserModal").show();
+				$('#addUserModal').html(data);                
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+	}
+	
+	function updateOrderStatus(level_id){
+		var orderID = [];
+		// $("input:checkbox[class=checkbox]:checked").each(function(){
+			// 	var id = parseInt($(this).val());
+			// 	orderID.push(id);
+			// });
+			
+			$('.checkbox').each(function (index, obj) {
+				if (this.checked === true) {
+					var id = parseInt($(this).val());
+					orderID.push(id);
+				}
+			});
+			
+			
+			
+			//alert(orderID.toString());
+			{% if role_id == 0 %}
+			level_id = parseInt($('#foc_status').val())+1;
+			{% else %}
+			level_id = level_id
+			{% endif %}
+			if(orderID.length > 0){
+				showLoader();
+				$.ajax({
+					url: "{% url 'src:update-foc-status' %}",
+					method: 'POST',
+					data: { level_id:level_id, order_id: orderID, csrfmiddlewaretoken: '{{ csrf_token }}' },
+					success: function (data) {
+						if(typeof data.flag !== "undefined" && !data.flag){
+							hideLoader();
+							openToaster("danger", data.message);
+						}else{
+							if (data.error == false) {
+								console.log(data.message)
+								hideLoader();
+								openToaster("success", data.message);
+								setTimeout(() => {
+									window.location.reload();
+								}, 1000);
+							}
+						}
+					},
+					error: function (err) {
+						console.log(err)
+					}
+				});
+			}
+		};	
+		
+		
+		function focRequestDetails(id) {
+			showLoader();
+			var url = "{% url 'src:foc-requests-details' '1' %}";
+			url = url.replace(1,id);
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					hideLoader();
+					$('#ajax-foc-request-detail').html(data);
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			});
+		}
+		
+		
+		
+		
+		function toggleOrganization(activetype, inactiveType) {
+			$('#' + activetype).addClass("activeTab");
+			$('#' + inactiveType).removeClass("activeTab");
+			$('.' + inactiveType + 'Block').hide();
+			$('.' + activetype + 'Block').show();
+		}
+		
+		function toggleFreeze(inputid, colid, colNo) {
+			var checkbox = document.getElementById(inputid);
+			if (checkbox.checked == true) {
+				$("#rolesTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+				$("#rolesTable tbody tr").each(function (index) {
+					$("#rolesTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+					$("#rolesTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+				});
+				$('#' + colid + ' #freeze').show();
+				$('#' + colid + ' #unfreeze').hide();
+			} else {
+				$("#rolesTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+				$("#rolesTable tbody tr").each(function (index) {
+					$("#rolesTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+					$("#rolesTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+				});
+				$('#' + colid + ' #unfreeze').show();
+				$('#' + colid + ' #freeze').hide();
+			}
+		}
+		
+		function toggleSelectCol(inputid, colid, colNo) {
+			var checkbox = document.getElementById(inputid);
+			if (checkbox.checked == true) {
+				$("#addPermissionModule thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+				$("#addPermissionModule tbody tr").each(function (index) {
+					$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+					$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+				});
+				$('#' + colid + ' #freeze').show();
+				$('#' + colid + ' #unfreeze').hide();
+			} else {
+				$("#addPermissionModule thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+				$("#addPermissionModule tbody tr").each(function (index) {
+					$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+					$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+				});
+				$('#' + colid + ' #unfreeze').show();
+				$('#' + colid + ' #freeze').hide();
+			}
+		}
+		
+		$(document).ready(function () {
+			setHeightWidth();
+			showLoader();
+			setTimeout(() => {
+				hideLoader();
+			}, 2000);
+			$('#rolesTable').tablesorter({
+				widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+				widgetOptions: {
+					resizable_addLastColumn: true,
+					resizable: false,
+					resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+					stickyHeaders_attachTo: ".primaryContainerBG",
+					filter_external: '.search',
+					filter_columnFilters: false,
+				}
+			});
+			
+			$("#rolesTable tbody tr").click(function () {
+				$(this).addClass("selected").siblings().removeClass("selected");
+			});
+			
+			$(".primaryContainerBG").scroll(function () {
+				var divTable = $(".primaryContainerBG");
+				$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+			});
+			
+			$(".checkBoxContainer").scroll(function () {
+				var divTable = $(".checkBoxContainer");
+				$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+			});
+			
+			$("#hideColumn input:checkbox:checked").each(function () {
+				var column = "table ." + $(this).attr("name");
+				$(column).hide();
+			});
+			$("#hideColumn input:checkbox").click(function () {
+				var column = "table ." + $(this).attr("name");
+				$(column).toggle();
+			});
+			
+			
+			var checkbox_val = ["request_by_name_foc","user_name_foc","foc_status_foc","created_at_foc","foc_delivery_date_foc"];
+			checkbox_str = checkbox_val.join(',');
+			$('#show_columns').val(checkbox_str);
+			
+			$(".colCheck").change(function () {
+				if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+					$(".iconHide").css("background-image", "url({% static 'img/png/hide.png' %})");
+				} else {
+					$(".iconHide").css("background-image", "url({% static 'img/svg/hideblue.svg' %})");
+				}
+			});
+			
+			$(".colFreezeCheck").change(function () {
+				if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+					$(".iconUnfreeze").css("background-image", "url({% static 'img/svg/unfreeze.svg' %})");
+				} else {
+					$(".iconUnfreeze").css("background-image", "url({% static 'img/svg/freeze.svg' %})");
+				}
+			});
+			
+			$('.checked_all').on('change', function() {     
+				$('.checkbox').prop('checked', $(this).prop("checked")); 
+				if($('.checkbox:checked').length < 0){
+					//alert($('.checkbox:checked').length);
+					$('#forward').show();
+				}else{
+					// alert("test2");
+					$('#forward').hide();
+				}             
+			});
+			
+			$('.checkbox').change(function(){ 
+				if($('.checkbox:checked').length == $('.checkbox').length){
+					$('.checked_all').prop('checked',true);
+				}else{
+					$('.checked_all').prop('checked',false);
+				}
+				if($('.checkbox:checked').length > 0){
+					$('#forward').show();
+				}else{
+					$('#forward').hide();
+				}
+			});	
+			
+			{% if foc_requests %}
+			$(".checked_all").attr("disabled", false);
+			{% else %}    
+			$(".checked_all").attr("disabled", true);
+			{% endif %}
+			
+			{% if role_id == 0 %}
+			$(".all_checkbox_class").css("display", "none");
+			$(".checked_class").css("display", "none");
+			{% endif %}
+			jQuery(".main-table").clone(true).appendTo('#table-scroll').addClass('clone');
+			jQuery(".main-tableModal").clone(true).appendTo('#table-scrollModal').addClass('clone');
+			
+		});
+		
+		$(window).resize(function () {
+			setHeightWidth();
+		});
+	</script>
+	
+	
+	<script type="text/javascript">
+		$(document).ready(function () {
+			
+			$('#order_datepicker').datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0",
+				dateFormat: 'dd/mm/yy' 
+			});
+			var prevTop = 0;
+			
+			$('.commonTableBg').on('scroll', function () {
+				var page = $('#page').val();
+				var totalPages = $('#total_pages').val();
+				
+				var currentTop = $(this).scrollTop();
+				if (prevTop !== currentTop) {
+					prevTop = currentTop;
+					if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+						
+						if($('#page_status').val() == 0 && page  <= totalPages){
+							$('#loading').show(); 
+							$('#page_status').val('1');
+							$.ajax({
+								url: "{% url 'src:ajax-foc-requests-lists' %}",
+								method: 'GET',
+								data: { page:page },
+								success: function (data) {
+									setTimeout(() => {
+										$('#tablebody').find('tr:last').prev().after(data);
+										$('#page').val(parseInt(page)+1);
+										$('#loading').hide();
+										$('#page_status').val('0');
+										$('#addOrgTable').trigger('update');
+										
+										
+										
+										
+									}, 2000);
+								},
+								error: function (err) {
+									alert(err.message);
+									window.location.reload();
+								}
+							});
+						}
+					}
+				}
+			})
+			
+		});
+		
+		function getUserRecord(){
+			console.log(1);
+			$.ajax({                    
+				method: 'GET',
+				url : "{% url 'src:users-for-foc-record' %}",
+				data: {
+				},
+				success: function (data) {
+					$('#tablebody').html(data);                        
+				},
+				error: function (err) {
+					alert(err.message);                       
+				}
+			});
+		}
+		
+		function getfocRecord(){
+			var foc_status    = $('#foc_status').val();
+			var order_date = $('#order_datepicker').val();
+			var name = $("#user_sap_id").val();            
+			var page = $('#page').val();
+			// var town_id         = $('#town_id').val();
+			// var route_id        = $('#route_id').val();
+			// var user_sap_id     = $('#user_sap_id').val();
+			// var order_date      = $('#order_datepicker').val();
+			
+			$('#tablebody').html('<tr><td colspan="8"><div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div></td></tr>');
+				$.ajax({
+					url: "{% url 'src:ajax-foc-requests-lists' %}",
+					method: 'GET',
+					data: { foc_status:foc_status,order_date:order_date,name:name },
+					success: function (data) {
+						$('#tablebody').html(data);
+						$('#addOrgTable').trigger('update');
+						
+						focRequestDetails($('#tablebody > tr:nth-child(1)').attr('data-UserId'));
+					},
+					error: function (err) {
+						// alert(err.message);
+						// window.location.reload();
+					}
+				});
+			}
+		</script>
+		
+		{% endblock %}

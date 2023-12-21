@@ -1,0 +1,70 @@
+<style>
+  .header-title h2,
+  .header-title h3 {
+    display: inline-block;
+  }
+  h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
+  }
+  
+  table {
+    width: 750px;
+    border-collapse: collapse;
+    margin: 0px auto;
+  }
+  
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+  
+  th {
+    background: #3498db;
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  td,
+  th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 12px;
+  }
+</style>
+
+         
+  <table>
+    <thead>
+      <tr>
+        <th colspan="{{ columns_length }}">
+          <h3> Leave Report </h3>
+        </th>
+      </tr>
+      <tr>
+        <th class="name" {% if 'user_name' not in columns %} style="display: none;" {% endif %}>User Name</th>
+        <th class="from_date" {% if 'leave_from_date' not in columns %} style="display: none;" {% endif %}>Leave Date(From-To)</th>
+        <th class="to_date" {% if 'remark' not in columns %} style="display: none;" {% endif %}>Remark</th>
+        <th class="status" {% if 'status' not in columns %} style="display: none;" {% endif %}>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for result in leaveReport %}
+      <tr>
+        <td class="user_name" {% if 'user_name' not in columns %} style="display: none;" {% endif %}>{{ result.user_name }}</td>
+
+        <td class="from_date" {% if 'leave_from_date' not in columns %} style="display: none;" {% endif %}>{% if result.leave_from_date %}{{ result.leave_from_date | date:"d/m/Y"}}{% else %} - {% endif %} - {% if result.leave_to_date %} {{ result.leave_to_date  | date:"d/m/Y" }} {% else %} - {% endif %}</td>
+
+        <td class="to_date" {% if 'remark' not in columns %} style="display: none;" {% endif %}> {% if result.leave_detail %} {{ result.leave_detail }} {% else %} - {% endif %} </td>
+        
+        <td class="status" {% if 'status' not in columns %} style="display: none;" {% endif %}> {% if result.leave_status == 1 %} Initiated {% elif result.leave_status == 2 %} Forwarded {% elif result.leave_status == 3 %} Approved {% elif result.leave_status == 4 %} Declined  {% endif %} </td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

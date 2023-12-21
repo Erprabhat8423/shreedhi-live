@@ -1,0 +1,3 @@
+{% for favorite in request.session.favorites %}
+<li class="dropdown-item logoutItem" onclick="openLink('{{favorite.link}}')"> {{favorite.favorite}} &nbsp;&bull;</li>
+{% endfor %}

@@ -1,0 +1,76 @@
+{% load static %}
+
+
+{% if last_notification %}
+<div class="row" id="detailsBoxFirst" style="display: block;">
+    <div class="col-md-12 p-md-0">
+        <h6><b>{{ last_notification.heading }} </b></h6>
+    </div>
+    <div class="col-md-12 p-md-0 mt-md-3">
+        <div class="row mb-md-2">
+            
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-2 p-0">
+                        <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Sender</h6>
+                        <h6 class="largeText">
+                            {{last_notification.from_user_name}}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-2 p-0">
+                        {% if last_notification.notification_type == '0' %}
+                        <img src="{% static 'img/svg/mobile_no.svg' %}" class="profileIconSize" />
+                        {% elif last_notification.notification_type == '1' %}
+                        <img src="{% static 'img/svg/app.svg' %}" class="profileIconSize" />
+                        {% else %}
+                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                        {% endif %}
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Notification Type</h6>
+                        <h6 class="largeText">
+                            {% if last_notification.notification_type|add:"0" == 0 %}
+                            SMS
+                            {% elif last_notification.notification_type|add:"0" == 1 %}
+                            PUSH Notification
+                            {% else %}
+                            Email
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-md-2">
+            <div class="col-md-12 p-md-0">
+                <div class="row">
+                    <div class="col-2 p-0">
+                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Message</h6>
+                        <h6 class="largeText">
+                            {{last_notification.activity}}
+                            <br>
+                            {% if last_notification.activity_image is not None and last_notification.activity_image != "" %}
+                                            <a href="{{last_notification.activity_image}}" download><i class="fa fa-download"></i></a>
+                                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<p>No Record Found.</p>
+{% endif %}

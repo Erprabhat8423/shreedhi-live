@@ -1,0 +1,163 @@
+{% load static %}
+
+<div class="modal-AddOrganisation centered" >
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 ">
+                <div class="row modalHoliday">
+                    <div class="text-center">
+                        <img src="{% static 'img/svg/calander-vacations.svg' %}"  />
+                        <h4 class="text-white mt-2">Add New <span class="modal-heading d-block"> Holiday </span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 add-details-popup">
+                <form name="holidayForm" id="holidayForm" method="POST" autocomplete="off" enctype="multipart/form-data" >
+                    {% csrf_token %}
+                    <div class="row add-form-row-mrng" style="justify-content: flex-end;">
+                        <button class="btn btn-close " type="button"  onclick="manipulateModal('AddnewHolidayModal','close')">
+                            <span class="mob-d-none" onclick="">Close</span>
+                            <i class="far fa-times-circle mob-d-block desk-d-none"></i>
+                        </button>
+                        <button class="btn btn-save mob-ml-16" type="button" onclick="saveHolidayForm()">
+                            Save
+                        </button>
+                    </div>
+                    <div class="row add-form-row-mrng">
+                        <div class="col-sm-12 col-12  pr-0 mt-2">                          
+                            <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="font-wt-b d-inline-block">
+                                Holiday Type*
+                            </h6>
+                            <select class="inputField selectField" data-live-search="true" style="width: 100%;" name="holiday_type_id" id="holiday_type_id">
+                                <option value="">Add Holiday Type</option>
+                                {% for holiday_type in holiday_types %}
+                                <option value="{{holiday_type.id}}">{{holiday_type.holiday_type|safe}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="error_msg float-right" id=""></label> 
+                        </div>
+                        <div class="col-sm-12 col-12  pr-0 mt-2">                          
+                            <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="font-wt-b d-inline-block">
+                                Holiday Name*
+                            </h6>
+                            <input class="inputField " id="holidayName" name="holidayName" placeholder="Holiday Name">
+                            <label class="error_msg float-right" id=""></label>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row add-form-row-mrng mt-2">
+                        <div class="col-sm-12 col-12  pr-0">
+                            <img src="{% static 'img/svg/calander-blue.svg' %}"  class="profileIconSize" />&nbsp;&nbsp;
+                            <h6 class="font-wt-b d-inline-block" >Select Date Range</h6>
+                            
+                        </div>
+                        
+                        <div class="col-sm-12 col-12 px-0 mt-2">
+                            <div class="row ">
+                                <div class="col-sm-6 col-6 pl-0 pr-2">
+                                    <!-- <input class="inputField position-relative" type="text" placeholder="Date From*" id="" name="dateFrom" /> -->
+                                    <input id="from_date" name="from_date" class="searchTable w-100 " placeholder="Date From*" value="{% now 'd/m/Y' %}" type="text" readonly >
+                                    <img src="{% static 'img/svg/claender-grey.svg' %}" class="profileIconSize calender-icon-input" style="right: 16px;" />
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                                <div class="col-sm-6 col-6  pl-1 pr-0 ">
+                                    <!-- <input class="inputField position-relative" type="text" placeholder="Date To*" id="" name="dateTo"  /> -->
+                                    <input id="to_date" name="to_date" class="searchTable w-100 " placeholder="Date To*" value="{% now 'd/m/Y' %}" type="text" readonly >
+                                    <img src="{% static 'img/svg/claender-grey.svg' %}" class="profileIconSize calender-icon-input" />
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row add-form-row-mrng">
+                        <div class="col-sm-12 col-12  pr-0 mt-2">
+                            <img src="{% static 'img/svg/vacation-holiday.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                            <h6 class="font-wt-b d-inline-block">
+                                Holiday Description
+                            </h6>
+                        </div>
+                        
+                        <div class="col-sm-12 col-12 px-0 mt-2">
+                            <textarea class="inputField " type="textarea" placeholder="describe Holiday Here*"
+                            id="holiday_description" name="holiday_description"></textarea>
+                            <label class="error_msg float-right" id=""></label>
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+function validateForm(){
+        var error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        $('.select2-container').css("border", "");
+        
+        if ($.trim($('[name="holiday_type_id"]').val()) == "") {
+            error = error + 1;
+            $('[name="holiday_type_id"]').parent().find('.error_msg').text('Please select holiday type');
+            $('[name="holiday_type_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        if ($.trim($('[name="holidayName"]').val()) == "") {
+            error = error + 1;
+            $('[name="holidayName"]').css("border", "1px solid #db8305");
+            $('[name="holidayName"]').parent().find('.error_msg').text("Please enter Holiday Name*");
+        }
+        holiday_description = editor.getData();
+        if (holiday_description == "") {
+            error = error + 1;
+            $('[name="holiday_description"]').css("border", "1px solid #db8305");
+            $('[name="holiday_description"]').parent().find('.error_msg').text("Please enter holiday description*");
+        }else{
+            $('[name="holiday_description"]').val(holiday_description);
+        }
+        
+        
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    
+    
+    function saveHolidayForm(){
+        if(validateForm()){
+            return false;
+        }else{
+            showLoader();
+            var formData = $('#holidayForm').serialize();
+            console.log(formData);                
+            $.ajax({
+                url: "{% url 'src:add-holiday' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.flag) {
+                        $('#AddnewHolidayModal').html('');
+                        $('#AddnewHolidayModal').hide();
+                        manipulateModal('AddnewHolidayModal','close');
+                        openToaster("success", response.message);
+                        setTimeout(function(){ window.location.reload(); }, 500);
+                        
+                        
+                    } else {
+                        openToaster("danger", response.message);
+                    }
+                }
+            });
+        }
+    }
+</script>

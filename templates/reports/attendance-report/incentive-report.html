@@ -1,0 +1,163 @@
+{% extends 'layout/layout.html' %} 
+{% load helper_tags %} 
+{% block content %} 
+{% load static %} 
+
+{% block style %} 
+{% endblock %}
+<style>
+    .select2-container--default .select2-selection--single .select2-selection__rendered{
+        text-align: left;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-sm-12 h-100">
+        <div class="col-md-4 p-md-0">
+            <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+        </div>
+        <div class="primaryContainer h-100 ajaxReportSection mt-4" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 p-md-0 text-right">
+                    <select class="inputField " name="selectfortnight"  style="width: 20% !important;"  onchange="showFortnightly(this.value);">
+                        <option value="monthly">Monthly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                    </select>
+                    <select class="inputField " name="fortnight" id="fortnight"  style="width: 20% !important;display:none;"  onchange="filterIncentive(this.value)">
+                        <!--<option value="">Select Fortnight</option>-->
+                        <option value="1">Fortnight 1</option>
+                        <option value="2">Fortnight 2</option>
+                    </select>
+                    <input type="search" style="width: 20% !important;" placeholder="Incentive Date" value="{{current_date}}" class="searchTable" id="search_date" onchange="filterIncentive(this.value)" readonly>
+                    
+                    <button type="button" id="" class="btn iconBox iconExportExcel" style="margin-right: 120px;" onclick="exportExcel()"></button>    
+                    </div>
+                </div>
+                <div class="row" id="tableBox">
+                    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajaxReportData">
+                        <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Sap Code</th>
+                                    <th>Distributor Name</th>
+                                    <!--<th>SS Incentive</th>-->
+                                    <th>Distributor Incentive</th>
+                                    <!--<th>Primary  TPT Amount</th>-->
+                                    <!--<th>Distributor TPT Amount</th>-->
+                                    {% for slab in superstockists_distinct_slab %}
+                                    <th>{{slab.slab_detail}}</th>
+                                    {% endfor %}
+                                    <th>NET Amount</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="tablebody">
+                                {% if superstockists %}
+                                {% for superstockist in superstockists %}
+                                <tr>
+                                    <td>{{superstockist.emp_sap_id}}</td>
+                                    <td>{{superstockist.name}} <strong>({{superstockist.store_name}})</strong></td>
+                                    <!--<td>{{superstockist.ss_incentive}}</td>-->
+                                    <td>{{superstockist.distributor_incentive}}</td>
+                                    <!--<td>{{superstockist.primary_transporter_amount}}</td>-->
+                                    <!--<td>{{superstockist.secondary_transporter_amount}}</td>-->
+                                    {% for slab_amount in superstockist.slab_amount_list %}
+                                    <td>{{slab_amount}}</td>
+                                    {% endfor %}
+                                    <td>{{superstockist.net_amount}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">
+                                        No Record Found...
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %} 
+{% block script %}
+
+<script>
+
+    
+    $(document).ready(function(){
+        $("#search_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'mm/yy' 
+        });
+        
+        
+       
+        
+    });
+    
+    function showFortnightly(value){
+        if(value == "monthly"){
+            $('#fortnight').hide();
+            filterIncentive($("#search_date").val());
+        }else{
+             $('#fortnight').show();
+            filterIncentive($("#fortnight").val());
+        }
+    }
+    
+    function filterIncentive(val ){
+        
+        if($("[name='selectfortnight'").val() == 'monthly'){
+            var search_date = val;
+            var fortnight = "";
+        }else{
+            var search_date = $("#search_date").val();
+            var fortnight = val;
+        }
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:ajax-incentive-report' %}",
+            method: 'GET',
+            data: { search_date:search_date,fortnight:fortnight },
+            success: function (data) {
+                hideLoader();
+                $('#addOrgTable').html(data);
+            },
+            error: function (err) {
+            }
+        });
+    }
+    
+    function exportExcel(){
+        if($("[name='selectfortnight'").val() == 'monthly'){
+            var search_date = $("#search_date").val();
+            var fortnight = "NA";
+        }else{
+            var search_date = $("#search_date").val();
+            var fortnight = $("#fortnight").val();
+        }
+        if(search_date){ 
+                search_date = search_date.split('/');
+                search_date = search_date[1]+'-'+search_date[0]
+            }else{ search_date = '0' }
+            
+            var url = "{% url 'src:export-incentive-report' 'search_date' 'fortnight'  %}";
+            url = url.replace('search_date',search_date);
+            url = url.replace('fortnight',fortnight);
+            window.location.href = url; 
+        }
+    
+  
+</script>
+
+{% endblock %}
+

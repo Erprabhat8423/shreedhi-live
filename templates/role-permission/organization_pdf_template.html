@@ -1,0 +1,71 @@
+<style>
+  .header-title h2,
+  .header-title h3 {
+    display: inline-block;
+  }
+  h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
+  }
+
+  table {
+    width: 750px;
+    border-collapse: collapse;
+    margin: 0px auto;
+  }
+
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+
+  th {
+    background: #3498db;
+    color: #000000;
+    font-weight: bold;
+  }
+
+  td,
+  th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 12px;
+  }
+</style>
+
+<div class="col-md-12">
+  <div class="col-12" style="margin-bottom: 15px;">
+    <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th colspan="{{ columns_length }}">
+          <h3> Oragnisations List </h3>
+        </th>
+      </tr>
+      <tr>
+        <th class="org_name" {% if 'org_name' not in columns %} style="display: none;" {% endif %}>Organization Name</th>
+        <th class="landline_no" {% if 'landline_no' not in columns %} style="display: none;" {% endif %}>Landline No.</th>
+        <th class="mobile_no" {% if 'mobile_no' not in columns %} style="display: none;" {% endif %}>Mobile No.</th>
+        <th class="email_id" {% if 'email_id' not in columns %} style="display: none;" {% endif %}>Email id</th>
+        <th class="address">Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for organization in organizations %}
+      <tr>
+        <td class="org_name" {% if 'org_name' not in columns %} style="display: none;" {% endif %}>{{ organization.organization_name }}</td>
+        <td class="landline_no" {% if 'landline_no' not in columns %} style="display: none;" {% endif %}>{% if organization.landline_country_code %}{{ organization.landline_country_code }}{% endif %} {% if organization.landline_state_code %}{{ organization.landline_state_code }}{% endif %} {% if organization.landline_number %}{{ organization.landline_number }} {% else %} - {% endif %}</td>
+        <td class="mobile_no" {% if 'mobile_no' not in columns %} style="display: none;" {% endif %}> {% if organization.mobile_country_code %}{{ organization.mobile_country_code }}{% endif %} {% if organization.mobile_number %}{{ organization.mobile_number }} {% else %} - {% endif %} </td>
+		   <td class="email_id" {% if 'email_id' not in columns %} style="display: none;" {% endif %}> {% if organization.email %}{{ organization.email }} {% else %} - {% endif %} </td>
+		   <td class="address">{{ organization.address }}, {{ organization.pincode }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

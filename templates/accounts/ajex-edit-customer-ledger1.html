@@ -1,0 +1,326 @@
+{% if ledger_users %}
+
+<table id="tblCustomers" class="table table-bordered mt-0 fixTableHead cbtn-selectors" style="width: 100%; float: right;">
+    <thead>
+        <tr>
+            <th >Date</th>
+            <th>Particular</th>
+            <th>Bank Details</th>
+            <th>Credit </th>
+            <th>Debit</th>
+            <th>Balance</th>
+            <th class="actionsec">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        {% for ledger_user in ledger_users %}
+        <tr>
+            <td><input type="text" name="ledger_date[]" required="" id="ledger_date_{{forloop.counter}}" class="datepicker inputField ledger_date" value='{{ledger_user.order_date|date:"d/m/Y"}}'></td>
+            <td>
+            {% if ledger_user.invoice_no == '0' %} 
+               <input type="hidden" name="particulars[]" id="particulars_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.particulars}}'>
+                <input type="hidden" name="order_id[]" id="order_id_{{forloop.counter}}"  value='{{ledger_user.order_id}}'> 
+                <input type="hidden" name="invoice_no[]" id="invoice_no_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.invoice_no}}'> 
+                
+                
+                <input type="text" disabled class="inputField quantity_index" value='{{ledger_user.particulars}}'>
+                
+                {% else %} 
+                <input type="hidden" name="particulars[]" id="particulars_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.particulars}}'>
+                <input type="hidden" name="order_id[]" id="order_id_{{forloop.counter}}"  value='{{ledger_user.order_id}}'> 
+                <input type="hidden" name="invoice_no[]" id="invoice_no_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.invoice_no}}'> 
+                
+                <input type="text" disabled class="inputField quantity_index" value='{{ledger_user.particulars}}({{ledger_user.invoice_no}})'>
+                {% endif %}
+            </td>
+            <td>
+            <input type="hidden" name="payment_note_id[]" id="payment_note_id_{{forloop.counter}}"  value='{{ledger_user.payment_note}}'>
+            <input type="hidden" name="note_type_id[]" id="note_type_id_{{forloop.counter}}"  value='{{ledger_user.note_type}}'>
+            <select class="inputField selectField " style="width: 100% !important;" name="bank_name[]" id="bank_id_{{forloop.counter}}" onchange="getaccount({{forloop.counter}})">
+           <option value=""> Select bank</option>
+            {% for banklist in banks %}
+            <option value="{{ banklist.id }}" {% if ledger_user.bank_id == banklist.id %} selected {% endif %}>{{ banklist.bank_name }}({{banklist.account_no}})</option>
+            {% endfor %}
+            </select></td>
+            <td class="cr editMe">{% if ledger_user.credit %} <input type="text" onkeypress="return validateFloatKeyPress(this,event);" name="credit[]" required=""  id="credit_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.credit}}'>{% else %}<input type="text" onkeypress="return validateFloatKeyPress(this,event);" name="credit[]" required="" id="credit_{{forloop.counter}}" class="inputField quantity_index" value='0'>{% endif %}
+            </td>
+            <td class="dr editMe"><input type="text" name="debit[]" required="" onkeypress="return validateFloatKeyPress(this,event);" id="debit_{{forloop.counter}}" class="inputField quantity_index" value='{{ledger_user.debit}}'></td>
+            <td class="total">
+                <input type="hidden" name="balance[]" id="balance_{{forloop.counter}}" class="inputField quantity_index " value='{{ledger_user.balance}}'>
+                <input type="text" disabled required="" id="balance_{{forloop.counter}}" class="inputField quantity_index " value='{{ledger_user.balance}}'></td>
+            <td class="actionsec">
+                <a href="javascript:void(0)" id="{{forloop.counter}}" class="addrow"><img src="/static/img/svg/addblue.svg" class="tableRowIcon"></a>&nbsp;
+                <a href="javascript:void(0)" class="removerow"><img src="/static/img/svg/deleteblue.svg" class="tableRowIcon"></a>
+            </td>
+        </tr>
+        {% endfor %}
+        
+    </tbody>
+</table>
+
+{% else %}
+<p
+    style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+    No Record Found...</p>
+{% endif %}
+<br><br>
+
+<script>
+    // $('#user_id').val('{{first_user}}')
+</script>
+
+<script type="text/javascript">
+   $(document).ready(function() {
+    $(document).on("click", "#tblCustomers tbody td .btnDelete", function () {
+        var total,sum,sum1,total1;
+        //var prev_blance = $(this).closest('tr').find("input[name='balance[]']").val();
+        var sum = Number(parseFloat($(this).closest('tr').find(".total >input").val()));
+        var cr = Number(parseFloat($(this).closest('tr').find(".cr >input").val()));
+        var dr = Number(parseFloat($(this).closest('tr').find(".dr >input").val()));
+        if (cr !== 0) {
+                    sum=Number(sum);
+                    total = parseFloat(sum + cr);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum=Number(sum);
+                    total = parseFloat(sum - dr);
+                }
+             $(this).closest('tr').next('tr').find("input[name='balance[]']").val(total);
+  //$("#tblCustomers > tbody > tr").eq($(row).index()).remove(); 
+       $(this).closest('tr').remove();          
+       $('#tblCustomers > tbody >tr').each(function(){  
+                var cr1 = Number(parseFloat($(this).next('tr').find(".cr >input").val()));
+                var dr1 = Number(parseFloat($(this).next('tr').find(".dr >input").val()));
+                var sum1 = Number(parseFloat($(this).find(".total >input").val()));
+                console.log(sum1)
+                if (cr1 !== 0) {
+                   // cr2 = cr1- cr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 - cr1);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 + dr1);
+                }
+                console.log(total1);
+                $(this).closest('tr').next('tr').find(".total >input").val(total1.toFixed(2));
+});
+        
+
+});
+// add row
+//$(document).on("click", "#tblCustomers tbody td .addrow", function () {
+$("#tblCustomers tbody tr td .addrow").click(function () {
+      
+     //validationeach();
+      if(validationeach()){
+            return false;
+        }else{ 
+                var row = $(this).closest('tr');
+                //alert($(this).closest('tr').find("input[name='balance[]']").val());
+                var prev_blance = $(this).closest('tr').find("input[name='balance[]']").val();
+                var order_id = $(this).closest('tr').find("input[name='order_id[]']").val();
+                if(order_id == null)
+                {
+                    var orderval = ''
+                }
+                else
+                {
+                    var orderval = order_id
+                }
+                var i = $(row).index()+2;
+                var htmlval = `<tr>
+                        <td><input type="text" name="ledger_date[]" onclick="return getdateval(`+i+`);" required="" id="ledger_date_`+i+`" class="inputField ledger_date" value=''><div class="error_msg1 errorfield"></div></td>
+                        <td>
+                            <select class="inputField" style="width: 100% !important;" name="particulars[]" id="particulars_`+i+`">
+                        <option value="0"> Select mode</option>
+                        {% for modetypes in modetype %}
+                        <option value="Receive Payment({{ modetypes.mode_of_payment }})">Receive Payment({{ modetypes.mode_of_payment }})</option>
+                        {% endfor %}
+                        </select><div class="error_msg2 errorfield"></div>
+                        <input type="hidden" name="invoice_no[]" id="invoice_no_`+i+`" class="inputField quantity_index" value=''>
+                        <input type="hidden" name="order_id[]" id="order_id_`+i+`"  value='0'>
+                        </td>
+                        <td><input type="hidden" name="payment_note_id[]" id="payment_note_id_`+i+`"  value=''>
+                            <input type="hidden" name="note_type_id[]" id="note_type_id_`+i+`"  value=''>
+                            <input type="hidden" name="payment_mode_id[]" id="payment_mode_id_`+i+`"  value=''>
+                            <select class="inputField" style="width: 100% !important;" name="bank_name[]" id="bank_id_`+i+`" onchange="getaccount(`+i+`)">
+                        <option value=""> Select bank</option>
+                        {% for banklist in banks %}
+                        <option value="{{ banklist.id }}">{{ banklist.bank_name }}({{banklist.account_no}})</option>
+                        {% endfor %}</select>
+                        <input type="hidden" name="organization_id[]" id="organization_id_`+i+`"  value=''>
+                        <div class="error_msg3 errorfield"></div>
+                        <input type="hidden" onkeypress="return validateNumberKeyPress(this,event);" placeholder="Account No" name="accountNo[]" required="" id="account_no_`+i+`" class="inputField quantity_index numeric" value=''>
+                        <div class="error_msg6 errorfield"></div></td>
+                        <td class="cr"><input type="text" name="credit[]" onkeypress="return validateFloatKeyPress(this,event);" required="" id="credit_`+i+`" class="inputField quantity_index" value='0'><div class="error_msg4 errorfield"></div></td>
+                        <td class="dr"><input type="text" name="debit[]" onkeypress="return validateFloatKeyPress(this,event);" required="" id="debit_`+i+`" class="inputField quantity_index" value='0'><div class="error_msg5 errorfield"></div></td>
+                        <td class="total"><input type="hidden" name="balance[]" id="balance_`+i+`" class="inputField quantity_index " value='`+prev_blance+`'>
+                            <input type="text" disabled required="" id="balance_`+i+`" class="inputField" value='`+prev_blance+`'><div class="error_msg7 errorfield"></div></td>
+                        <td class="actionsec">
+                            <a href="javascript:void(0)" id="`+i+`" class="btnDelete"><img src="/static/img/svg/deleteblue.svg" class="tableRowIcon"></a>
+                        </td>
+                    </tr>`;
+                     
+                    $('#tblCustomers > tbody > tr').eq($(row).index()).after(htmlval);
+                    
+                    var j = 1;
+                    $('#tblCustomers tbody tr').each(function(){
+                        $(this).find("input[name='ledger_date[]']").attr('id','ledger_date_'+j);
+                        $(this).find("input[name='particulars[]']").attr('id','particulars_'+j);
+                        $(this).find("input[name='bank_details[]']").attr('id','bank_details_'+j);
+                        $(this).find("input[name='quantity[]']").attr('id','quantity_'+j);
+                        
+                        $(this).find("input[name='credit[]']").attr('id','credit_'+j);
+                        $(this).find("input[name='debit[]']").attr('id','debit_'+j);
+                        $(this).find("input[name='balance[]']").attr('id','balance_'+j);
+                        j++;
+                        $(this).find("input[name='ledger_date[]']").datepicker({
+								weekStart: 1,
+								changeMonth: true,
+								changeYear: true,  
+								yearRange: "-100:+0",
+								daysOfWeekHighlighted: "6,0",
+								autoclose: true,
+								todayHighlight: true,
+								dateFormat: 'dd/mm/yy',
+		}); 
+                        });
+            }
+  }); 
+    }); 
+//remove row
+//$(document).on("click", "#tblCustomers tbody td .removerow", function () {
+    $("#tblCustomers tbody tr td").on('change',function(){
+if($(this).find("input[name='credit[]']").val() =='')
+{
+    $(this).find("input[name='credit[]']").val('0');
+}
+  if($(this).find("input[name='debit[]']").val() =='')
+{
+    $(this).find("input[name='debit[]']").val('0');
+} 
+    });   
+    $("#tblCustomers tbody tr td .removerow").click(function() {
+var row = $(this).closest('tr');
+
+debugger;
+var total,sum,sum1,total1;
+//var prev_blance = $(this).closest('tr').find("input[name='balance[]']").val();
+var sum = Number(parseFloat($(this).closest('tr').find(".total >input").val()));
+var cr = Number(parseFloat($(this).closest('tr').find(".cr >input").val()));
+var dr = Number(parseFloat($(this).closest('tr').find(".dr >input").val()));
+if (cr !== 0) {
+                    sum=Number(sum);
+                    total = parseFloat(sum + cr);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum=Number(sum);
+                    total = parseFloat(sum - dr);
+                }
+             $(this).closest('tr').next('tr').find("input[name='balance[]']").val(total);
+  $("#tblCustomers > tbody > tr").eq($(row).index()).remove();           
+ $('#tblCustomers > tbody >tr').each(function(){  
+                var cr1 = Number(parseFloat($(this).next('tr').find(".cr >input").val()));
+                var dr1 = Number(parseFloat($(this).next('tr').find(".dr >input").val()));
+                var sum1 = Number(parseFloat($(this).find(".total >input").val()));
+                console.log(sum1)
+                if (cr1 !== 0) {
+                   // cr2 = cr1- cr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 - cr1);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 + dr1);
+                }
+                console.log(total1);
+                $(this).closest('tr').next('tr').find(".total >input").val(total1.toFixed(2));
+});
+//$(this).closest('tr').next('tr').find(".total >input").val(total1.toFixed(2));
+
+var j = 1;
+        $('#tblCustomers tbody tr').each(function(){
+            $(this).find("input[name='ledger_date[]']").attr('id','ledger_date_'+j);
+            $(this).find("input[name='particulars[]']").attr('id','particulars_'+j);
+            $(this).find("input[name='bank_details[]']").attr('id','bank_details_'+j);
+            $(this).find("input[name='quantity[]']").attr('id','quantity_'+j);
+            $(this).find("input[name='credit[]']").attr('id','credit_'+j);
+            $(this).find("input[name='debit[]']").attr('id','debit_'+j);
+            $(this).find("input[name='balance[]']").attr('id','balance_'+j);
+            j++;
+        });
+  }); 
+</script>
+
+    <script>
+  $(document).ready(function() {    
+    
+    var total,sum,sum1,total1;
+  $(document).on("keyup", "#tblCustomers tbody tr", function () {
+ //$('#tblCustomers tbody tr').keyup(function() {
+if($(this).find("input[name='credit[]']").val() == ''){
+   $(this).find("input[name='credit[]']").val('0'); 
+}
+if($(this).find("input[name='debit[]']").val() == ''){
+   $(this).find("input[name='debit[]']").val('0'); 
+}
+var sum = Number(parseFloat($(this).find(".total >input").val()));
+var cr = Number(parseFloat($(this).find(".cr >input").val()));
+var dr = Number(parseFloat($(this).find(".dr >input").val()));
+
+if (cr !== 0) {
+                    sum=Number(sum);
+                    total = parseFloat(sum - cr);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum=Number(sum);
+                    total = parseFloat(sum + dr);
+                }
+             $(this).find(".total >input").val(total.toFixed(2));
+
+     
+               $('#tblCustomers > tbody > tr').each(function(){  
+                var cr1 = Number(parseFloat($(this).next('tr').find(".cr >input").val()));
+                var dr1 = Number(parseFloat($(this).next('tr').find(".dr >input").val()));
+                var sum1 = Number(parseFloat($(this).find(".total >input").val()));
+                console.log(sum1)
+                if (cr1 !== 0) {
+                   // cr2 = cr1- cr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 - cr1);
+                } else {
+                    // dr2 = dr1- dr;
+                    sum1=Number(sum1);
+                    total1 = parseFloat(sum1 + dr1);
+                }
+                console.log(total1);
+                $(this).closest('tr').next('tr').find(".total >input").val(total1.toFixed(2));
+               });
+      
+            });
+
+   
+});
+$(function () {
+    $(document).on("click",".editMe",function () {
+       if($(this).attr("contentEditable") == true){
+        $(this).attr("contentEditable","false");
+    } else {
+        $(this).attr("contentEditable","true");
+    }
+    });
+    
+});
+$('#tblCustomers tbody td .editMe').on('click', function() {
+        
+         var row = $(this).closest('td');
+       
+       if($(this).attr("contentEditable") == true){
+        $(this).attr("contentEditable","false");
+    } else {
+        $(this).attr("contentEditable","true");
+    }
+    });
+    </script>

@@ -1,0 +1,172 @@
+{% load static %}
+
+<div class="col-12 p-0 col-md-12 p-md-0">
+    <div class="row">
+        <div class="col-3 p-0 col-md-3 p-md-0">
+            {% if user.store_image and user.store_image != 'None' %}
+            <img src="{{ user.store_image }}" style="width: 100%; ">
+            {% else %}
+            <img src="{% static 'img/png/storePic.png' %}" style="width: 100%; height: 60%;">
+            {% endif %}
+        </div>
+        <div class="col-9 p-0 col-md-9 p-md-0">
+            <div class="row">
+                <div class="col-9 col-md-9">
+                    <h5 class="m-0"><b style="color: #009cff;">{{user.store_name}} </b></h5>
+                    <h6 class="m-0">{{user.salutation}} {{user.first_name}} {{user.middle_name}} {{user.last_name}}</h6>
+                </div>
+                <div class="col-3 p-0 col-md-3 p-md-0 text-right">
+                    <img src="{% static 'img/svg/openingCrates.svg' %}" class="profileIconSize">&nbsp;&nbsp;{% if user.opening_crates %}{{user.opening_crates}}{% else %}-{% endif %}
+                    <h6 class="smalltext lightGrey">No. of Crates with Distributor</h6>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1 pr-0 col-md-1">
+                    <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                </div>
+                <div class="col-5 col-md-5">
+                    <h6 class="smallText">Contact No.</h6>
+                    <h6 class="largeText">{{user.primary_contact_number}}</h6>
+                </div>
+                <div class="col-6 p-0 col-md-6 p-md-0 text-right">
+                    {% if user.outstanding_amount %} <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;<span style="font-size: 1.2rem;"> </span>{{user.outstanding_amount}} {% else %} - {% endif %}</span>
+                    <h6 class="smalltext lightGrey">Outstanding Amt.</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-4">
+            <div class="row mb-md-2">
+                <div class="col-8 p-0 col-md-8 p-md-0">
+                    <div class="row">
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Gender</h6>
+                                    <h6 class="largeText">{{user.gender | title}}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0">
+                                    <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-0 col-md-10 p-md-0">
+                                    <h6 class="smallText">Blood Group</h6>
+                                    <h6 class="largeText">{% if user.blood_group %}{{user.blood_group}}{% else %}-{% endif %}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 p-0 col-md-12 p-md-0 mt-3">
+                            <div class="row">
+                                <div class="col-1 p-0 col-md-1 p-md-0">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-11 p-0 col-md-11 p-md-0">
+                                    <h6 class="smallText">Store Address</h6>
+                                    <h6 class="largeText">{% if user.address_line_1 %} {{user.address_line_1}},{% endif %} {% if user.address_line_2 %} {{user.address_line_2}},{% endif %} {{user.state_name}}, {{user.country_name}},{{user.pincode}}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 col-md-4">
+                    {% if user.is_tagged == 1 %}
+                    <button class="btn btn-Map w-100 mt-2" onclick="getGeoTaggedMap('{{ user.id }}')"> <img src="{% static 'img/svg/viewonMapWhite.svg' %}"
+                    class="btnIcon"> Show on
+                    map</button>
+                    {% endif %}
+                    
+                    </div>
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col-1 p-0 col-md-1 p-md-0">
+                        <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-11 p-0 col-md-11 p-md-0">
+                        <h6 class="smallText">Other Contact Person</h6>
+                    </div>
+                </div>
+                {% if contact_persons %}
+                {% for contact_person in contact_persons %}
+                <div class="row mt-2 cardRow">
+                    <div class="col-7 p-0 col-md-7 p-md-0">
+                        <h6 class="m-0">{{contact_person.contact_person_name}}</h6>
+                        <label class="smallText m-0">{{contact_person.designation}}</label>
+                    </div>
+                    <div class="col-5 p-0 col-md-5 p-md-0">
+                        <h6 class="m-0">{{contact_person.contact_number}}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>No Record Found.</p>
+                {% endif %}
+
+                <div class="row mb-2 row mt-3 mb-md-2 row mt-md-3">
+                    <div class="col-6 p-0 col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-10 p-0 col-md-10 p-md-0">
+                                <h6 class="smallText">Organisation</h6>
+                                <h6 class="largeText">{% if user.organization_name %} {{user.organization_name}} {% else %} - {% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 p-0 col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-10 p-0 col-md-10 p-md-0">
+                                <h6 class="smallText">Department</h6>
+                                <h6 class="largeText">{% if user.department_name %} {{user.department_name}} {% else %} - {% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-6 p-0 col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-6 p-0 col-md-10 p-md-0">
+                                <h6 class="smallText">Roles</h6>
+                                <h6 class="largeText">{{user.role_name}}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 p-0 col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-6 p-0 col-md-10 p-md-0">
+                                <h6 class="smallText">SAP ID</h6>
+                                <h6 class="largeText">{% if user.emp_sap_id %} {{user.emp_sap_id}} {% else %} - {% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3 moreInfo" style="display: block !important;">
+    <div class="dropdown-divider w-100"></div>
+    <div class="col-12 col-sm-12 text-center p-0">
+        <h6 class="m-0" onclick="viewUserDetails('{{user.id}}')" style="cursor: pointer;">
+            <u>More Info</u></h6>
+        </div>
+    </div>

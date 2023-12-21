@@ -1,0 +1,406 @@
+{% load static %}
+<style type="text/css">
+  #ajax_maps {
+    width: 100%;
+    height: 400px;
+  }
+</style>
+<div class="modal-ViewEmployee centered">
+  <div class="modal-header pb-0" id="headerViewEmployee">
+    <div class="col-12 p-0">
+      <div class="row">
+        <div class="col-6">
+          <h5 class="mt-md-2" style="color: #0052a0;">{{employee.salutation }} {{employee.first_name }} {{employee.middle_name }} {{employee.last_name }} | {{employee.role_name | capfirst }}</h5>
+          
+        </div>
+        <div class="col-6">
+          <button class="btn btn-close float-right mt-3" type="button"
+          onclick="manipulateModal('viewEmployeeModal','close')">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-body pt-0" id="viewEmpModalBody" style="overflow: auto">
+  <div class="row mb-3" id="infoPills">
+    <div class="col-sm-12 p-0">
+      <ul class="nav nav-tabs">
+        <li class="infoTabs" id="basicTab" onclick="changeInfoTab('basic')">Basic info
+        </li>
+        <li class="infoTabs" id="officialTab" onclick="changeInfoTab('official')">Official
+          Details
+        </li>
+        <li class="infoTabs" id="attendanceTab" onclick="changeInfoTab('attendance')">
+          Attendance Configuration
+        </li>
+        <li class="infoTabs" id="uploadsTab" onclick="changeInfoTab('uploads')">Uploads
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 p-0 h-100 w-100" id="basic">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-12 p-0 mt-2">
+              <div class="row">
+                <div class="col-md-2 p-0 text-center">
+                  {% if employee.profile_image and employee.profile_image != 'None' %}
+                  <img src="{{ employee.profile_image }}" style="width: 100%;">
+                  {% else %}
+                  <img src="{% static 'img/svg/profile.svg' %}" style="height: 93%;float: left;width: 93%;">
+                  {% endif %}
+                </div>
+                <div class="col-md-10 p-10">
+                  <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                    Contact No.*
+                  </h6>
+                  {% for user_contact in user_contacts %}
+                  <div class="row mt-2">
+                    <div class="col-md-4 pr-0">
+                      <h6 class="viewText mt-0">{{user_contact.country_code}} {{user_contact.contact_number}}</h6>
+                    </div>
+                    <div class="col-md-4 pr-0">
+                      <h6 class="viewText mt-0">{{user_contact.contact_type_name}}</h6>
+                      
+                    </div>
+                    {% if user_contact.is_primary == 1 %}
+                    <div class="col-md-4 pr-0">
+                      <button class="btn btn-step activeStep">
+                        &#10004;
+                      </button>
+                      <span class="viewText m-0">Primary</span>
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Date of Birth
+              </h6>
+              <h6 class="viewText">{{employee.date_of_birth | date:"d/m/Y"}}</h6>
+            </div>
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Email id
+              </h6>
+              <h6 class="viewText">{{employee.official_email }}</h6>
+            </div>
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Gender
+              </h6>
+              <h6 class="viewText">{{employee.gender | capfirst }}</h6>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Blood group
+              </h6>
+              <h6 class="viewText">{% if employee.blood_group %}{{employee.blood_group}}{% else %}-{% endif %}</h6>
+            </div>
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Father's Name
+              </h6>
+              <h6 class="viewText">{{employee.father_name }}</h6>
+            </div>
+            <div class="col-md-4">
+              <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Mother's Name
+              </h6>
+              <h6 class="viewText">{{employee.mother_name }}</h6>
+            </div>
+          </div>
+          
+          
+        </div>
+        <div class="col-md-4">
+          
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Correspondance Address
+              </h6>
+              <h6 class="viewText">{% if employee_correspondence_address.address_line_1 %} {{employee_correspondence_address.address_line_1}},{% endif %} {% if employee_correspondence_address.address_line_2 %} {{employee_correspondence_address.address_line_2}},{% endif %} {{employee_correspondence_address.state_name}}, {{employee_correspondence_address.country_name}},{{employee_correspondence_address.pincode}}</h6>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Permanent Address
+              </h6>
+              <h6 class="viewText">{% if employee_permanent_address.address_line_1 %} {{employee_permanent_address.address_line_1}},{% endif %} {% if employee_permanent_address.address_line_2 %} {{employee_permanent_address.address_line_2}},{% endif %} {{employee_permanent_address.state_name}}, {{employee_permanent_address.country_name}},{{employee_permanent_address.pincode}}</h6>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    <div class="col-md-12 p-0 h-100 w-100" id="official">
+      <div class="row">
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            Organization*
+          </h6>
+          <h6 class="viewText">{{employee.organization_name}}</h6>
+        </div>
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            Department*
+          </h6>
+          <h6 class="viewText">{{employee.department_name}}</h6>
+        </div>
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            Roles
+          </h6>
+          <h6 class="viewText">{{employee.role_name}}</h6>
+        </div>
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            Employee ID
+          </h6>
+          <h6 class="viewText">{{employee.emp_sap_id}}</h6>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            Aadhar Card No*
+          </h6>
+          <h6 class="viewText">{{employee.aadhaar_nubmer}}</h6>
+        </div>
+        <div class="col-md-3">
+          <img src="{% static 'img/svg/PAN.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+          <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+            PAN Card No*
+          </h6>
+          <h6 class="viewText">{{employee.pan_number}}
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Date of Joining
+            </h6>
+            <h6 class="viewText">{{employee.date_of_joining|date:"d/m/Y" }}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Working Hour
+            </h6>
+            <h6 class="viewText">{{employee.working_shift_name}}</h6>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Reporting to
+            </h6>
+            <h6 class="viewText">{{employee.reporting_to_name}}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Email id (Official)
+            </h6>
+            <h6 class="viewText">{{employee.official_email}}</h6>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-md-12">
+            <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+            <h5 class="mt-2 mb-0" style="display: inline-block;">
+              Area Details
+            </h5>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                  Zone
+                </h6>
+              </div>
+              <div class="col-md-4">
+                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                  Town
+                </h6>
+              </div>
+            </div>
+            {% for area_allocated in user_areas %}
+            <div class="row cardRow mt-3">
+              <div class="col-md-4">
+                <h6 class="viewText">{{area_allocated.zone_name}}</h6>
+              </div>
+              <div class="col-md-4">
+                <h6 class="viewText">{{area_allocated.town_name}}</h6>
+              </div>
+              
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 p-0 fullWidth fulHeight" id="attendance">
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-striped table-borderless" style="font-size: 1rem;">
+              <thead>
+                <tr>
+                  <th>Distributor</th>
+                  <th>Periphery</th>
+                  <th>Attendance Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if user_attendance_locations %}
+                {% for user_attendance_location in user_attendance_locations %}
+                <tr>
+                  <td>{{user_attendance_location.distributor_ss_name}}</td>
+                  <td>{{user_attendance_location.periphery}}</td>
+                  <td>{{user_attendance_location.timing}}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td colspan="3"><p>No Record Found.</p></td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6" id="ajax_maps">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 p-0 fullWidth fulHeight" id="uploads">
+        <div class="row">
+          <div class="col-md-3">
+            <h6><img src="{% static 'img/svg/aadhaar.svg' %}"> &nbsp;&nbsp; Aadhar Card</h6>
+            <div class="card">
+              {% if user_documents.aadhaar_card %}
+              <img src="{{ user_documents.aadhaar_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+              {% else %}
+              <img src="{% static 'img/svg/GSTNGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-3">
+            <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; PAN Card</h6>
+            <div class="card">
+              {% if user_documents.pan_card %}
+              <img src="{{ user_documents.pan_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+              {% else %}
+              <img src="{% static 'img/svg/GSTNGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Asynchronously Load the map API 
+    var script = document.createElement('script');
+    script.src = "//maps.googleapis.com/maps/api/js?libraries=places&key={{google_app_key}}&callback=initMap";
+    document.body.appendChild(script);
+  });
+  function initMap() {
+    var map;
+    var bounds = new google.maps.LatLngBounds();
+    var mapOptions = {
+      mapTypeId: 'roadmap'
+    };
+    
+    // Display a map on the web page
+    map = new google.maps.Map(document.getElementById("ajax_maps"), mapOptions);
+    map.setTilt(50);
+    
+    // Multiple markers location, latitude, and longitude
+    var markers = [
+    {% for user_coordinate in user_coordinates %}
+    {% if user_coordinate.coordinate.latitude %}
+    ["{{user_coordinate.coordinate.latitude}}", "{{user_coordinate.coordinate.longitude}}", "{{user_coordinate.distributor_ss_name}}"],
+    {% endif %}
+    {% endfor %}
+    ];
+    
+    // Info window content
+    var infoWindowContent = [
+    {% for user_coordinate in user_coordinates %}
+    {% if user_coordinate.coordinate.latitude %}
+    ['<div class="info_content" style="padding:20px;line-height: 23px;background:#089000;color: #fff; border-radius:10px;">' +
+      '<h3 style="border-bottom:1px solid #ddd; margin:0 1px 7px 0;"><i class="fa fa-user"></i> {{user_coordinate.distributor_ss_name}}</h3>' +
+      '<p>Latitude: {{user_coordinate.coordinate.latitude}}, Longitude: {{user_coordinate.coordinate.longitude}}</p>' +
+      '</div>'],
+      {% endif %}
+      {% endfor %}
+      ];
+      
+      // Add multiple markers to map
+      var infoWindow = new google.maps.InfoWindow(), marker, i;
+      
+      // Place each marker on the map  
+      for( i = 0; i < markers.length; i++ ) {
+        var position = new google.maps.LatLng(markers[i][0], markers[i][1]);
+        bounds.extend(position);
+        marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          title: markers[i][2],
+          icon: 'static/img/png/geo.gif'
+        });
+        
+        // Add info window to marker    
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infoWindow.setContent(infoWindowContent[i][0]);
+            infoWindow.open(map, marker);
+          }
+        })(marker, i));
+        
+        // Center the map to fit all markers on the screen
+        map.fitBounds(bounds);
+      }
+      
+      // Set zoom level
+      var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+        this.setZoom(16);
+        google.maps.event.removeListener(boundsListener);
+      });
+      
+    }
+    // Load initialize function
+    
+  </script>

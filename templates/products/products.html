@@ -1,0 +1,798 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<style>
+    .padding_0{
+        padding-left: 0;
+        padding-right: 0;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-12 p-md-0">
+                <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 mt-3 mb-3 col-md-3 padding_0  h-100">
+        <div class="nonprimaryContainerBG h-100">
+            <div class="row mb-2 mt-2" id="secondRow">
+                <div class="col-md-12 p-md-0">
+                    <h6><b>Product list &nbsp;&nbsp;</b></h6>
+                </div>
+                <div class="col-md-12 p-md-0">
+                    <input class="searchTable product_search" placeholder="Search" type="search" data-column="all">
+                    <button type="button" class="btn iconBox iconAddProduct" onclick="addProduct()"></button>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 nonprimaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" >
+                    <table id="producTable" class="table table-borderless table-striped table-hover mt-0"
+                    style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Container</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product_tablebody">
+                        {% if products %}
+                        {% for product in products %}
+                        <tr  {% if forloop.first %} class="odd selected" {% endif %} data-product-id ="{{product.id}}">
+                            <td onclick="getProductvariant('{{ product.id }}')">{{ product.product_name}} ({{ product.product_class_name}})</td>
+                            <td onclick="getProductvariant('{{ product.id }}')">{{ product.container_name}}</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a href="javascript:void(0)"
+                                        onclick="editProduct('{{ product.id }}')"><img src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                                        <div class="col-md-5">
+                                            <label class="switch">
+                                                <input type="checkbox" class="checkbox" name="is_active"
+                                                id="is_active_{{ product.id }}"
+                                                {% if product.status == 1 %} checked="" {% else %}
+                                                {% endif %}
+                                                onclick="updateProductStatus('{{ product.id }}', '{{ product.status }}')">
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <!-- <tr id="product_loading" style="display: none;">
+                                <td class="text-center" colspan="2"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                                </td>
+                            </tr> -->
+                            {% else %}
+                            <tr>
+                                <td colspan="2" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9 pr-md-0 h-100 padding_0">
+        <div class="row">
+            <div class="col-md-12">
+                
+                <div class="row mb-2" id="topRow">
+                    <div class="col-md-5 p-md-0">
+                        <h6><b>Variant List &nbsp;&nbsp;</b></h6>
+                    </div>
+                    <div class="col-md-7 p-md-0">
+                        <div class="row mb-2 mt-2" id="secondRow">
+                            <div class="col-md-12 p-md-0 text-right">
+                                <input class="searchTable variant_search" placeholder="Search" type="search" data-column="all">
+                                <button type="button" class="btn iconBox iconAddVariant" onclick="addProductVariant()"></button>
+                                
+                                
+                                <!-- <div class="dropdown" style="display: inline-block;">
+                                    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    
+                                    <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                    <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                        <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                            src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                        </div>
+                                    </div> -->
+                                    <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                        <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                        aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'item_sku_code',2)"
+                                            />
+                                            <label class="mb-0" for="item_sku_code">Item Code</label>
+                                        </a>
+                                        
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'variant_name', 3)"
+                                            />
+                                            <label class="mb-0" for="variant_name">Variant Name</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'variant_size', 7)"
+                                            />
+                                            <label class="mb-0" for="variant_size">Variant Size</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'no_of_pouch', 5)"
+                                            />
+                                            <label class="mb-0" for="no_of_pouch">No.of pouch</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'container_size', 5)"
+                                            />
+                                            <label class="mb-0" for="container_size">Container</label>
+                                        </a>
+                                        <a class="dropdown-item columnHideItem">
+                                            <input type="checkbox" class="colCheck" name="" 
+                                            onclick="showHideColumns(this,'mrp', 7)"
+                                            />
+                                            <label class="mb-0" for="mrp">Price Breakdown</label>
+                                        </a>
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                    <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name="" id="lock_item_sku_code" data-id="1"
+                                        onclick="toggleFreeze(this.id,'item_sku_code',1)" />
+                                        <label class="mb-0" for="lock_item_sku_code">Item code</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name=""
+                                        id="lock_variant_name" data-id="2" 
+                                        onclick="toggleFreeze(this.id,'variant_name',2)" />
+                                        <label class="mb-0" for="lock_variant_name">Variant Name</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name=""
+                                        id="lock_variant_size" data-id="3"  
+                                        onclick="toggleFreeze(this.id,'variant_size',3)" />
+                                        <label class="mb-0" for="lock_variant_size">Variant Size</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name="" id="lock_no_of_pouch" data-id="4"
+                                        onclick="toggleFreeze(this.id,'no_of_pouch',4)" />
+                                        <label class="mb-0" for="lock_no_of_pouch">No of pouch</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name="" id="lock_container_size" data-id="4"
+                                        onclick="toggleFreeze(this.id,'container_size',5)" />
+                                        <label class="mb-0" for="lock_container_size">Container Size</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colFreezeCheck" name="" id="lock_mrp" data-id="4"
+                                        onclick="toggleFreeze(this.id,'mrp',6)" />
+                                        <label class="mb-0" for="lock_mrp">Price Breakdown</label>
+                                    </a>
+                                    
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+        
+        <div class="col-md-12 h-100">
+            
+            <div class="primaryContainerBG h-100 commonTableBg tableBox" id="detailsBox" style="border-radius: 12px !important;">
+                
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_variant_pages" id="total_variant_pages" value="{{ total_variant_pages }}" />
+                
+                <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="item_sku_code">
+                            Item Code
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="variant_name">Variant Name<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="variant_size">Variant Size<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="no_of_pouch">No. of pouch<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="container_size">Container Size<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="mrp">Price Breakdown<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if product_variants %}
+                    {% for product_variant in product_variants %}
+                    <tr>
+                        <td class="item_sku_code">{{ product_variant.item_sku_code }}</td>
+                        <td class="variant_name">{{ product_variant.variant_name }}</td>
+                        <td class="variant_size">{{ product_variant.variant_size }}</td>
+                        <td class="no_of_pouch">{{ product_variant.no_of_pouch }}</td>
+                        <td class="container_size">{{ product_variant.container_size }}</td>
+                        <td class="mrp" onclick="priceBreakdown('{{ product_variant.gst }}','{{ product_variant.mrp }}',{{ product_variant.sp_distributor }},{{ product_variant.sp_superstockist }},{{ product_variant.sp_employee }})"><i class="fa fa-rupee"></i> View</td>
+                        <td >
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <a href="javascript:void(0)"
+                                    onclick="editProductVariant('{{ product_variant.id }}')" ><img
+                                    src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                                    <div class="col-md-5">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" name="is_active"
+                                            id="is_active_variant_{{ product_variant.id }}"
+                                            {% if product_variant.status == 1 %} checked="" {% else %}
+                                            {% endif %}
+                                            onclick="updateProductVariantStatus('{{ product_variant.id }}', '{{ product_variant.status }}')">
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <!-- <tr id="loading" style="display: none;">
+                            <td class="text-center" colspan="10"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                            </td>
+                        </tr> -->
+                        {% else %}
+                        <tr>
+                            <td colspan="10" style="text-align: center;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addProductModal" style="display: none;">
+    
+</div>
+<div class="overlayModal" id="addDeptModal" style="display: none;">
+    
+</div>
+
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+
+<script type="text/javascript">
+
+
+function priceBreakdown(gst,mrp,sp_distributor,sp_superstockist,sp_employee){
+html = `<table class="table table-hover">`;
+    if(parseInt(gst)!='' && parseInt(gst)>0){
+        html += `<tr><th> GST</th> <td>`+gst+`% </td></tr>`;
+    }else{
+        html += `<tr><th> GST</th> <td>-</td></tr>`;
+    }
+    html += `<tr><th> MRP</th> <td>₹ `+mrp+` </td></tr>
+			<tr><th>SP Distributor</th><td>₹ `+sp_distributor+`</td></tr>
+			<tr><th>SP Super Stockist</th><td>₹ `+sp_superstockist+`</td></tr>
+			<tr><th>SP Employee</th><td>₹ `+sp_employee+`</td></tr>
+</table>`;
+
+$.confirm({
+    title: '<p style="font-size:15px;">Price Breakdown & GST</p>',
+    content:' ' + html,
+    theme:'material',
+    animation:'zoom',
+    buttons: {
+        cancel: function () {
+        },
+    },
+});
+}
+
+
+    $(document).ready(function () {
+        var prevTop = 0;
+        $('#detailsBox').on('scroll', function () {
+            
+            var page = $('#page').val();
+            var totalPages = $('#total_variant_pages').val();
+            console.log(page)
+            console.log(totalPages)
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    
+                    if($('#page_status').val() == 0 && page  <= totalPages){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        
+                        selected_product_id = $('.selected').data('product-id');
+                        url = "{% url 'src:ajax-product-variant-lists' 1 %}";
+                        url = url.replace(1,parseInt(selected_product_id))
+                        
+                        $.ajax({
+                            url: url,
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+<script>
+    function exports(type){
+        var columns = $('#show_columns').val();
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-organizations-to-xlsx' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-organizations-to-pdf' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            }
+        }
+        
+    }
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('.' + colid + ' #freeze').show();
+            $('.' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('.' + colid + ' #unfreeze').show();
+            $('.' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(element, el_class, colNo) {
+        var checkbox_val = [];
+        var checkbox = $(element);
+        if ($(element).is(':checked')) {
+            $('.'+el_class).hide();
+        }else{
+            $('.'+el_class).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["10%", "15%", "10%", "10%", "15%","10%","10%","12%","12%","15%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.variant_search',
+                filter_columnFilters: false,
+            }
+        });
+
+        $('#producTable').tablesorter({
+            widgets: ["zebra", "filter"],
+            widgetOptions: {
+                filter_external: '.product_search',
+                filter_columnFilters: false,
+            }
+        });
+
+        
+        $("#producTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        $(".mobileCode").mask("+00");
+        $(".phoneCode").mask("000");
+        $(".landLineNo").mask("000000");
+        $(".mobileNo").mask("0000000000");
+        $(".pincode").mask("000000");
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["org_name","landline_no","mobile_no","email_id"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $('#addOrgTable').tablesorter({
+        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+        widgetOptions: {
+            resizable_addLastColumn: true,
+            resizable: false,
+            resizable_widths: ["10%", "15%", "10%", "10%", "15%","10%","10%","12%","12%","15%"],
+            stickyHeaders_attachTo: ".primaryContainerBG",
+            filter_external: '.variant_search',
+            filter_columnFilters: false,
+        }
+    });
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    $(".deptRow").click(function () {
+        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+    });
+    
+    
+    $(".primaryContainerBG").scroll(function () {
+        var divTable = $(".primaryContainerBG");
+        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+    });
+    
+</script>
+
+<script>
+    
+    function addProduct() {
+        $('#addProductModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-product' %}",
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editProduct(id) {
+        $('#addProductModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-product' 1 %}";
+        url = url.replace(1,id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    function addProductVariant() {
+        selected_product_id = $('.selected').data('product-id');
+        
+        $('#addProductModal').html('');
+        showLoader();
+        url = "{% url 'src:add-product-variant' 1 %}";
+        url = url.replace(1,parseInt(selected_product_id))
+        $.ajax({
+            url: url ,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                $("#addProductModal").show();
+                $('#addProductModal').html(data);
+                $('.selectField').select2();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editProductVariant(id) {
+        $('#addProductModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-product-variant' 1 %}";
+        url = url.replace(1,id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                }else{
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        });
+    }
+    
+    function getProductvariant(id) {
+        $('#detailsBox').html('');
+        showLoader();
+        url = "{% url 'src:get-product-variants' 1 %}";
+        url = url.replace(1,parseInt(id));
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $('#detailsBox').html(data);
+                $('.colCheck,.colFreezeCheck').attr("checked",false)
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["10%", "15%", "10%", "10%", "15%","10%","10%","12%","12%","15%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.variant_search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                $(".deptRow").click(function () {
+                    $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                });
+                
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function updateProductStatus(id, active_status) {
+        if ($('#is_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        
+        $.ajax({
+            url: "{% url 'src:update-product-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    if ($('#is_active_' + id).prop("checked") == true) {
+                        $('#is_active_' + id).prop("checked",false);
+                    }else{
+                        $('#is_active_' + id).prop("checked",true); 
+                    }
+                }else{
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                    }
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function updateProductVariantStatus(id, active_status) {
+        if ($('#is_active_variant_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        
+        //showLoader();
+        $.ajax({
+            url: "{% url 'src:update-product-variant-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    if ($('#is_active_variant_' + id).prop("checked") == true) {
+                        $('#is_active_variant_' + id).prop("checked",false);
+                    }else{
+                        $('#is_active_variant_' + id).prop("checked",true); 
+                    }
+                }else{
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                    }
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% load static %}
+<form action="" id="markVacationForm">
+    <div class="row">
+        <div class="col-md-6 px-0">
+            <div class="row">
+                <span class="slider-icon-box" onclick="getHolidayCalendar('{{ holiday.id }}','{{previous_month}}','{{current_year}}')">
+                    <img src="{% static 'img/svg/arrow_left.svg' %}" alt="">
+                </span>
+                <span class="calendar-title">{{current_month_name}} 
+                    <b style="color: #000;">{{current_year}}</b>
+                </span>
+                <span class="slider-icon-box mr-3" onclick="getHolidayCalendar('{{ holiday.id }}','{{next_month}}','{{current_year}}')"> 
+                    <img src="{% static 'img/svg/arrow_right.svg' %}" alt="">
+                </span>
+                <div class="border-left ">
+                    <span class="d-block   customer-name">
+                        {{ customer.first_name }}{% if customer.middle_name is not None %} {{ customer.middle_name }} {% endif %}{{ customer.last_name }}
+                    </span> 
+                    <span class="d-block  emp-sap-id">{{ customer.emp_sap_id }}</span>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-md-6 px-0">
+            <button type="button" class="btn btn-save float-right" onclick="addHoliday()">Add New
+            </button>
+        </div>
+        <div class="col-md-6 px-0 text-right">
+            <!-- <ul class="tabBar pull p-0 marginTop1rem" style="width: 60% !important; border: 0;">
+                <li class="customer-tab activeTab" id="multiple_selection_tab" onclick="handleTabChange(this,1);">Multiple Selection</li>
+                <li class="customer-tab" id="range_selection_tab" onclick="handleTabChange(this,2);">Range Selection </li>
+            </ul> -->
+            <input type="hidden" id="date_selection_type" value="1">
+            <input type="hidden" id="range_start_date">
+            <input type="hidden" id="range_end_date">
+            <input type="hidden" name="customer_id" value="{{customer.id}}">
+            
+            <!-- button type="button" class="btn btn-primary" style="width: 15%;
+            border-radius: 7px;    height: 27px;
+            line-height: 12px;"onclick="updateVacation()">Add</button>  -->
+            {% csrf_token %}
+        </div>
+        
+        <div class="col-md-12 px-0 calendar-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                        <th>Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for calendar_date in calendar_dates %}
+                    <tr>
+                        {% for data in calendar_date %}
+                        <td class="{% if data.is_holiday == 1 %}yellow{% endif %}">
+                            <input type="checkbox" name="" id="date-{{data.full_date|date:'Y-m-d'}}" value="{{data.full_date|date:'Y-m-d'}}" onclick="" class="calendar__input" disabled="">
+                            <label for="date-{{data.full_date|date:'Y-m-d'}}" class="calendar__label">
+                                <div class="calendar__label__date" >
+                                    {{data.short_date }}<br>
+                                </div>
+                            </label>
+                            <span>{% if data.is_holiday == 1 %}{{data.holiday}}{% endif %}</span>
+                        </td>                                        
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+</form>
+
+

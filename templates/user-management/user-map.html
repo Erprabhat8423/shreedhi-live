@@ -1,0 +1,419 @@
+
+
+{% if user_coordinates.latitude %}
+<style>
+    #map
+    {
+        overflow: auto!important;
+        height: 500px;
+        width: 100%;
+    }
+</style>
+
+<input type="hidden" id="attendance_lat" name="attendance_lat" value="{{ user_coordinates.latitude }}" class="form-control col-md-7 col-xs-12" readonly="" required="required">
+<input type="hidden" id="attendance_long" name="attendance_long" value="{{ user_coordinates.longitude }}" class="form-control col-md-7 col-xs-12" readonly="" required="required">
+<input type="hidden" id="periphery" name="periphery" value="" class="form-control col-md-7 col-xs-12"  required="required" placeholder="Periphery (In Meter)">
+<input type="hidden" id="attendance_address" name="attendance_address" value="" class="form-control col-md-7 col-xs-12"  required="required" placeholder="Periphery (In Meter)">
+
+<script type="text/javascript">
+    var latitude  = '{{ user_coordinates.latitude }}';
+    var longitude = '{{ user_coordinates.longitude }}';
+    $(document).ready(function () {
+        
+        // Asynchronously Load the map API 
+        
+        var script = document.createElement('script');
+        
+        script.src = "//maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initMap";
+        
+        document.body.appendChild(script);
+    });
+    var cityCircle='';
+    function initMap() {
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+            
+            center: {lat: parseFloat(latitude), lng: parseFloat(longitude)},
+            
+            zoom: 12
+            
+        });
+        var myLatlng = new google.maps.LatLng(parseFloat(latitude),parseFloat(longitude));
+        // var marker = new google.maps.Marker({
+            //   position: myLatlng,
+            //   map: map
+            // });
+            
+            var marker = new google.maps.Marker({
+                
+                map: map,
+                icon: 'static/img/png/geo.gif',
+                draggable:true,
+                
+                anchorPoint: new google.maps.Point(0, -29)
+                
+            });
+            // console.log(myLatlng);
+            
+            
+            
+            if (navigator.geolocation) {
+                
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    
+                    var pos = {
+                        
+                        lat: parseFloat(latitude),
+                        
+                        lng: parseFloat(longitude)
+                        
+                    };
+                    document.getElementById('attendance_lat').value = parseFloat(latitude);
+                    
+                    document.getElementById('attendance_long').value = parseFloat(longitude);
+                    
+                    var myLatlng = new google.maps.LatLng(parseFloat(latitude),parseFloat(longitude));
+                    marker.setPosition(myLatlng);
+                    marker.setVisible(true);
+                    map.setCenter(pos);
+                    
+                    map.setZoom(12);
+                    
+                });
+                
+                
+                
+                
+            } else {
+                document.getElementById('attendance_lat').value = 'parseFloat(latitude)';
+                
+                document.getElementById('attendance_long').value = 'parseFloat(longitude)';
+                marker.setPosition(myLatlng);
+                
+                marker.setVisible(true);
+                
+                // Browser doesn't support Geolocation
+                
+            }
+            
+            
+            
+            
+            
+            var input = document.getElementById('attendance_address');
+            
+            
+            
+            var autocomplete = new google.maps.places.Autocomplete(input);
+            
+            autocomplete.bindTo('bounds', map);
+            
+            
+            
+            // var infowindow = new google.maps.InfoWindow();
+            
+            // var marker = new google.maps.Marker({
+                
+                //   map: map,
+                
+                //   draggable:true,
+                
+                //   anchorPoint: new google.maps.Point(0, -29)
+                
+                // });
+                
+                
+                
+                autocomplete.addListener('place_changed', function() {
+                    
+                    if(cityCircle!=''){
+                        
+                        cityCircle.setMap(null);
+                        
+                    }
+                    
+                    var attendance_dist = document.getElementById('periphery').value;
+                    
+                    
+                    
+                    // infowindow.close();
+                    
+                    // marker.setVisible(false);
+                    
+                    var place = autocomplete.getPlace();
+                    
+                    if (!place.geometry) {
+                        
+                        window.alert("Autocomplete's returned place contains no geometry");
+                        
+                        return;
+                        
+                    }
+                    
+                    
+                    
+                    // If the place has a geometry, then present it on a map.
+                    
+                    if (place.geometry.viewport) {
+                        
+                        map.fitBounds(place.geometry.viewport);
+                        
+                    } else {
+                        
+                        map.setCenter(place.geometry.location);
+                        
+                        map.setZoom(12);
+                        
+                    }
+                    
+                    
+                    
+                    marker.setPosition(place.geometry.location);
+                    
+                    marker.setVisible(true);
+                    
+                    if(attendance_dist!=''){
+                        
+                        cityCircle = new google.maps.Circle({
+                            
+                            strokeColor: '#4b90a6',
+                            
+                            strokeOpacity: 0.8,
+                            
+                            strokeWeight: 2,
+                            
+                            fillColor: '#72b9cf',
+                            
+                            fillOpacity: 0.35,
+                            
+                            map: map,
+                            
+                            center: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
+                            
+                            radius: parseFloat(attendance_dist)
+                            
+                        });
+                        
+                    }
+                    
+                    document.getElementById('attendance_lat').value = place.geometry.location.lat();
+                    
+                    document.getElementById('attendance_long').value = place.geometry.location.lng();
+                    
+                });
+                
+                
+                
+                map.addListener('click', function(e) {
+                    
+                    if(cityCircle!=''){
+                        
+                        cityCircle.setMap(null);
+                        
+                    }
+                    
+                    
+                    
+                    
+                    
+                    var attendance_dist = document.getElementById('periphery').value;
+                    
+                    document.getElementById('attendance_lat').value = e.latLng.lat();
+                    
+                    document.getElementById('attendance_long').value = e.latLng.lng();
+                    
+                    marker.setPosition(e.latLng);
+                    
+                    map.setZoom(15);
+                    
+                    if(attendance_dist!=''){
+                        
+                        cityCircle = new google.maps.Circle({
+                            
+                            strokeColor: '#4b90a6',
+                            
+                            strokeOpacity: 0.8,
+                            
+                            strokeWeight: 2,
+                            
+                            fillColor: '#72b9cf',
+                            
+                            fillOpacity: 0.35,
+                            
+                            map: map,
+                            
+                            center: {lat: e.latLng.lat(), lng: e.latLng.lng()},
+                            
+                            radius: parseFloat(attendance_dist)
+                            
+                        });
+                        
+                    }
+                    
+                });
+                
+                
+                
+                google.maps.event.addListener(marker, 'dragend', function(e) 
+                
+                {
+                    
+                    if(cityCircle!=''){
+                        
+                        cityCircle.setMap(null);
+                        
+                    }
+                    
+                    
+                    
+                    
+                    
+                    var attendance_dist = document.getElementById('periphery').value;
+                    
+                    document.getElementById('attendance_lat').value = e.latLng.lat();
+                    
+                    document.getElementById('attendance_long').value = e.latLng.lng();
+                    
+                    marker.setPosition(e.latLng);
+                    
+                    map.setZoom(15);
+                    
+                    if(attendance_dist!=''){
+                        
+                        cityCircle = new google.maps.Circle({
+                            
+                            strokeColor: '#4b90a6',
+                            
+                            strokeOpacity: 0.8,
+                            
+                            strokeWeight: 2,
+                            
+                            fillColor: '#72b9cf',
+                            
+                            fillOpacity: 0.35,
+                            
+                            map: map,
+                            
+                            center: {lat: e.latLng.lat(), lng: e.latLng.lng()},
+                            
+                            radius: parseFloat(attendance_dist)
+                            
+                        });
+                        
+                    }
+                    
+                    
+                    
+                });
+                
+                
+                
+                let attendance_dist = document.getElementById('periphery');
+                
+                $(document).on('change', '#periphery', function(e){
+                    // })
+                    // attendance_dist.addEventListener('change', function (e) {
+                        
+                        if(cityCircle!=''){
+                            
+                            cityCircle.setMap(null);
+                            
+                        }
+                        
+                        let attendance_lat = document.getElementById('attendance_lat').value;
+                        
+                        let attendance_long = document.getElementById('attendance_long').value;
+                        
+                        let attendance_dist_data = document.getElementById('periphery').value;
+                        
+                        
+                        
+                        if(attendance_lat!='' && attendance_long!=''){
+                            
+                            cityCircle = new google.maps.Circle({
+                                
+                                strokeColor: '#4b90a6',
+                                
+                                strokeOpacity: 0.8,
+                                
+                                strokeWeight: 2,
+                                
+                                fillColor: '#72b9cf',
+                                
+                                fillOpacity: 0.35,
+                                
+                                map: map,
+                                
+                                center: {lat: parseFloat(attendance_lat), lng: parseFloat(attendance_long)},
+                                
+                                radius: parseFloat(attendance_dist_data)
+                                
+                            });
+                            
+                        }else{
+                            
+                            document.getElementById('periphery').value="";
+                            
+                            alert("Please select address on map.");
+                            
+                        }
+                        
+                        
+                        
+                    });
+                    
+                }
+                
+                
+                
+                
+                
+            </script>
+            
+            <div id="map" width="100%" height="600" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0"></div>
+            
+            {% else %}
+            <style>
+                #snackbar {
+                    display:block;
+                    min-width: 250px; 
+            
+                    background-color: #333; 
+                    text-align: center; 
+                    border-radius: 2px; 
+                    padding: 16px; 
+                    position: fixed; 
+                    z-index: 999; 
+                    right: 10%; 
+                    top:10%;
+                    color: #fff;
+                    background-color: rgba(231,76,60,0.88);
+                    border-color: rgba(231,76,60,0.88);
+                    font-size:13px;
+                    font-weight:600;
+                }
+            
+            
+                #snackbar.show {
+                    visibility: visible;
+                    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+                    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+                }
+                
+                /* Animations to fade the snackbar in and out */
+                @-webkit-keyframes fadein {
+                    from {right: 0; opacity: 0;}
+                    to {right: 10%; opacity: 1;}
+                }
+            
+                @keyframes  fadein {
+                    from {right: 0; opacity: 0;}
+                    to {right: 10%; opacity: 1;}
+                }
+            
+                
+            </style>
+            <div id="snackbar" class="show">Distributor/Super Stockist geo-tagging is not available.</div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d629.2543513112871!2d81.00471616042805!3d26.85266719178686!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399be2c34ffd7a1f%3A0xcfc083576c4e16d8!2sMalik%20timber!5e0!3m2!1sen!2sin!4v1600544836788!5m2!1sen!2sin" width="100%" height="600" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+            
+            {% endif %}

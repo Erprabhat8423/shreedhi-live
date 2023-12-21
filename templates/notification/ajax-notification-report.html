@@ -1,0 +1,39 @@
+{% load static %}
+
+{% if notifications %}
+{% for notification in notifications %}
+<tr>
+    <td class="user_name" onclick="getNotificationDetails('{{ notification.id }}')">{{notification.to_user_name}} <br>
+        ({{notification.recipient_role}})</td>
+        <td class="notification_heading" onclick="getNotificationDetails('{{ notification.id }}')">{{notification.heading}}</td>
+        <td class="notification_message" onclick="getNotificationDetails('{{ notification.id }}')">
+            {{notification.activity|truncatechars:100}}
+            {% if notification.activity_image is not None and notification.activity_image != "" %}
+            <a href="{{notification.activity_image}}" download><i class="fa fa-download"></i></a>
+            {% endif %}
+        </td>
+        <td class="notification_type" onclick="getNotificationDetails('{{ notification.id }}')">
+            {% if notification.notification_type is not None %} 
+            {% if notification.notification_type|add:"0" == 0 %}
+            SMS
+            {% elif notification.notification_type|add:"0" == 1 %}
+            Push
+            {% else %} EMAIL {% endif %} {% else %} - {% endif %}
+        </td>
+        <td class="send_at" onclick="getNotificationDetails('{{ notification.id }}')">
+            {{notification.created_at|date:'d/m/Y H:i'}}
+        </td>
+</tr>
+{% endfor %}
+
+{% else %}
+<tr>
+    <td colspan="5" style="text-align: center;">
+        No Record Found...
+    </td>
+</tr>
+{% endif %}
+
+<script>
+    $('#notification_count').text('('+{{notifications.count}}+')');
+</script>

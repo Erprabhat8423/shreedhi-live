@@ -1,0 +1,617 @@
+{% load static %}
+<div class="modal-AddUser centered">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">Vehicle Information &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row" id="infoPills">
+                <div class="col-sm-12 p-0">
+                    <ul class="nav nav-tabs">
+                        <li class="infoTabs activeInfoTabs" id="user_basicTab" onclick="changeInfoTab('user_basic')">Vehicle Pollution
+                        </li>
+                        <li class="infoTabs" id="user_officialTab" onclick="changeInfoTab('user_official')">Registration Detail
+                        </li>
+                        <li class="infoTabs" id="user_productDetailsTab" onclick="changeInfoTab('user_productDetails')">
+                            Fitness
+                            Details
+                        </li>
+                        
+                    </li>
+                    <li class="infoTabs" id="user_cratesSumTab" onclick="changeInfoTab('user_cratesSum')">Insurance Detail
+                    </li>
+                    
+                    <li class="infoTabs" id="user_orderSumTab" onclick="changeInfoTab('user_orderSum')">Road Permit
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-body pt-0" id="viewUserModalBody" style="overflow: auto; height: 479px;">
+    <div class="row h-100">
+        <div class="col-md-12 p-0 h-100 activeTab" id="user_basic">
+            <div class="row h-100">
+                <div class="col-md-12 TContainer">
+                    <div class="col-2">
+                        <button type="button" onclick="myfunction()" class="btn iconBox iconAddNew"></button>
+                    </div>
+                    <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                        <thead>
+                            <tr>
+                                <th class="route_name">Certification Serial No.</th>
+                                <th class="route_name">Date of Registration</th>
+                                <th class="route_name">Pollution Validity</th>
+                                <th class="route_name"> Certificate Copy</th>
+                                <th>Action</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicle_pollution in vehicle_pollutions %}
+                            <tr>
+                                <td class="route_name">{{ vehicle_pollution.certificate_sr_no }}</td>
+                                <td class="route_name">{{ vehicle_pollution.date_of_registration |date:'d/m/Y'}}</td>
+                                <td class="route_name">{{ vehicle_pollution.pollution_valid_till |date:'d/m/Y'}}</td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {% if vehicle_pollution.copy_of_certificate != null %} 
+                                            <a href="{{vehicle_pollution.copy_of_certificate}}" download>
+                                                <img src="/static/img/svg/download.svg" style="
+                                                height: 22px;
+                                            ">{% endif %} 
+                                        </div>
+                                    </div> 
+                                </td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="javascript:void(0)"
+                                            onclick="editPollution('{{vehicle_pollution.id}}')">
+                                            <img
+                                            src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                        </div>
+                                    </div> 
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-12 p-0 h-100" id="user_official">
+            <div class="row h-100">
+                <div class="col-md-12 TContainer">
+                    <div class="col-2">
+                        <button type="button" onclick="Registration()" class="btn iconBox iconAddNew"></button>
+                    </div>
+                    <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                        <thead>
+                            <tr>
+                                <th class="route_name">Owner Name</th>
+                                <th class="route_name">Registered Number</th>
+                                <th class="route_name">Registration Address</th>
+                                <th class="route_name"> RTO </th>
+                                <th class="route_name"> Registration Fees Amount</th>
+                                <th class="route_name"> Registration Date</th>
+                                <th class="route_name"> Registration Validity</th>
+                                <th class="route_name"> Registration Copy</th>
+                                
+                                
+                                <th>Action</th>
+                              
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicle_registration in vehicle_registrations %}
+                            <tr>
+                                <td class="route_name">{% if vehicle_registration.owner_name is not None %}{{ vehicle_registration.owner_name }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration.registration_number is not None %}{{ vehicle_registration.registration_number }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration.registered_address is not None %}{{ vehicle_registration.registered_address }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration.rto is not None %}{{ vehicle_registration.rto }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration.registration_fees_amount is not None %}{{ vehicle_registration.registration_fees_amount }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration. %}{{ vehicle_registration.|date is not Noneregistration_date |date:'d/m/Y'}{{% endif %}</td>
+                                <td class="route_name">{% if vehicle_registration.registration_valid_till is not None %}{{ vehicle_registration.registration_valid_till|date:'d/m/Y' }}{% endif %}</td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {% if vehicle_registration.registration_copy != null %} 
+                                            <a href="{{vehicle_registration.registration_copy }}" download>
+                                                <img src="/static/img/svg/download.svg" style="
+                                                height: 22px;
+                                            ">{% endif %} 
+                                        </div>
+                                    </div> 
+                                </td>
+                                
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="javascript:void(0)"
+                                            onclick="editRegistration('{{vehicle_registration.id}}')">
+                                            <img
+                                            src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                        </div>
+                                    </div> 
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="col-md-12 p-0 h-100" id="user_productDetails">
+            <div class="row h-100">
+                <div class="col-md-12 TContainer">
+                    <div class="col-2">
+                        <button type="button" onclick="Fitness()" class="btn iconBox iconAddNew"></button>
+                    </div>
+                    <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                        <thead>
+                            <tr>
+                                <th class="route_name">Application Number</th>
+                                <th class="route_name">Inspection Date</th>
+                                <th class="route_name">Fitness Validity</th>
+                                <th class="route_name">Fitness Certificate Copy</th>
+                                <th>Action</th>
+                              
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fitness_detail in fitness_details %}
+                            <tr>
+                                <td class="route_name">{% if fitness_detail.application_no is not None %}{{ fitness_detail.application_no }}{% endif %}</td>
+                                <td class="route_name">{% if fitness_detail.inspection_date is not None %}{{ fitness_detail.inspection_date |date:'d/m/Y'}}{% endif %}</td>
+                                <td class="route_name">{% if fitness_detail.fitness_valid_till is not None %}{{ fitness_detail.fitness_valid_till|date:'d/m/Y' }}{% endif %}</td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {% if fitness_detail.copy_of_fitness_certificate != null %} 
+                                            <a href="{{fitness_detail.copy_of_fitness_certificate}}" download>
+                                                <img src="/static/img/svg/download.svg" style="
+                                                height: 22px;
+                                            ">{% endif %} 
+                                        </div>
+                                    </div> 
+                                </td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="javascript:void(0)"
+                                            onclick="editFitness('{{fitness_detail.id}}')">
+                                            <img
+                                            src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                        </div>
+                                    </div> 
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="col-md-12 p-0 h-100" id="user_cratesSum">
+            <div class="row h-100">
+                <div class="col-md-12 TContainer">
+                    <div class="col-2">
+                        <button type="button" onclick="Insurance()" class="btn iconBox iconAddNew"></button>
+                    </div>
+                    <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                        <thead>
+                            <tr>
+                                <th class="route_name">Insurer Name</th>
+                                <th class="route_name">Date of Insurance</th>
+                                <th class="route_name">Insurance Validity</th>
+                                <th class="route_name">Premium Amount</th>
+                                <th class="route_name">Insured Amount</th>
+                                <th class="route_name">Insurance Copy</th>
+                                <th>Action</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicle_insurance in vehicle_insurances %}
+                            <tr>
+                                <td class="route_name">{% if vehicle_insurance.name_of_insurer is not None %}{{ vehicle_insurance.name_of_insurer }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_insurance.date_of_insurance is not None %}{{ vehicle_insurance.date_of_insurance |date:'d/m/Y'}}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_insurance.valid_till is not None %}{{ vehicle_insurance.valid_till |date:'d/m/Y'}}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_insurance.premium_amount is not None %}{{ vehicle_insurance.premium_amount }}{% endif %}</td>
+                                <td class="route_name">{% if vehicle_insurance.total_sum_insured is not None %}{{ vehicle_insurance.total_sum_insured }}{% endif %}</td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {% if vehicle_insurance.insurance_copy != NULL %} 
+                                            <a href="{{vehicle_insurance.insurance_copy }}" download>
+                                                <img src="/static/img/svg/download.svg" style="
+                                                height: 22px;
+                                            "> 
+                                            {% endif %}
+                                        </div>
+                                    </div> 
+                                </td>
+                                
+                                
+                                
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="javascript:void(0)"
+                                            onclick="editInsurance('{{vehicle_insurance.id}}')">
+                                            <img
+                                            src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                        </div>
+                                    </div> 
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="col-md-12 p-0 h-100" id="user_orderSum">
+            <div class="row h-100">
+                <div class="col-md-12 TContainer">
+                    <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                        <thead>
+                            <tr>
+                                <th class="route_name">Permit No</th>
+                                <th class="route_name">Permit Registration Date</th>
+                                <th class="route_name">Permit Validity</th>
+                                <th class="route_name">Permit Route</th>
+                                <th class="route_name">Purpose</th>
+                                <th class="route_name">Insurance Copy</th>
+                                <th>Action</th>
+                                <div class="col-2">
+                                    <button type="button"  onclick="Permit()"  class="btn iconBox iconAddNew"></button>
+                                </div>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for road_permit in road_permits %}
+                            <tr>
+                                <td class="route_name">{% if road_permit.permit_no is not None %}{{ road_permit.permit_no }}{% endif %}</td>
+                                <td class="route_name">{% if road_permit.permit_registration_date is not None %}{{ road_permit.permit_registration_date|date:'d/m/Y' }}{% endif %}</td>
+                                <td class="route_name">{% if road_permit.permit_valid_till is not None %}{{ road_permit.permit_valid_till|date:'d/m/Y' }}{% endif %}</td>
+                                <td class="route_name">{% if road_permit.permitted_route is not None %}{{ road_permit.permitted_route }}{% endif %}</td>
+                                <td class="route_name">{% if road_permit.purpose is not None %}{{ road_permit.purpose }}{% endif %}</td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="col-md-3">
+                                                {% if road_permit.insurance_copy != NULL  %} 
+                                            <a href="{{road_permit.insurance_copy }}" download>
+                                                <img src="/static/img/svg/download.svg" style="
+                                                height: 22px;
+                                            "> 
+                                            {% endif %}
+                                        </div>
+                                    </div> 
+                                </td>
+                                <td >
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="javascript:void(0)"
+                                            onclick="editPermit('{{road_permit.id}}')">
+                                            <img
+                                            src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                        </div>
+                                    </div> 
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+        
+        
+    </div>
+    
+    
+    
+    <script>
+        
+        var vahicle_id="{{vehicle.id}}";
+        function myfunction()
+        {
+            url = "{% url 'src:add-pollutionDetails' '1' %}";
+            url = url.replace('1',vahicle_id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+        
+        
+        
+        function editPollution(id)
+        {
+            url = "{% url 'src:edit-pollutionDetails' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+        var vahicle_id="{{vehicle.id}}";
+        function Registration()
+        {
+            url = "{% url 'src:add-RegistrationDetails' '1' %}";
+            url = url.replace('1',vahicle_id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+
+    
+        function editRegistration(id)
+        {
+            url = "{% url 'src:edit-RegistrationDetails' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+
+        var vahicle_id="{{vehicle.id}}";
+        function Fitness()
+        {
+            url = "{% url 'src:add-FitnessDetails' '1' %}";
+            url = url.replace('1',vahicle_id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+                
+        }
+
+
+
+
+
+        
+        function editFitness(id)
+        {
+            url = "{% url 'src:edit-FitnessDetails' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+
+
+
+
+        var vahicle_id="{{vehicle.id}}";
+        function Insurance()
+        {
+            url = "{% url 'src:add-InsuranceDetails' '1' %}";
+            url = url.replace('1',vahicle_id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+                
+        }
+
+
+
+        
+        function editInsurance(id)
+        {
+            url = "{% url 'src:edit-InsuranceDetails' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+
+        var vahicle_id="{{vehicle.id}}";
+        function Permit()
+        {
+            url = "{% url 'src:add-PermitDetails' '1' %}";
+            url = url.replace('1',vahicle_id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+                
+        }
+
+
+
+        
+        function editPermit(id)
+        {
+            url = "{% url 'src:edit-PermitDetails' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    $("#addUserModal").show();
+                    $('#addUserModal').html(response);
+                    $('.selectField').select2();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+            
+        }
+
+
+
+
+
+
+
+
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

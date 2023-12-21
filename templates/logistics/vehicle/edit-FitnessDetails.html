@@ -1,0 +1,319 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 550%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-500" />
+                    <h4 class="modalColHead">Edit Fitness Details</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="editFitnessDetails" method="POST" autocomplete="off"  action="" aria-label="Product">
+                    {% csrf_token %}
+                     <input type="hidden" name="fitness_id" value="{{fitness.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Edit Fitness Details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="editFitnessDetails('{{fitness.id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"}
+                            onclick="RegistrationList('{{ fitness.vehicle_id }}')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Application No.*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Application No*" name="application_no" id="application_no" maxlength="50" value="{{fitness.application_no}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Inspection Date*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Inspection Date*" name="inspection_date" id="inspection_date" maxlength="50" readonly value="{{fitness.inspection_date|date:'d/m/Y'}}" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Fitness Validity*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="*Fitness Validity Till*" name="fitness_valid_till" readonly id="fitness_valid_till" maxlength="50" value="{{fitness.fitness_valid_till|date:'d/m/Y'}}"/>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+
+
+                 
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Copy Of Certificate</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input type="file" class="inputField" type="text" placeholder="*Certificate Copy*" name="copy_of_fitness_certificate" id="copy_of_fitness_certificate" maxlength="50" value="{{fitness.copy_of_fitness_certificate}}" /> <a target="_blank" href="{{fitness.copy_of_fitness_certificate}}">Click Here For Image</a>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+
+            
+
+                
+                
+               
+                
+                    
+            
+                <div id="newRow">
+                    
+                </div>
+               
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+    function editFitnessDetails() {
+        if(validateZoneForm()){
+            hideLoader();
+            return false;
+        }else{
+            var vehicle_id="{{vehicle.id}}";
+            $form = $(this)
+            var formData = new FormData(document.getElementById("editFitnessDetails"));
+            $.ajax({
+                url:'{% url 'src:edit-FitnessDetails' '1' %}',
+                url:url.replace('1',vehicle_id),
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    hideLoader();
+                    
+                    if(data.flag){
+                        RegistrationList('{{ fitness.vehicle_id}}')
+                    }
+                    else{
+                        openToaster('success',data.message)
+                        window.location= ""
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+        }
+    }
+    
+    function validateZoneForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        if($('#application_no').val() == ""){
+            $('#application_no').parent().find('.error_msg').text('Please Fill Application No');
+            $('#application_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("application_no").value;
+        
+        if(a.length > 50){
+            $('#application_no').parent().find('.error_msg').text('Length should be less than 100');
+            $('#application_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        var length = $.trim($("#application_no").val()).length;
+        if(length == 0){
+            $('#application_no').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#application_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        
+
+
+
+        if($('#inspection_date').val() == ""){
+            $('#inspection_date').parent().find('.error_msg').text('Please Give Inspection Date');
+            $('#inspection_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("inspection_date").value;
+        
+        if(a.length > 50){
+            $('#inspection_date').parent().find('.error_msg').text('Length should be less than 50');
+            $('#inspection_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        var length = $.trim($("#inspection_date").val()).length;
+        if(length == 0){
+            $('#inspection_date').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#inspection_date').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        
+
+
+        if($('#fitness_valid_till').val() == ""){
+            $('#fitness_valid_till').parent().find('.error_msg').text('Please Fill Validity');
+            $('#fitness_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        var a = document.getElementById("fitness_valid_till").value;
+        
+        if(a.length > 50){
+            $('#fitness_valid_till').parent().find('.error_msg').text('Length should be less than 50');
+            $('#fitness_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+        
+        var length = $.trim($("#fitness_valid_till").val()).length;
+        if(length == 0){
+            $('#fitness_valid_till').parent().find('.error_msg').text('Field Is Mandatory');
+            $('#fitness_valid_till').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        
+
+
+          
+        if($('#copy_of_fitness_certificate').val() != ""){
+            var ext = $('#copy_of_fitness_certificate').val().split('.').pop().toLowerCase();
+            var oFile = document.getElementById("copy_of_fitness_certificate").files[0]; 
+            if($.inArray(ext, ['png','jpg','jpeg']) == -1 ) {
+                $('#copy_of_fitness_certificate').parent().find('.error_msg').text('Only PNG and JPEG are allowed.');
+                $('#copy_of_fitness_certificate').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            if (oFile.size > 5242880) 
+            {
+                $('#copy_of_fitness_certificate').parent().find('.error_msg').text(' Image file should not be more than 5 MB ');
+                $('#copy_of_fitness_certificate').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+            
+        }
+
+
+
+
+       
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    function validateDateRange(){
+        if($("#fitness_valid_till").val() != "" && $("#inspection_date").val() != ""){
+                inspection_date = new Date(getDateFormat($("#inspection_date").val()));
+                fitness_valid_till = new Date(getDateFormat($("#fitness_valid_till").val()));
+                $('.error_msg').text('');
+                $('[name="inspection_date"]').css("border", "");
+                $('[name="fitness_valid_till"]').css("border", "");
+    
+                if(inspection_date > fitness_valid_till){
+                    $('[name="fitness_valid_till"]').parent().find('.error_msg').text('Date Should Be More Than Registration Date');
+                    $('[name="fitness_valid_till"]').css("border", "1px solid #db8305");
+                    $("#fitness_valid_till").val('')
+                    return false;
+                }
+                }
+    }
+
+
+    function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+    
+    
+    
+    
+    $("#inspection_date").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+    });
+    
+    $("#fitness_valid_till").datepicker({  
+        changeMonth: true,
+        changeYear: true,  
+        yearRange: "-100:+10",
+        dateFormat: 'dd/mm/yy',
+        onSelect: function () {
+         validateDateRange();
+        }
+        
+    });
+
+
+
+    
+    
+
+
+
+    
+</script>

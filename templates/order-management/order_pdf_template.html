@@ -1,0 +1,78 @@
+<style>
+    .header-title h2,
+    .header-title h3 {
+      display: inline-block;
+    }
+    h3 {
+      font-size: 18px;
+      text-align: center;
+      padding: 15px 0px 0px 0px;
+      margin: 0px;
+    }
+    
+    table {
+      width: 750px;
+      border-collapse: collapse;
+      margin: 0px auto;
+    }
+    
+    /* Zebra striping */
+    tr:nth-of-type(odd) {
+      background: #eee;
+    }
+    
+    th {
+      background: #3498db;
+      color: #000000;
+      font-weight: bold;
+    }
+    
+    td,
+    th {
+      padding: 5px;
+      border: 1px solid #ccc;
+      text-align: left;
+      font-size: 12px;
+    }
+  </style>
+  
+  <div class="col-md-12">
+    <div class="col-12" style="margin-bottom: 15px;">
+      <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th colspan="{{ columns_length }}">
+            <h3> Order List </h3>
+          </th>
+        </tr>
+        <tr>
+          <th class="order_id" {% if 'order_id' not in columns %} style="display: none;" {% endif %}>Order ID</th>
+          <th class="distributor_ss" {% if 'distributor_ss' not in columns %} style="display: none;" {% endif %}>Dist./SS Name</th>
+          <th class="shift" {% if 'shift' not in columns %} style="display: none;" {% endif %}>Shift</th>
+          <th class="route" {% if 'route' not in columns %} style="display: none;" {% endif %}>Route</th>
+          <th class="amount" {% if 'amount' not in columns %} style="display: none;" {% endif %}>Amount</th>
+          <th class="status" {% if 'status' not in columns %} style="display: none;" {% endif %}>Status</th>
+          <th class="order_date" {% if 'order_date' not in columns %} style="display: none;" {% endif %}>Order Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        {% for order in orders %}
+        <tr>
+          <td class="order_id" {% if 'order_id' not in columns %} style="display: none;" {% endif %}>{{ order.order_code }}</td>
+          <td class="distributor_ss" {% if 'distributor_ss' not in columns %} style="display: none;" {% endif %}>{{order.store_name}} <br>( {{ order.user_name }}<br>/{{order.user_sap_id}})</td>
+          <td class="shift" {% if 'shift' not in columns %} style="display: none;" {% endif %}> {{ order.order_shift_name }} </td>
+          <td class="route" {% if 'route' not in columns %} style="display: none;" {% endif %}>{% if order.route_name %}{{ order.route_name }} {% else %} - {% endif %}</td>
+          <td class="amount" {% if 'amount' not in columns %} style="display: none;" {% endif %}> {{ order.order_total_amount }} </td>
+          <td class="status" {% if 'status' not in columns %} style="display: none;" {% endif %}> {% if order.order_status == 1 %} Initiated {% elif order.order_status == 2 %} Forward {% elif order.order_status == 3 %} Approved {% else %} Delivered {% endif %} </td>
+          <td class="order_date" {% if 'order_date' not in columns %} style="display: none;" {% endif %}> {% if order.order_date %} {{ order.order_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %} </td>
+        </tr>
+        {% endfor %}
+        
+      </tbody>
+    </table>
+  </div>
+  
+  

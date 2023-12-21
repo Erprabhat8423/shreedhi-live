@@ -1,0 +1,30 @@
+{% if ledger_users %}
+<table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+    <thead>
+        <tr>
+            <th >Date</th>
+            <th>Particular</th>
+            <th>Bank Details</th>
+            <th>Credit </th>
+            <th>Debit</th>
+            <th>Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ledger_user in ledger_users %}
+        <tr>
+            <td>{{ledger_user.order_date|date:"d/m/Y"}}</td>
+            <td>{{ledger_user.particulars|capfirst }}<br><b>{% if ledger_user.invoice_no == '0' %} {% else %}({{ledger_user.invoice_no}}){% endif %}</b></td>
+            <td>{% if ledger_user.bank_details %}{{ledger_user.bank_details}}{% else %}-{% endif %}</td>
+            <td>{% if ledger_user.credit %}{{ledger_user.credit}}{% else %}0{% endif %}</td>
+            <td>{{ledger_user.debit}}</td>
+            <td>{{ledger_user.balance}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p
+    style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+    No Record Found...</p>
+{% endif %}

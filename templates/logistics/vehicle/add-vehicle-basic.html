@@ -1,0 +1,341 @@
+{% load static %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 550%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/route.png' %}" class="w-500" />
+                    <h4 class="modalColHead">Vehicle Registration</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 col-sm-12  p-md-4">
+                <form id="addVehicleDetails" method="POST" autocomplete="off"  enctype="multipart/form-data"  action="" aria-label="Product" id="uploadt">
+                 {% csrf_token %}
+                     <input type="hidden" name="vehicle_id" value="{{vehicle.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b> Vehicle Registration </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveFitnessDetails()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"}
+                            onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-d-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Vehicle Type*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <select class="inputField selectField" style="width: 100% !important;" name="vehicle_type" id="vehicle_type">
+                            <option value="Private" {% if vehicle.vehicle_type == "Private" %}selected{% endif %}>Private</option>
+                            <option value="Commercial" {% if vehicle.vehicle_type == "Commercial" %}selected{% endif %}>Commercial</option>
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Registration No.*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <input class="inputField alpha_numeric" type="text" placeholder="Registration Number" name="registration_number" id="registration_number1" maxlength="50"  value="{{vehicle.registration_number}}" >
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+            
+                
+
+
+
+                 
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Chassis No.</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <input class="inputField" type="text" placeholder="Chassis Number" name="chassis_no" id="chassis_no" maxlength="50" value="{% if vehicle.chassis_no is not None %}{{vehicle.chassis_no}}{% endif %}">
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Fuel Type</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <select class="inputField selectField" style="width: 100% !important;" name="fuel_type" id="fuel_type">
+                            <option value="">Select</option>
+                            {% for fuel_type in fuel_types %}
+                            <option value="{{fuel_type.id}}" {% if fuel_type.id == vehicle.fuel_type %}selected{% endif %}>{{fuel_type.fuel_type}}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Production Unit*</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="production_unit_id" id="production_unit_id" >
+                            <option value="">Select</option>
+                            {% for production in production_unit %}
+                            <option value="{{production.id}}" {% if production.id == vehicle.production_unit_id|add:"0" %}selected{% endif %}>{{production.production_unit_name}}</option>
+                            {% endfor %}
+                            
+                        </select>
+                        <label class="error_msg float-right" id="route_error"></label>
+                    </div>
+                </div>
+            
+
+                
+                
+               
+                
+                    
+            
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+    
+    <script>
+
+
+
+
+        
+        function saveFitnessDetails() {
+            showLoader();
+            if(validateZoneForm()){
+                hideLoader();
+                return false;
+            }else{
+                $.ajax({
+                    url: "{% url 'src:add-vehicle-basic' %}",
+                    method: 'POST',
+                    data: $('#addVehicleDetails').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            window.location.reload()
+                            
+                            openToaster("success", data.message);
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    // hideLoader();
+                });
+            } 
+        }
+        
+
+        function validateZoneForm(){
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+    
+            //if($('#chassis_no').val() == ""){
+            //    $('#chassis_no').parent().find('.error_msg').text('Please Fill Chassis No ');
+            //    $('#chassis_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+
+            //var length = $.trim($("#chassis_no").val()).length;
+            //if(length == 0){
+            //    $('#chassis_no').parent().find('.error_msg').text('Field Is Mandatory');
+            //    $('#chassis_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+
+            //var a = document.getElementById("chassis_no").value;
+        
+            //if(a.length > 50){
+            //    $('#chassis_no').parent().find('.error_msg').text('Length should be less than 50');
+            //    $('#chassis_no').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+    
+    
+            
+            if($.trim($('[name="production_unit_id"]').val()) == ""){
+                $('[name="production_unit_id"]').parent().find('.error_msg').text('Please select Production Unit');
+                $('[name="production_unit_id"]').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+    
+ 
+            if($('#registration_number1').val() == ""){
+                $('#registration_number1').parent().find('.error_msg').text('Please Give Registration No');
+                $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+            var length = $.trim($("#registration_number1").val()).length;
+            if(length == 0){
+                $('#registration_number1').parent().find('.error_msg').text('Field Is Mandatory');
+                $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+            var a = document.getElementById("registration_number1").value;
+        
+            if(a.length > 50){
+                $('#registration_number1').parent().find('.error_msg').text('Length should be less than 50');
+                $('#registration_number1').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+
+            //if($('#fuel_type').val() == ""){
+            //    $('#fuel_type').parent().find('.error_msg').text('Please Give Registration No');
+            //    $('#fuel_type').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+
+            //var length = $.trim($("#fuel_type").val()).length;
+            //if(length == 0){
+            //    $('#fuel_type').parent().find('.error_msg').text('Field Is Mandatory');
+            //    $('#fuel_type').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+
+            //var a = document.getElementById("fuel_type").value;
+        
+            //if(a.length > 50){
+            //    $('#fuel_type').parent().find('.error_msg').text('Length should be less than 50');
+            //    $('#fuel_type').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            //    error = error + 1;
+            //}
+            
+            
+    
+        
+    
+           
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        
+        $(document).ready(function(){
+            $(".datepicker").datepicker({
+                weekStart: 1,
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'dd/mm/yy',
+            });
+        });
+        function handleOwnershipType(value){
+            if(value == "First Hand"){
+                $('.owner_div').hide();
+                $('.dealer_div').show()
+            }else if(value == "Second Hand"){
+                $('.owner_div').show();
+                $('.dealer_div').hide()
+            }
+            else if(value == "On Rent"){
+                $('.owner_div').show();
+                $('.dealer_div').hide()
+            }
+        }
+        
+        $('#addBasicDetailsForms').submit(function(e){
+            showLoader();
+            if(validateBasicForm()){
+                hideLoader();
+                return false;
+            }else{
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                
+                $.ajax({
+                    url: "{% url 'src:add-vehicle-basic' %}",
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.error == true) {
+                            hideLoader();
+                            $(".text-danger").html('');
+                            var data = response.message;
+                            $.each(data, function (index, value) {
+                                $('#' + index).html(value);
+                            });
+                        } else {
+                            hideLoader();
+                            $('#addUserModal').html('');
+                            $('#addUserModal').hide();
+                            openToaster("success", response.message);
+                            setInterval(function(){ window.location.reload(); }, 500);
+                            //editVehicleRegistration(response.vehicle_id) 
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                
+                
+            }
+            
+        });
+        
+    
+    </script>
+    
+    

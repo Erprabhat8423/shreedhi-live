@@ -1,0 +1,222 @@
+{% load static %}
+<form name="addDocumentDetailsForms" id="addDocumentDetailsForms" method="POST" autocomplete="off" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="last_user_id" id="last_user_id" value="{{ last_user_id }}" >
+    <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" onclick="editEmployeeAttendanceDetail('{{ last_user_id }}')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline"> &nbsp;&nbsp; Upload Documents
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                
+                
+                <div class="col-md-12 p-0 fullWidth fulHeight" id="step1">
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h5>Aadhar Card</h5>
+                            <div class="card">
+                                <img id="previewEmployeeAadhar" src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50"
+                                style="transform: translate(50%,50%);">
+                            </div>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_Aadhar" name="aadhaar_card" type="file" accept="image/*"
+                                    style="display: none;" onchange="fileUploaders(this.id,'previewEmployeeAadhar', 'aadhar')" />
+                                    
+                                </div>
+                                <label class="error_msg float-right" id="aadhar_image_error"></label>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_Aadhar')">
+                                    Upload
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <h5>PAN Card</h5>
+                            <div class="card">
+                                <img id="previewEmployeePAN" src="{% static 'img/svg/PANGrey.svg' %}" class="w-50"
+                                style="transform: translate(50%,50%);">
+                            </div>
+                            <div class="row fileUploadContainer">
+                                <div class="col-md-8" style="padding: 0.6rem;">
+                                    <label class="custom-file-upload m-0 lightGrey">
+                                        Upload Image
+                                    </label>
+                                    <input id="file-upload_PAN" name="pan_card" type="file" accept="image/*" multiple
+                                    style="display: none;" onchange="fileUploaders(this.id,'previewEmployeePAN', 'pan')" />
+                                    
+                                </div>
+                                <label class="error_msg float-right" id="pan_image_error"></label>
+                                <div class="col-md-4 upload" onclick="openImageSelector('file-upload_PAN')">
+                                    Upload
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-3 offset-9 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li2" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li3" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn3">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li4" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn4">
+                            &#10004;
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</form>
+
+<script>
+    function fileUploaders(id, previewId, fileType) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            document.getElementById(''+fileType+'_image_error').innerHTML = '';
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    
+                    document.getElementById(''+fileType+'_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    $("#"+previewId).attr("src", "static/img/svg/aadhaargrey.svg");
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            document.getElementById(''+fileType+'_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            $("#"+previewId).attr("src", "static/img/svg/aadhaargrey.svg");
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    $('#addDocumentDetailsForms').submit(function(e){
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+            
+        }else{
+            
+            $('#addUserModal').html('');
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: "{% url 'src:add-employee-document-detail' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    $('.error').remove();
+                    console.log(response)
+                    if(response.error){
+                        $.each(response.errors, function(name, error){
+                            alert(error);
+                            window.location.reload();
+                        })
+                    } else {
+                        hideLoader();
+                        openToaster("success", response.message);
+                        closeUserModal();
+                        ajaxEmployeeList('1');
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    });
+    
+    
+    function validateForm(){
+        
+        error = 0;
+        
+        // $('[name="aadhaar_card"]').css("border", "");
+        // if ($('[name="aadhaar_card"]').val() == null || $('[name="aadhaar_card"]').val() == "") {
+            //     $('[name="aadhaar_card"]').parent().find('.error_msg').text("Please select aadhaar image*");
+            //     error = error + 1;
+            // }
+            
+            // $('[name="pan_card"]').css("border", "");
+            // if ($('[name="pan_card"]').val() == null || $('[name="pan_card"]').val() == "") {
+                //     $('[name="pan_card"]').parent().find('.error_msg').text("Please select pan image*");
+                //     error = error + 1;
+                // }
+                
+                
+                if(error > 0){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        </script>

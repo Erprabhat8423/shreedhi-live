@@ -1,0 +1,57 @@
+{% load helper_tags %}
+{% load static %}
+
+{% if today_order_status > 0 %}
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="width: 10%; text-align: center;"> DATE </th>
+            <th>S.No</th>
+            <th>SAP ID</th>
+            <th style="width: 30%;">Party Name</th>
+            <th> Town </th>
+            <th>Milk Opening Balance</th>
+            <th>Milk Sale Amount</th>
+            <th>Other sale Amount</th>
+            <th>TCS Amount</th>
+            <th>total sale</th>
+            <th>Amt. Recd.</th>
+            <th>Total closing outstading</th>
+            <th>Opening Balance Crt.</th>
+            <th>DISPATCH Crt.</th>
+            <th>RECEIVING Crt.</th>
+            <th>Total outstading Crt.</th>
+            <th>SECURITY DIPOSIT</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if orders %}
+        {% for order in orders_list %}
+        <tr>
+            <td style="text-align: center;">{{ order.order_date }}</td>
+            <td style="text-align: center;">{{ forloop.counter }}</td>
+            <td style="text-align: center;">{{order.user_sap_id }}</td>
+            <td>{{order.store_name}}({{ order.user_name }})</td>
+            <td>{{ order.town_name }}</td>
+            <td>{{ order.opening_amount }}</td>
+            <td>{{ order.total_milk_amount }}</td>
+            <td>{{ order.other_amount }}</td>
+            <td>{{ order.tcs_amount }}</td>
+            <td>{{ order.order_total_amount }}</td>
+            <td>{{ order.amount_to_be_paid }}</td>
+            <td>{{ order.closing_amount }}</td>
+            <td>{{ order.opening_balance_crt }}</td>
+            <td>{{ order.dispatch_crate }}</td>
+            <td>{{ order.reciving_crate }}</td>
+            <td>{{ order.Total_crate }}</td>
+            <td>{{ order.security_amount }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+{% else %}
+<p
+    style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+    No Record Found...{{today_order_status}}</p>
+{% endif %}

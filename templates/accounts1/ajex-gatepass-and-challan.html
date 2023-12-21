@@ -1,0 +1,50 @@
+{% load helper_tags %}
+{% load static %}
+{% if today_order_status > 0 %}
+{% if users_list %}
+<table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+    <thead>
+        <tr>
+            <th style="text-align: center;">Sr.No.</th>
+            <th>Party Name/Routes(Vehicle No.)</th>
+            <th>Challans</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users_list %}
+         <tr>
+             <th style="text-align: center;">{{forloop.counter}}.</th>
+             <th>{{user.store_name}}({{ user.name }}/{{user.user_sap_id}})</th>
+             <td>
+             </td>
+         </tr>
+         {% for vehicles in user.vehicle_detail %}
+         <tr>
+             <td>
+             </td>
+             <td>
+                {{vehicles.route_name}}<span style="color: #3498db;">({{vehicles.registration_number}})</span>  
+             </td>
+             <td>
+                {% if vehicles.challan_invoice_pdf %}
+                <a href="{{vehicles.challan_invoice_pdf }}"download>Download Challan</a>
+                {% else %}
+                <span id="CHALLAN_{{ user.user_id }}_{{ user.order_date }}_{{vehicles.vehicle_id}}"><a href="javascript:void(0)"
+                onclick="downloadGatepassChallan('{{ user.user_id }}', '{{ user.order_date }}','{{user.production_unit_id}}','{{vehicles.vehicle_id}}','challan', 'CHALLAN')">Generate Challan</a>
+                </span>
+                {% endif %} 
+             </td>
+         </tr>
+         {% endfor %}
+         {% endfor %}
+     </tbody>
+</table>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+{% else %}
+<script>
+    $('.iconExport').hide();
+</script>
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}

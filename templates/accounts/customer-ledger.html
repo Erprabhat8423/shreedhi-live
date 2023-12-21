@@ -1,0 +1,244 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+    #addOrgTable thead th {
+        border: 1px solid #e7e7e7 !important;
+    }
+
+    #addOrgTable td {
+        border: 1px solid #e7e7e7 !important;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 col-sm-6 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span
+                    class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}"
+                    onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-6 p-md-0 ">
+                    <div class="col-md-12 p-md-0 " style="display: inline-flex;">
+                        <div class="col-md-3" style="float: inline-end;">
+                            <select class="inputField selectField " style="width: 100% !important;"
+                                name="user_id" id="user_id" onchange="getledger()">
+                                <option value=""> Select User</option>
+                                {% for user in Users %}
+                                <option value="{{ user.id }}" {% if first_user == user.id  %} selected {% endif %}>{{ user.store_name }}({{user.emp_sap_id}})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input class="inputField" type="text" id="from" name="from" placeholder="From Date" value="{{from_date}}" onchange="getledger()">
+                        </div>
+                        <div class="col-md-3">
+                            <input class="inputField" type="text" id="to" name="to" placeholder="To Date" value="{{to_date}}" onchange="getledger()">
+                        </div>
+                        <div class="col-md-3">
+                           <button type="button" class="btn iconBox col-md-12 p-md-0 iconRecievePayment" style="width: 100% !important;height: 2.5rem !important; " onclick="creditUserLedger()"></button>
+                           
+                        </div>
+                        <div class="col-md-3">
+                            
+                            <button type="button" class="btn iconBox col-md-12 p-md-0 iconRecievePayments" style="width: 100% !important;height: 2.5rem !important; " onclick="creditDebitUserLedger()"></button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if ledger_users %}
+                    <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+                        <thead>
+                            <tr>
+                                <th >Date</th>
+                                <th>Particular</th>
+                                <th>Bank Details</th>
+                                <th>Credit </th>
+                                <th>Debit</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ledger_user in ledger_users %}
+                            <tr>
+                                <td>{{ledger_user.order_date|date:"d/m/Y"}}</td>
+                                <td>{{ledger_user.particulars|capfirst }}<br><b>{% if ledger_user.invoice_no == '0' %} {% else %}({{ledger_user.invoice_no}}){% endif %}</b></td>
+                                <td>{% if ledger_user.bank_details %}{{ledger_user.bank_details}}{% else %}-{% endif %}</td>
+                                <td>{% if ledger_user.credit %}{{ledger_user.credit}}{% else %}0{% endif %}</td>
+                                <td>{{ledger_user.debit}}</td>
+                                <td>{{ledger_user.balance}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p
+                        style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+                        No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script>
+    function getledger(){
+        var start_date  = $('#from').val();
+        if(start_date){ 
+            start_date = start_date.split('/');
+            start_date = start_date[2]+'-'+start_date[1]+'-'+start_date[0]
+        }else{ start_date = '0' }
+        var end_date    = $('#to').val();
+        if(end_date){ 
+            end_date = end_date.split('/');
+            end_date = end_date[2]+'-'+end_date[1]+'-'+end_date[0]
+        }else{ end_date = '0' }
+        var id          = $('#user_id').val();
+        if (id) {
+            $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-user-ledger' %}",
+                method: 'GET',
+                data: { start_date: start_date, end_date: end_date,id:id},
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        else{
+            openToaster("danger","plese select user. ");
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#start_date").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            changeDate: true,
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy'
+        });
+    });
+
+    $(function() {
+        var dateFormat = "dd/mm/yy",
+            from = $("#from")
+            .datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            changeYear: true,
+            maxDate: '{{to_date}}',
+            numberOfMonths: 1,
+            dateFormat: 'dd/mm/yy'
+            })
+            .on("change", function() {
+            to.datepicker("option", "minDate", getDate(this));
+            }),
+            to = $("#to").datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            changeYear: true,
+            minDate: '{{from_date}}',
+            maxDate: '{{to_date}}',
+            numberOfMonths: 1,
+            dateFormat: 'dd/mm/yy'
+            })
+            .on("change", function() {
+            from.datepicker("option", "maxDate", getDate(this));
+            });
+
+        function getDate(element) {
+            var date;
+            try {
+            date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+            date = null;
+            }
+
+            return date;
+        }
+        
+        $("#showTo").click(function() {
+            $("#from").datepicker("show");
+        });
+        });
+
+        
+function creditDebitUserLedger(){
+    $('#addUserModal').html('');
+    showLoader();
+        
+    $.ajax({
+        url: "{% url 'src:save-credit-debit-note' %}",
+        method: 'GET',
+        data: {},
+        success: function (data) {
+            hideLoader();
+            $("#addUserModal").show();
+            $('#addUserModal').html(data);
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+
+            
+        },
+        error: function (err) {
+            // alert(err.message);
+            // window.location.reload();
+        }
+    });
+}
+
+
+function creditUserLedger(){
+    $('#addUserModal').html('');
+    showLoader();
+        
+    $.ajax({
+        url: "{% url 'src:credit-user-ledger' %}",
+        method: 'GET',
+        data: {},
+        success: function (data) {
+            hideLoader();
+            $("#addUserModal").show();
+            $('#addUserModal').html(data);
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+
+            
+        },
+        error: function (err) {
+            // alert(err.message);
+            // window.location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

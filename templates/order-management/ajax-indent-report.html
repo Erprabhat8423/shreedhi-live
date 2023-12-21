@@ -1,0 +1,167 @@
+{% load static %}
+{% load helper_tags %}
+{% if today_order_status > 0 %}
+{% if indent_lists %}
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th> Customer Code  </th>
+            <th> Name of Distributor/SS  </th>
+            <th> Town  </th>
+            {% if product_milk_variant_list %}
+            {% for product_variant in product_milk_variant_list %}
+            <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+            {% endfor %}
+            {% endif %}
+            <th style="text-align:center">TOTAL {{milk_product_class_name.product_class}} CRATES</th>
+            {% if product_without_milk_variant_list %}
+            {% for product_variant in product_without_milk_variant_list %}
+            <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+            {% endfor %}
+            {% endif %}
+            <!--<th>FLAT INCENTIVE</th>-->
+            <!--<th>BULK PACK INCENTIVE</th>-->
+            <th>TOTAL DISCOUNT AMOUNT</th>
+            <th>INVOICE AMOUNT</th>
+            <th>PAYMENT DETAILS</th>
+            <th>OUTSTANDING DETAILS</th>
+            <th>SECURITY</th>
+            <th>BALANCE AFTER DEPOSIT</th>
+            <th>BALANCE SECURITY</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if indent_lists %}
+        {% for indent in indent_lists %}
+        <tr>
+            <td>{{ indent.emp_sap_id }}</td>
+            <td>{% if indent.store_name is not None %}{{indent.store_name}}{%endif%}({{ indent.first_name }} {{ indent.middle_name }} {{ indent.last_name }})</td>
+            <td>{{ indent.town_name }}</td>
+            {% if indent.milk_items %}
+            {% for item in indent.milk_items %}
+            <th style="color:#ffff;background-color: {{item.product_color_code}}; text-align:center"> {{item.milk_items}}  </th>
+            {% endfor %}
+            {% endif %}
+            <th style="text-align:center"> {{ total_milk_crates|index:forloop.counter0 }}  </th>
+            {% if indent.without_milk_items %}
+            {% for item in indent.without_milk_items %}
+            <th style="color:#ffff;background-color: {{item.product_color_code}}; text-align:center"> {{item.without_milk_items}}  </th>
+            {% endfor %}
+            {% endif %}
+            <!--<td>{{ total_flat_scheme_incentive|index:forloop.counter0 }}</td>-->
+            <!--<td>{{ total_bulk_scheme_incentive|index:forloop.counter0 }}</td>-->
+            <td>{% sum total_flat_scheme_incentive|index:forloop.counter0 total_bulk_scheme_incentive|index:forloop.counter0 %}</td>
+            <td>{% subtract indent.order_total_amount total_incentive_amount|index:forloop.counter0 %}</td>
+            <td>{{indent.amount_to_be_paid}}</td>
+            <td>{{indent.outstanding_amount}}</td>
+            <td>{% if indent.security_amount %}{{indent.security_amount}}{% endif %}</td>
+            <td>{% subtract indent.balance_after_deposit total_incentive_amount|index:forloop.counter0 %}</td>
+            <td>{% sum indent.balance_security total_incentive_amount|index:forloop.counter0 %}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr>
+            <th colspan="3" style="text-align: right;">GRAND TOTAL(CRATES)</th>
+            {% if total_milk_crates_qty %}
+            {% for total_milk_crates in total_milk_crates_qty %}
+            <th style="text-align:center">{{total_milk_crates}}</th>
+            {% endfor %}
+            {% endif %}
+            <th></th>
+            {% if total_without_milk_crates_qty %}
+            {% for total_without_milk_crates in total_without_milk_crates_qty %}
+            <th style="text-align:center">{{total_without_milk_crates}}</th>
+            {% endfor %}
+            {% endif %}
+            <!--<th></th>-->
+            <!--<th></th>-->
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <th colspan="3" style="text-align: right;">TOTAL QUANTITY IN LTR</th>
+            {% if total_milk_qty_ltr_all %}
+            {% for total_milk in total_milk_qty_ltr_all %}
+            <th style="text-align:center">{{total_milk}}</th>
+            {% endfor %}
+            {% endif %}
+            <th></th>
+            {% if total_withoutmilk_qty_ltr_all %}
+            {% for total_without_milk in total_withoutmilk_qty_ltr_all %}
+            <th style="text-align:center">{{total_without_milk}}</th>
+            {% endfor %}
+            {% endif %}
+            <!--<th></th>-->
+            <!--<th></th>-->
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <th colspan="3" style="text-align: right;">TRADE SCHEME POUCHES</th>
+            {% if total_free_milk_pouches %}
+            {% for total_milk_pouches in total_free_milk_pouches %}
+            <th style="text-align:center">{{total_milk_pouches}}</th>
+            {% endfor %}
+            {% endif %}
+            <th></th>
+            {% if total_free_without_milk_pouches_qty %}
+            {% for total_without_milk_pouches in total_free_without_milk_pouches_qty %}
+            <th style="text-align:center">{{total_without_milk_pouches}}</th>
+            {% endfor %}
+            {% endif %}
+            <!--<th></th>-->
+            <!--<th></th>-->
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tbody>
+</table>
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+{% else %}
+<p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+{% endif %}
+
+<script>
+    {% if today_order_status == 0 and order_date != today_date %}
+    $("#order_datepicker").css("margin-right","220px");
+    $('#order_exports').hide();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% else %}
+    $("#order_datepicker").css("margin-right","0");
+    {% if order_date == today_date %}
+    $('#order_exports').hide();
+    {% if today_order_status > 0 and order_regenerate_status > 0 %}
+    $('#order_regenerate').show();
+    {% elif today_order_status == 0 %}
+    $('#order_generate').show();
+    {% elif today_order_status > 0 %}
+    $('#order_export').show();
+    {% endif %}
+    {% else %}
+    $('#order_exports').show();
+    $('#order_export').hide();
+    $('#order_regenerate').hide();
+    $('#order_generate').hide();
+    {% endif %}
+    {% endif %}
+
+</script>

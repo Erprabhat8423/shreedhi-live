@@ -1,0 +1,299 @@
+{% extends 'layout/layout.html' %} 
+{% load helper_tags %} 
+{% block content %} 
+{% load static %} 
+
+{% block style %} 
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-sm-12 h-100">
+        <div class="col-md-4 p-md-0">
+            <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+        </div>
+        <div class="primaryContainer h-100 ajaxReportSection mt-4" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6 p-md-0 text-right">
+                    
+                    <input type="search" style="width: 20% !important;" placeholder="Attendance Date" value="{% now 'd/m/Y' %}" class="searchTable" id="search_date" onchange="filterAttendance(this.value)" readonly>
+                    
+                    <input class="search searchTable report_search" placeholder="Search" type="search" data-column="all">
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        
+                        <input type="hidden" name="show_columns" id="show_columns" value="" >
+                        <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                            src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                            <!-- <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a> -->
+                            </div>
+                        </div>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="employee_name" id="employee_name" data-id="1" onclick="showHideColumns(this,'employee_name',1)" />
+                                    <label class="mb-0" for="employee_name">Employee Name</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="added_employee" id="added_employee" data-id="2" onclick="showHideColumns(this,'added_employee',2)" />
+                                    <label class="mb-0" for="added_employee">Added User</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="tagged_employee" id="tagged_employee" data-id="3" onclick="showHideColumns(this,'tagged_employee',3)" />
+                                    <label class="mb-0" for="tagged_employee">Tagged User</label>
+                                </a>
+                                
+                                
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_employee_name" data-id="1" onclick="toggleFreeze(this.id,'zone_name',1)" />
+                                    <label class="mb-0" for="lock_employee_name">Employee Name</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_added_employee" data-id="1" onclick="toggleFreeze(this.id,'added_employee',2)" />
+                                    <label class="mb-0" for="lock_added_employee">Added User</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_tagged_employee" data-id="1" onclick="toggleFreeze(this.id,'tagged_employee',3)" />
+                                    <label class="mb-0" for="lock_tagged_employee">Tagged User</label>
+                                </a>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="row" id="tableBox">
+                    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajaxReportData">
+                        <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="employee_name">
+                                        Employee Name
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    
+                                    <th class="added_employee">
+                                        Added User
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="tagged_employee">
+                                        Tagged User
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="tablebody">
+                                {% if users %}
+                                {% for user in users %}
+                                <tr>
+                                    <td class="employee_name">{{user.name}}<strong>({{user.role_name}})</strong></td>
+                                    <td class="added_employee">{{user.added_employee_count}}</td>
+                                    <td class="tagged_employee">{{user.tagged_employee_count}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center;">
+                                        No Record Found...
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %} 
+{% block script %}
+
+<script>
+    $(document).ready(function(){
+        $("#search_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        
+        var checkbox_val = ["employee_name","added_employee","tagged_employee"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function() {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function() {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+        
+        
+        //    update tablesorter
+        updateTableSorter();
+        
+        $("#addOrgTable tbody tr").click(function() {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function() {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        
+    });
+    
+    function filterAttendance(search_date){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:ajax-employee-report' %}",
+            method: 'GET',
+            data: { search_date:search_date },
+            success: function (data) {
+                hideLoader();
+                $('#tablebody').html(data);
+                $('#addOrgTable').trigger('update');
+            },
+            error: function (err) {
+            }
+        });
+    }
+    
+    
+    function updateTableSorter(){
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["25%", "25%", "25%", "25%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.report_search',
+                filter_columnFilters: false,
+            }
+        });
+    }
+    
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function(index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function(index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function(index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('.' + colid + ' #freeze').show();
+            $('.' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function(index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('.' + colid + ' #unfreeze').show();
+            $('.' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(element, el_class, colNo) {
+        var checkbox_val = [];
+        var checkbox = $(element);
+        if ($(element).is(':checked')) {
+            $('.' + el_class).hide();
+        } else {
+            $('.' + el_class).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function() {
+            if (!$(this).is(':checked')) {
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    function exports(type){
+        var columns = $('#show_columns').val();
+        
+        search_date = $('#search_date').val();
+        search_date = search_date.split('/');
+        search_date = search_date[2]+'-'+search_date[1]+'-'+search_date[0];
+        
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-employee-report-to-xlsx' 'columns' 'search_date' %}";
+                url = url.replace('columns',columns).replace('search_date',search_date);
+                window.location.href = url;
+            } else {
+                
+            }
+        }
+        
+    }
+</script>
+
+{% endblock %}
+

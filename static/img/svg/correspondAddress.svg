@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #0085d9;
+        stroke-width: 2px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="correspondAddress" class="cls-1" d="M1300.03,380.923c0,6.962-9.04,12.929-9.04,12.929s-9.03-5.967-9.03-12.929a8.919,8.919,0,0,1,2.64-6.329,9.11,9.11,0,0,1,12.79,0A8.919,8.919,0,0,1,1300.03,380.923Zm-6.02,0a3.015,3.015,0,1,1-3.02-2.984A3,3,0,0,1,1294.01,380.923Z" transform="translate(-1276 -368.016)"/>
+</svg>

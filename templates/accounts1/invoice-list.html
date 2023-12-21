@@ -1,0 +1,282 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+    #addOrgTable thead th {
+        border: 1px solid #e7e7e7 !important;
+    }
+
+    #addOrgTable td {
+        border: 1px solid #e7e7e7 !important;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 col-sm-6 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span
+                            class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}"
+                            onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 p-md-0 ">
+                    <div class="col-md-12 p-md-0 " style="display: inline-flex; ">
+                        <div class="col-md-2 p-md-0 offset-2">
+                            <select class="inputField selectField" style="width: 93% !important; padding: 0.3rem;"
+                                name="organization_id" id="organization_id" onchange="getUserList(); getInvoiceReport()">
+                                <option value="">Select Organization</option>
+                                {% for organization in organizations %}
+                                <option value="{{ organization.id }}">{{ organization.organization_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 " style="float: inline-end;">
+                            <select class="inputField selectField " style="width: 100% !important;"
+                                name="user_id" id="user_id" onchange="getUserList(); getInvoiceList()">
+                                <option value=""> Select User</option>
+                                {% for user in orders_list %}
+                                <option value="{{ user.id }}">{{ user.user_name }}({{user.user_sap_id}})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input class="inputField" placeholder="Start Date" name="start_date" id="start_date"
+                            value="{{ cdate }}" style="width: 90%;float: inline-start;height: 40px !important;"
+                            onchange="getUserList(); getInvoiceList()" readonly>
+                        </div>
+                        {% comment %} <div class="col-md-3">
+                            <input class="inputField" placeholder="End Date" name="end_date" id="end_date"
+                            value="{{ cdate }}"
+                            style="width: 60%; padding: 0.3rem;float: inline-start;margin-right: 200px;height: 40px !important; "
+                            onchange="getUserList(); getInvoiceList() " readonly>
+                        </div> {% endcomment %}
+
+                        <!-- <a href="javascript:void(0)" onclick="downloadAllInvoice()" id="order_exports"
+                            class="btn iconBox col-md-4 p-md-0 iconExports"
+                            style="width: 200px; margin-right: 220px; padding:0.1rem!important;"></a> -->
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if today_order_status > 0 %}
+                    <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+                        <thead>
+                            <tr>
+                                <th >Sr. No. </th>
+                                <th >Date</th>
+                                <th>Store Name(Distributor/SS Name) </th>
+                                <th>Order Code </th>
+                                <th>Order Amount </th>
+                                <th>Invoice Amount</th>
+                                <th>Download Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if user_list %}
+                            {% for user in user_list %}
+                            <tr>
+                                <td >{{ forloop.counter }}.</td>
+                                <td>{{user.order_date }}</td>
+                                <td>{{ user.store_name }}({{ user.user_name }}/{{user.emp_sap_id}})</td>
+                                <td>{{ user.order_code }} </td>
+                                <td>{{ user.order_amount|floatformat:2 }} </td>
+                                <td>{{ user.invoice_amount|floatformat:2 }}</td>
+                                <td>
+                                    {% if user.withoutgst == 1 %}
+                                    {% if user.bill_invoice_pdf %}
+                                    <a href="{{user.bill_invoice_pdf}}"download>Download Bill |</a>
+                                    {% else %}
+                                    <span id="Bill_{{ user.user_id }}_{{ user.order_date }}"><a href="javascript:void(0)"
+                                    onclick="genrateInvoice('{{ user.user_id }}','{{ user.order_date }}','{{user.production_unit_id}}','bill', 'Bill')">Generate BOS |</a>
+                                    </span>
+                                    {% endif %}
+                                    {% else %}
+                                    {% endif %}
+                                    {% if user.withgst == 1 %}
+                                    {% if user.tax_invoice_pdf %}
+                                    <a href="{{user.tax_invoice_pdf}}"download>Download TI </a>
+                                    {% else %}
+                                    <span id="Tax_{{ user.user_id }}_{{ user.order_date }}"><a href="javascript:void(0)"
+                                    onclick="genrateInvoice('{{ user.user_id }}', '{{ user.order_date }}','{{user.production_unit_id}}','tax', 'Tax')">Generate TI</a>
+                                    </span>
+                                    {% endif %}
+                                    {% else %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p
+                        style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">
+                        No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    $(document).ready(function() {
+        getUserList();   
+    });
+    function getUserList() {
+        var start_date = $('#start_date').val();
+        //var end_date = $('#end_date').val();
+        var organization_id = $('#organization_id').val();
+        
+        if (start_date) {
+            start_date = start_date.split('/');
+            start_date = start_date[2] + '-' + start_date[1] + '-' + start_date[0]
+        } else { start_date = '0' }
+       // if (end_date) {
+       //     end_date = end_date.split('/');
+       //     end_date = end_date[2] + '-' + end_date[1] + '-' + end_date[0]
+       // } else { end_date = '0' }
+        $.ajax({
+            url: "{% url 'src:get-ordered-user-list' %}",
+            method: 'GET',
+            data: { start_date: start_date,organization_id:organization_id },
+            success: function (data) {
+                $('[name="user_id"]').html(data.options)
+                $(".selectField").select2();
+            },
+            error: function (err) {
+                // alert(err.message);
+                // window.location.reload();
+            }
+        });
+    };
+    function getInvoiceReport() {
+        var start_date = $('#start_date').val();
+        //var end_date = $('#end_date').val();
+        var id = $('#user_id').val();
+        var organization_id = $('#organization_id').val();
+        if (id) {
+            if (start_date) {
+                start_date = start_date.split('/');
+                start_date = start_date[2] + '-' + start_date[1] + '-' + start_date[0]
+            } else { start_date = '0' }
+            //if (end_date) {
+            //    end_date = end_date.split('/');
+            //    end_date = end_date[2] + '-' + end_date[1] + '-' + end_date[0]
+            //} else { end_date = '0' }
+            $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-invoice-list' %}",
+                method: 'GET',
+                data: { start_date: start_date,id: id,organization_id:organization_id },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        else{
+            getInvoiceList();
+        }
+
+    }
+    function getInvoiceList() {
+        var start_date = $('#start_date').val();
+        //var end_date = $('#end_date').val();
+        var id = $('#user_id').val();
+        var organization_id = $('#organization_id').val();
+        if (start_date) {
+            start_date = start_date.split('/');
+            start_date = start_date[2] + '-' + start_date[1] + '-' + start_date[0]
+        } else { start_date = '0' }
+        //if (end_date) {
+        //    end_date = end_date.split('/');
+        //    end_date = end_date[2] + '-' + end_date[1] + '-' + end_date[0]
+        //} else { end_date = '0' }
+        if (start_date) {
+            $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-invoice-list' %}",
+                method: 'GET',
+                data: { start_date: start_date, id: id,organization_id:organization_id},
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+       // else {
+           // openToaster("danger","Start date is greater then end date ");
+            
+       // } 
+    }
+    function downloadInvoice(invoice_id, order_date) {
+        var url = "{% url 'src:print-invoice-template' 'order_date' 'invoice_id'  %}";
+        url = url.replace('order_date', order_date).replace('invoice_id', invoice_id);
+        window.location.href = url;
+    }
+    function genrateInvoice(user_id ,order_date,production_unit_id,invoice_type, id) {
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:genrate-invoice-template' %}",
+            method: 'POST',
+            data: { user_id: user_id,order_date: order_date,production_unit_id:production_unit_id,invoice_type:invoice_type,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function (data) {
+                hideLoader();
+                if(data.message == 'success'){
+                    val = id+'_'+user_id+'_'+order_date;
+                    var url = data.baseurl+'/media/invoice_pdf/'+data.filename+'.pdf';
+                    $('#'+val).html('<a href="'+url+'" download>Download '+id+'</a> |');
+                    openToaster("success",''+id+' Invoice generated successfully.');
+                }else{
+                    openToaster("danger", 'Failed to download the invoice.');
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+
+    function downloadAllInvoice() {
+        var order_date = $('#order_datepicker').val();
+        if (order_date) {
+            order_date = order_date.split('/');
+            order_date = order_date[2] + '-' + order_date[1] + '-' + order_date[0]
+        } else { order_date = '0' }
+
+        var url = "{% url 'src:print-all-invoice-template' 'order_date' %}";
+        url = url.replace('order_date', order_date);
+        window.location.href = url;
+    }
+    $(document).ready(function () {
+        $("#start_date").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            changeDate: true,
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy'
+
+        });
+    });
+
+</script>
+{% endblock %}

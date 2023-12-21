@@ -1,0 +1,331 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addOtherDetailsForms" id="addOtherDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="vehicle_id" id="vehicle_id" value="{{vehicle.id}}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        
+                        <h5 class="mt-md-2">Other Information &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mt-md-2">Pollution Registration Details &nbsp;&nbsp;</h5>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Certificate Sr. No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha_numeric" type="text" placeholder="  Certificate Sr. No" name="certificate_sr_no" id="certificate_sr_no" maxlength="50" value="{% if vehicle_pollution.certificate_sr_no is not None %}{{vehicle_pollution.certificate_sr_no}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Date of registration
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker" readonly type="text" placeholder="Date of registration" name="date_of_registration" id="date_of_registration" maxlength="50" value="{% if vehicle_pollution.date_of_registration %}{{vehicle_pollution.date_of_registration | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Valid Till
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField reg_valid_till" readonly type="text" placeholder="Valid Till" name="pollution_valid_till" id="pollution_valid_till" maxlength="50" value="{% if vehicle_pollution.pollution_valid_till %}{{vehicle_pollution.pollution_valid_till | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Copy of Certificate
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="form-control" type="file"  name="copy_of_certificate" id="copy_of_certificate" maxlength="50">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mt-md-2">Fitness Details &nbsp;&nbsp;</h5>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Application No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Application No" name="application_no" id="application_no" maxlength="50" value="{% if vehicle_fitness.application_no is not None %}{{vehicle_fitness.application_no}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Inspection Date
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker" readonly type="text" placeholder="Inspection Date" name="inspection_date" id="inspection_date" maxlength="50" value="{% if vehicle_fitness.inspection_date %}{{vehicle_fitness.inspection_date | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Valid Till
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField reg_valid_till" readonly type="text" placeholder="Valid Till" name="fitness_valid_till" id="fitness_valid_till" maxlength="50" value="{% if vehicle_fitness.fitness_valid_till %}{{vehicle_fitness.fitness_valid_till | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Copy of Certificate
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="file" name="copy_of_fitness_certificate">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                            </div>                            
+                            
+                        </div>
+                        
+                        
+                        <div class="col-md-6">
+                            
+                            <div class="row">
+                                
+                                <div class="col-md-12">
+                                    <h5 class="mt-md-2">Road Permit Details&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Permit No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha_numeric" type="text" placeholder="Permit No" name="permit_no" id="permit_no" maxlength="50" value="{{vehicle_roadpermit.permit_no}}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Date of registration
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker type="text"" placeholder="Date of registration" name="permit_registration_date" id="permit_registration_date" maxlength="50" value="{% if vehicle_roadpermit.permit_registration_date %}{{vehicle_roadpermit.permit_registration_date | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Valid Till
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField reg_valid_till" readonly type="text" placeholder="Valid Till" name="permit_valid_till" id="permit_valid_till" maxlength="50" value="{% if vehicle_roadpermit.permit_valid_till %}{{vehicle_roadpermit.permit_valid_till | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Purpose
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Purpose" name="purpose" id="purpose" maxlength="50" value="{{vehicle_roadpermit.purpose}}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Registration copy
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="file" name="insurance_copy">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                            </div>                            
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        $(document).ready(function(){
+            $(".reg_valid_till").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                dateFormat: 'dd/mm/yy' 
+            });
+            
+            $(".datepicker").datepicker({
+                weekStart: 1,
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'dd/mm/yy',
+            });
+        });
+        var vehicle_id = "{{vehicle.id}}";
+        
+        $('#addOtherDetailsForms').submit(function(e){
+            showLoader();
+            if(validateOtherForm()){
+                hideLoader();
+                return false;
+            }else{
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                url = "{% url 'src:edit-vehicle-other' '1' %}";
+                url = url.replace('1',vehicle_id)
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log(response)
+                        if (!response.flag == true) {
+                            openToaster("success", response.message);
+                        } else {
+                            hideLoader();
+                            $('#addUserModal').html('');
+                            $('#addUserModal').hide();
+                            openToaster("success", response.message);
+                            setInterval(function(){ window.location.reload(); }, 500);
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                
+                
+            }
+            
+        });
+        
+        function validateOtherForm(){
+            error = 0;
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+            
+        }
+    </script>
+    
+    

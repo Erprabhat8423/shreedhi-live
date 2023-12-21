@@ -1,0 +1,548 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+	<form name="addBonusSchemeForm" id="addBonusSchemeForm" method="POST" enctype="multipart/form-data" >
+		{% csrf_token %}
+		<div class="modal-header" id="headerStep1">
+			<div class="col-12 p-0">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="mt-md-2">Create Quantitative Scheme &nbsp;&nbsp;</h5>
+					</div>
+					<div class="col-6">
+						<button class="btn btn-save float-right" type="button" onclick="saveBonusScheme()" >
+							Save & Proceed
+						</button>
+						<button class="btn btn-close float-right" type="button" onclick="closeModal()">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal-body" id="addUserModalBody" style="overflow: auto">
+			<div class="row">
+				<div class="col-md-12 p-0 h-100 w-100" >
+					<div class="row">
+						<div class="col-md-4" style="border-right: 1px solid lightgrey;">
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Scheme Name</label>
+									<input class="inputField" type="text" placeholder="Enter Scheme Name"
+									name="scheme_name" id="scheme_name" maxlength="50"  />
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp; State</label>
+									<select class="inputField selectField" name="state_id" style="width: 100% !important;" onchange="getStateRouteOptions(this.value); getFilteredUsers();">
+										<option value="">Select State</option>
+										{% for state in states %}
+										<option value="{{state.id}}">{{state.state}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/route.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Route</label>
+									<select class="inputField selectField" data-placeholer="Select Route"  name="route_id[]" style="width: 100% !important;" onchange="routeTownOptions(this); getFilteredUsers();" multiple>
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Town</label>
+									<select class="inputField selectField" data-placeholer="Select Town"  name="town_id[]" style="width: 100% !important;" onchange="selectTownAllOption(this); getFilteredUsers();" multiple>
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/crate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;On order of <span id="total_minimum_order_quantity"></span></label>
+									<div class="row">
+										<div class="col-md-5 padding_0">
+											<input class="inputField numeric" type="text" placeholder="Enter Quantity" name="minimum_order_quantity[]"  maxlength="5" onkeyup="calculateTotalMinimumOrder();getFilteredUsers();" />
+											<label class="error_msg float-right"></label>
+										</div>
+										<div class="col-md-5 padding_0">
+											<select class="inputField selectField" name="order_container_id[]" style="width: 100% !important;" onchange="checkSelectedContainer(this);getFilteredUsers();">
+												<option value="">Select Container</option>
+												{% for container in containers %}
+												<option value="{{container.id}}">{{container.container}}</option>
+												{% endfor %}
+											</select>
+											<label class="error_msg float-right"></label>
+										</div>
+									</div>
+									<div id="new_rows"></div>
+								</div>
+							</div>
+							
+							
+							
+							<div class="row">
+								<div class="col-md-12 text-right" >
+									<a href="javascript:;" onclick="addNewRow()" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/schemeDate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Scheme Time Period</label>
+									<div class="row">
+										<div class="col-md-6 padding_0">
+											<input class="inputField" type="text" placeholder="Start Date"
+											name="start_date" id="start_date" readonly  />
+											<label class="error_msg float-right"></label>
+										</div>
+										
+										<div class="col-md-6 padding_0">
+											<input class="inputField" type="text" placeholder="End date"
+											name="end_date" id="end_date" readonly  />
+											<label class="error_msg float-right"></label>
+										</div>
+										
+									</div>
+									
+								</div>
+							</div>
+							
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/product_variant.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Free Product</label>
+									<select class="inputField selectField"  name="free_variant_id" style="width: 100% !important;" onchange="getProductVariantDetails(this.value,2); getFilteredUsers();">
+										<option value="">Select Product</option>
+										{% for product in products %}
+										<optgroup label="{{product.product_name}} ({{product.product_class_name}}) - {{product.container_name}}">
+											{% for product_variant in product.product_variants %}
+											<option value="{{product_variant.id}}">{{product_variant.variant_name}}</option>
+											{% endfor %}
+										</optgroup>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row" style="margin-top: 5px;">
+								<div class="col-md-6">
+									<input type="checkbox" onclick="toggleQty(this)" > 
+									<input class="container_qty numeric" style="display: none;"  type="text" placeholder="Qty" name="container_qty" onkeyup="getFilteredUsers()"  />
+									<label for="" class="scheme_label" id="free_product_unit">Container </label>
+								</div>
+								
+								<div class="col-md-6">
+									<input type="checkbox" onclick="toggleQty(this)"> 
+									<input class="container_qty numeric" style="display: none;" type="text" placeholder="Qty" name="pouch_qty" onkeyup="getFilteredUsers()"  />
+									<label for="" class="scheme_label">Pouch </label>
+								</div>
+								
+							</div>
+							
+							
+						</div>
+						
+						<div class="col-md-8" id="ajaxDistributors">
+							<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+								<thead>
+									<tr>
+										<th>Dis./SS name</th>
+										<th>On Order of</th>
+										<th>Free Product variant</th>
+										<th>Free Product quantity</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		
+		
+	</form>	
+</div>
+
+<script>
+	
+	$(document).ready(function(){
+		
+		$("#start_date").datepicker({
+			weekStart: 1,
+			changeMonth: true,
+			changeYear: true,  
+			yearRange: "-100:+10",
+			daysOfWeekHighlighted: "6,0",
+			autoclose: true,
+			todayHighlight: true,
+			dateFormat: 'dd/mm/yy',
+			minDate: 0
+		});
+		
+		$("#end_date").datepicker({
+			weekStart: 1,
+			changeMonth: true,
+			changeYear: true,  
+			yearRange: "-100:+10",
+			daysOfWeekHighlighted: "6,0",
+			autoclose: true,
+			todayHighlight: true,
+			dateFormat: 'dd/mm/yy',
+			minDate: 0
+		});
+		
+	});
+	
+	
+	function saveBonusScheme(){
+		showLoader();
+		if(validateFreeSchemeForm()){
+			hideLoader();
+			return false;
+		}else{
+			$.ajax({
+				url: "{% url 'src:add-bonus-scheme' %}",
+				method: 'POST',
+				data: $('#addBonusSchemeForm').serialize(),
+				success: function (data) {
+					hideLoader();
+					if(data.flag){
+						openToaster("success", data.message);
+						
+						$("#addUserModal").html('');
+						$("#addUserModal").hide();
+						openToaster("success", data.message);
+						setTimeout(function(){ window.location.reload(); }, 500);
+						
+					}else{
+						openToaster("danger", data.message);
+					}
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			}).always(function() {
+				hideLoader();
+			});
+		}
+		
+	}
+	function validateFreeSchemeForm(){
+		error = 0;
+		$('.error_msg ').text('');
+		$('.inputField').css("border", "");
+		if($('[name="scheme_name"]').val() == ""){
+			$('[name="scheme_name"]').parent().find('.error_msg').text('Please enter scheme name');
+			$('[name="scheme_name"]').css("border", "1px solid #db8305");
+			error = error + 1;
+		}
+		if($('[name="state_id"]').val() == ""){
+			$('[name="state_id"]').parent().find('.error_msg').text('Please select state');
+			$('[name="state_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="route_id[]"]').val() == "" || $('[name="route_id[]"]').val() == null){
+			$('[name="route_id[]"]').parent().find('.error_msg').text('Please select route/routes');
+			$('[name="route_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="town_id[]"]').val() == "" || $('[name="town_id[]"]').val() == null){
+			$('[name="town_id[]"]').parent().find('.error_msg').text('Please select town/towns');
+			$('[name="town_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		
+		
+		if($('[name="start_date"]').val() == ""){
+			$('[name="start_date"]').parent().find('.error_msg').text('Please enter start date');
+			$('[name="start_date"]').css("border", "1px solid #db8305");
+			error = error + 1;
+		}
+		
+		if($('[name="free_variant_id"]').val() == "" || $('[name="free_variant_id"]').val() == null){
+			$('[name="free_variant_id"]').parent().find('.error_msg').text('Please select free product');
+			$('[name="free_variant_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		
+		
+		$('[name="minimum_order_quantity[]"]').each(function(){
+			if($(this).val() == ""){
+				$(this).parent().find('.error_msg').text('Please enter details');
+				$(this).css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+		})
+
+		$('[name="order_container_id[]"]').each(function(){
+			if($(this).val() == ""){
+				$(this).parent().find('.error_msg').text('Please enter details');
+				$(this).siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+				error = error + 1;
+			}
+		})
+
+		
+
+
+		if(error > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	
+	
+	function getStateRouteOptions(value){
+		if(value == ""){
+			$('[name="route_id[]"]').html('');
+			$('#ajaxDistributors').html('');
+		}else{
+			showLoader();
+			var url = "{% url 'src:get-state-route-options' 1 %}";
+			url = url.replace(1,parseInt(value));
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					hideLoader();
+					$('[name="route_id[]"]').html(data.options);
+					$('[name="route_id[]"]').select2();
+					addMultiSelectPlacehoder();
+					
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			});
+		}
+		
+	}
+	
+	function getProductVariantDetails(value,type){
+		if(value == ""){
+			
+		}else{
+			showLoader();
+			var url = "{% url 'src:get-product-variant-details' 1 %}";
+			url = url.replace(1,parseInt(value));
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					hideLoader();
+					product = data.product;
+					if(type == 1){
+						$('#product_unit').html(product.container_name)
+					}else{
+						$('#free_product_unit').text(product.container_name)
+					}
+					
+					
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			});
+		}
+		
+	}
+	
+	function toggleQty(element){
+		if($(element).is(':checked')){
+			$(element).next().show();
+		}else{
+			$(element).next().val('');
+			$(element).next().hide();
+		}
+	}
+	
+	function checkSelectedContainer(element){
+		if($(element).val() != ""){
+			$('[name="order_container_id[]"]').not(element).each(function(){
+				if($(this).val() == $(element).val()){
+					openToaster('warning',"This container is already selected");
+					$(element).val('').trigger('change')
+				}
+			});
+		}
+		
+	}
+	
+	function addNewRow(){
+		
+		max_row = "{{containers.count}}";
+		max_row = parseInt(max_row);
+		total_row = $('[name="order_container_id[]"]').length
+		total_row = parseInt(total_row)
+		if(total_row < max_row){
+			
+			new_row = `
+			<div class="row" style="margin-top:5px;">
+				<div class="col-md-5 padding_0">
+					<input class="inputField numeric" type="text" placeholder="Enter Quantity" name="minimum_order_quantity[]"  maxlength="5" onkeyup="calculateTotalMinimumOrder();getFilteredUsers();"/>
+					<label class="error_msg float-right"></label>
+				</div>
+				<div class="col-md-5 padding_0">
+					<select class="inputField selectField" name="order_container_id[]" style="width: 100% !important;" onchange="checkSelectedContainer(this);getFilteredUsers();">
+						<option value="">Select Container</option>
+						{% for container in containers %}
+						<option value="{{container.id}}">{{container.container}}</option>
+						{% endfor %}
+					</select>
+					<label class="error_msg float-right"></label>
+				</div>
+				<div class="col-md-2" style="margin-top:5px;">
+					<a href="javascript:;" onclick="removeNewRow(this)" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+				</div>
+			</div>
+			`;
+			$('#new_rows').append(new_row);
+			$('.selectField').select2();
+		}else{
+			openToaster('warning',"Cannot exceed total number of container");
+		}
+		
+	}
+	function removeNewRow(element){
+		$(element).parent().parent().remove();
+		calculateTotalMinimumOrder();
+		getFilteredUsers();
+	}
+	
+	function calculateTotalMinimumOrder(){
+		total = 0;
+		$('[name="minimum_order_quantity[]"]').each(function(){
+			if($(this).val() != ""){
+				total = parseInt(total) + parseInt($(this).val());
+			}
+		});
+		$('#total_minimum_order_quantity').text(total);
+	}
+	
+	function routeTownOptions(element){
+		if($(element).val() != null){
+			route_ids = $(element).val().join();
+			if(route_ids == "all" || route_ids.includes("all")){
+				$('[name="route_id[]"] > option').prop("selected","selected");
+				var wanted_option = $('[name="route_id[]"] option[value="all"]');
+				wanted_option.prop('selected', false);
+				$('[name="route_id[]"]').trigger('change.select2');
+			}else{
+				url = "{% url 'src:get-route-town-options' %}";
+				$.ajax({
+					url: url,
+					method: 'POST',
+					data:{'route_ids':route_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+					success: function (data) {
+						$('[name="town_id[]"]').html(data)
+						$('[name="town_id[]"]').select2();
+						addMultiSelectPlacehoder();
+					},
+					error: function (err) {
+						console.log(err)
+					}
+				});
+			}
+		}else{
+			$('[name="town_id[]"]').html('')
+		}
+		
+	}
+	
+	function selectTownAllOption(element){
+		if($(element).val() != null){
+			town_ids = $(element).val().join();
+			
+			if(town_ids == "all" || town_ids.includes("all")){
+				$('[name="town_id[]"] > optgroup option').prop("selected","selected");
+				var wanted_option = $('[name="town_id[]"] option[value="all"]');
+				wanted_option.prop('selected', false);
+				$('[name="town_id[]"]').trigger('change.select2');
+			}else{
+				getFilteredUsers();
+			}
+		}
+	}
+	
+	
+	function getFilteredUsers(){
+		state_id = $('[name="state_id"]').val();
+		if($('[name="route_id[]"]').val() == null){
+			route_ids = '';
+		}else{
+			route_ids = $('[name="route_id[]"]').val().join();
+		}
+		
+		if($('[name="town_id[]"]').val() == null){
+			town_ids = '';
+		}else{
+			town_ids = $('[name="town_id[]"]').val().join();
+		}
+		
+		if($('[name="town_id[]"]').val() == null){
+			town_ids = '';
+		}else{
+			town_ids = $('[name="town_id[]"]').val().join();
+		}
+		order_container_id = [];
+		$('[name="order_container_id[]"]').each(function(){
+			order_container_id.push($(this).val())
+		})
+		minimum_order_quantity = [];
+		$('[name="minimum_order_quantity[]"]').each(function(){
+			minimum_order_quantity.push($(this).val())
+		})
+		free_variant_id = $('[name="free_variant_id"]').val();
+		
+		container_qty = $('[name="container_qty"]').val();
+		pouch_qty = $('[name="pouch_qty"]').val();
+		
+		
+		url = "{% url 'src:get-filtered-users' %}";
+		$.ajax({
+			url: url,
+			method: 'POST',
+			data:{
+				'state_id':state_id,
+				'route_ids':route_ids,
+				'town_ids':town_ids,
+				'order_container_id':order_container_id,
+				'free_variant_id':free_variant_id,
+				'minimum_order_quantity':minimum_order_quantity,
+				'container_qty':container_qty,
+				'pouch_qty':pouch_qty,
+				'scheme_type':2,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function (data) {
+				$('#ajaxDistributors').html(data);
+				addMultiSelectPlacehoder();
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+	}
+</script>
+

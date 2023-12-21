@@ -1,0 +1,48 @@
+{% load static %}
+
+<table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="text-align: center;"> Sr. No. </th>
+            <th style="text-align: center;"> Date  </th>
+            <th style="text-align: center;"> Dispatched from Plant  </th>
+            <th style="text-align: center;"> Return to Vehicle  </th>
+            <th style="text-align: center;"> Deposit in Plant  </th>
+            <th style="text-align: center;"> Difference with Vehicle  </th>
+            <th style="text-align: center;"> Difference with Party  </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center; font-weight: bold">Opening</td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center; font-weight: bold">{{ opening_crates }}</td>
+        </tr>
+        {% if crate_lists %}
+        {% for crate in crate_lists %}
+        <tr>
+            <td style="text-align: center;">{{forloop.counter}}.</td>
+            <td style="text-align: center;">{{ crate.month_date }}</td>
+            <td style="text-align: center;">{{ crate.dispatch }}</td>
+            <td style="text-align: center;">{{ crate.return_to_plant }}</td>
+            <td style="text-align: center;">{{ crate.plant }}</td>
+            <td style="text-align: center;">{{ crate.difference_with_vehicle }}</td>
+            <td style="text-align: center;">{{ crate.crate_difference }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th style="text-align: center;"></th>
+            <th style="text-align: center;">Total</th>
+            <th style="text-align: center;">{{ total_dispatch }}</th>
+            <th style="text-align: center;">{{ total_return_to_plant }}</th>
+            <th style="text-align: center;">{{ total_plant }}</th>
+            <th style="text-align: center;">{{ total_difference_with_vehicle }}</th>
+            <th style="text-align: center;">{{ last_opening_balance }}</th>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>

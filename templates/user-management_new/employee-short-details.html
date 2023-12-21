@@ -1,0 +1,194 @@
+{% load static %}
+
+<div class="row" style="height: 85%;">
+    <div class="col-md-12 p-0">
+        <div class="row">
+            <div class="col-md-2 p-md-0">
+                {% if employee.profile_image and employee.profile_image != 'None' %}
+                <img src="{{ employee.profile_image }}" style="width: 100%;">
+                {% else %}
+                <img src="{% static 'img/svg/profile.svg' %}" style="width: 100%; height: 60%;">
+                {% endif %}
+                
+            </div>
+            <div class="col-md-10 p-md-0">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6><b>{{employee.first_name}} {{employee.middle_name}} {{employee.last_name}} </b></h6>
+                        <h6 class="smallText"><span style="color: #0052a0;">{{employee.first_name}}</span> | {{employee.role_name | capfirst}}</h6>
+                    </div>
+                    <div class="col-md-4 p-md-0 text-right">
+                        <h5>
+                            {% if employee.device_id is None %}
+                            WEB&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}">
+                            {% else %}
+                            APP&nbsp;&nbsp;<img src="{% static 'img/svg/mobile_no.svg' %}">
+                            {% endif %}
+                       {% if employee.last_ip %}{{employee.last_ip}}{% endif %}
+                    </div>
+                </div>
+                <br clear="all">
+                <div class="row">
+                    <div class="col-md-1 p-md-0">
+                        <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <h6 class="smallText">Contact No.</h6>
+                        <h6 class="largeText"> {{employee.primary_contact_number}}</h6>
+                    </div>
+                    <div class="col-md-5 p-md-0">
+                        <h6 class="smallText">Employee Id</h6>
+                        <h6 class="largeText"> {{employee.emp_sap_id}}</h6>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-12 p-md-0 mt-md-3">
+                <div class="row mb-md-2">
+                    <div class="col-md-3 p-md-0">
+                        <div class="row">
+                            <div class="col-md-2 p-md-0">
+                                <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-10">
+                                <h6 class="smallText">Gender</h6>
+                                <h6 class="largeText">{{employee.gender | capfirst }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Email ID(Official)</h6>
+                                <h6 class="largeText">{{ employee.official_email }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Blood Group</h6>
+                                <h6 class="largeText">{% if employee.blood_group %}{{employee.blood_group}}{% else %}-{% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-md-2">
+                    <div class="col-md-12 p-md-0">
+                        <div class="row">
+                            <div class="col-1 p-0">
+                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-11 p-md-0">
+                                <h6 class="smallText">Correspondance Address</h6>
+                                <h6 class="largeText">{% if employee.address_line_1 %} {{employee.address_line_1}},{% endif %} {% if employee.address_line_2 %} {{employee.address_line_2}},{% endif %} {{employee.state_name}}, {{employee.country_name}},{{employee.pincode}}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-md-12 p-md-0">
+                        <div class="row">
+                            <div class="col-1 p-0">
+                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-11 p-md-0">
+                                <h6 class="smallText">Permanent Address</h6>
+                                <h6 class="largeText">{% if employee_permanent_address.address_line_1 %} {{employee_permanent_address.address_line_1}},{% endif %} {% if employee_permanent_address.address_line_2 %} {{employee_permanent_address.address_line_2}},{% endif %} {{employee_permanent_address.state_name}}, {{employee_permanent_address.country_name}},{{employee_permanent_address.pincode}}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="row mb-md-2">
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Organisation</h6>
+                                <h6 class="largeText">{{employee.organization_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Department</h6>
+                                <h6 class="largeText">{{employee.department_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Roles</h6>
+                                <h6 class="largeText">{{employee.role_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Father Name</h6>
+                                <h6 class="largeText">{{employee.father_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Mother Name</h6>
+                                <h6 class="largeText">{{employee.mother_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Date Of Birth</h6>
+                                <h6 class="largeText">{{employee.date_of_birth }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="dropdown-divider w-100"></div>
+    <div class="col-sm-12 text-center p-0">
+        <h6 class="m-0" onclick="viewEmployeeDetails('{{employee.id }}')" style="cursor: pointer;">
+            <u>More Info</u></h6>
+        </div>
+    </div>

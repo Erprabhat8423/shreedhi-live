@@ -1,0 +1,249 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 " style="display: inline-flex; ">
+                            <div class="col-md-2 offset-4" style="float: inline-end;">
+                                <select class="inputField selectField " style="width: 100% !important;"
+                                    name="user_id" id="user_id" onchange="getSalesReportByUser()">
+                                    
+                                    <option value=""> Select User</option>
+                                    {% for user in orders_list %}
+                                    <option value="{{ user.id }}">{{ user.user_name }}({{user.user_sap_id}})</option>
+                                    {% endfor %}
+    
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input class="inputField" placeholder="Start Date" name="order_date" id="order_date"
+                                    value="{{ cdate }}" style="width: 90%;float: inline-start;height: 40px !important;"
+                                    onchange="getUserList();getSalesReport() " readonly>
+                                <!-- getInvoiceList() -->
+                            </div>
+                            <div class="col-md-3">
+                                {% if today_order_status > 0 %}  
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important"></a>
+                            {% endif %}
+                            </div>
+    
+                            <!-- <a href="javascript:void(0)" onclick="downloadAllInvoice()" id="order_exports"
+                                class="btn iconBox col-md-4 p-md-0 iconExports"
+                                style="width: 200px; margin-right: 220px; padding:0.1rem!important;"></a> -->
+                        </div>
+                        <!-- <div class="col-md-10 p-md-0 text-right">
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ cdate }}" style="width: 25%; padding: 0.3rem; {% if today_order_status > 0 %}  {% else %} margin-right: 220px; {% endif %}" onchange="" readonly> -->
+                            <!-- {% comment %} getReport() {% endcomment %}
+                            {% if today_order_status > 0 and order_regenerate_status > 0 %}
+                            
+                            {% elif today_order_status == 0 %} -->
+                            
+                            <!-- {% elif today_order_status > 0 %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important"></a>
+                            {% endif %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important; display: none;"></a> -->
+                        </div>
+                    </div>
+            </div>
+            </div>
+            
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    {% if today_order_status > 0 %}
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%; text-align: center;"> DATE </th>
+                                <th >S.No</th>
+                                <th>SAP ID</th>
+                                <th style="width: 30%;">Party Name</th>
+                                <th> Town  </th>
+                                <th>Milk Opening Balance</th>
+                                <th>Milk Sale Amount</th>
+                                <th>Other sale Amount</th>
+                                <th>TCS Amount</th>
+                                <th>total sale</th>
+                                <th>Amt. Recd.</th>
+                                <th>Total closing  outstading</th>
+                                <th>Opening Balance Crt.</th>
+                                <th>DISPATCH Crt.</th>
+                                <th>RECEIVING Crt.</th>
+                                <th>Total outstading Crt.</th>
+                                <th>SECURITY DIPOSIT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if orders %}
+                            {% for order in orders_list %}
+                            <tr>
+                                <td style="text-align: center;">{{ order.order_date }}</td>
+                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td style="text-align: center;">{{order.user_sap_id }}</td>
+                                <td>{{ order.store_name }}({{ order.user_name }})</td>
+                                <td>{{ order.town_name }}</td>
+                                <td>{{ order.opening_amount }}</td>
+                                <td>{{ order.total_milk_amount }}</td>
+                                <td>{{ order.other_amount }}</td>
+                                <td>{{ order.tcs_amount }}</td>
+                                <td>{{ order.order_total_amount }}</td>
+                                <td>{{ order.amount_to_be_paid }}</td>
+                                <td>{{ order.closing_amount }}</td>
+                                <td>{{ order.opening_balance_crt }}</td>
+                                <td>{{ order.dispatch_crate }}</td>
+                                <td>{{ order.reciving_crate }}</td>
+                                <td>{{ order.Total_crate }}</td>
+                                <td>{{ order.security_amount }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %} 
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="padding:1.65rem!important; text-align:center; box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.15); font-size:20px; color: red; ">No Record Found...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>   
+</div>
+{% endblock content %}
+{% block script %}
+<script>
+    $(document).ready(function() {
+        // $('#addOrgTable').tablesorter({
+        //     widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+        //     widgetOptions: {
+        //         // resizable_addLastColumn: true,
+        //         resizable: false,
+        //         // resizable_widths: ["18.5%", "15.5%", "18.5%", "15.5%", "18%"],
+        //         stickyHeaders_attachTo: ".primaryContainerBG",
+        //         filter_external: '.search',
+        //         filter_columnFilters: false,
+        //     }
+        // });
+        getUserList();
+    });
+    function getUserList() {
+        var order_date = $('#order_date').val();
+        if (order_date) {
+            order_date = order_date.split('/');
+            order_date = order_date[2] + '-' + order_date[1] + '-' + order_date[0]
+        } else { order_date = '0' }
+        $.ajax({
+            url: "{% url 'src:get-report-user-list' %}",
+            method: 'GET',
+            data: { order_date: order_date},
+            success: function (data) {
+                $('[name="user_id"]').html(data.options)
+                $(".selectField").select2();
+            },
+            error: function (err) {
+                // alert(err.message);
+                // window.location.reload();
+            }
+        });
+    };
+    function getSalesReport() {
+        var order_date = $('#order_date').val();
+        var id = $('#user_id').val();
+        if (order_date) {
+            order_date = order_date.split('/');
+            order_date = order_date[2] + '-' + order_date[1] + '-' + order_date[0]
+        } else { order_date = '0' }
+        
+        $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+        $.ajax({
+            url: "{% url 'src:ajax-sales-report-list' %}",
+            method: 'GET',
+            data: { order_date: order_date, id: id },
+            success: function (data) {
+                $('#ajax-div').html(data);
+            },
+            error: function (err) {
+                // alert(err.message);
+                // window.location.reload();
+            }
+        });
+        }
+    
+        $(document).ready(function () {
+            $("#order_date").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+            
+            
+        });  
+        
+        function getSalesReportByUser() {
+        var order_date = $('#order_date').val();
+        
+        var id = $('#user_id').val();
+        if (id) {
+            
+            if (order_date) {
+                order_date = order_date.split('/');
+                order_date = order_date[2] + '-' + order_date[1] + '-' + order_date[0]
+            } else { order_date = '0' }
+            $('#ajax-div').html('<div style="text-align:center; margin 0px auto;"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            $.ajax({
+                url: "{% url 'src:ajax-sales-report-list' %}",
+                method: 'GET',
+                data: { order_date: order_date, id: id },
+                success: function (data) {
+                    $('#ajax-div').html(data);
+                },
+                error: function (err) {
+                    // alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        else{
+            getSalesReport();
+        }
+    }
+    function status(){
+        var order_date = $('#order_date').val();  
+    }
+    function exportsInExcel(){
+        var order_date = $('#order_date').val();
+        var id = $('#user_id').val();
+        
+            if(order_date){ 
+                order_date = order_date.split('/');
+                order_date = order_date[2]+'-'+order_date[1]+'-'+order_date[0]
+            }else{ order_date = '0' }
+            if(id){
+                var url = "{% url 'src:export-sales-report-list' 'order_date' 'id' %}";
+            url = url.replace('order_date',order_date).replace('id',id);
+            window.location.href = url; 
+            }
+            else{
+                var url = "{% url 'src:export-sales-report-list' 'order_date' 'id' %}";
+            url = url.replace('order_date',order_date).replace('id',"0");
+            window.location.href = url; 
+            }
+
+            
+        }
+    </script>
+    {% endblock %}

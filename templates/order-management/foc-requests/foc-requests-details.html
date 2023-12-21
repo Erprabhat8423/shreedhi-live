@@ -1,0 +1,39 @@
+{% load helper_tags %}
+{% load static %}
+
+
+<div class="primaryContainerBG h-100 manageBlock" id="detailsBox">
+		<div class="row" id="detailsBoxFirst" style="display: block !important;">
+			
+			
+			{% if last_foc_request %}
+			<div class="col-md-12 p-md-0">
+				<h6><b>{{last_foc_request.user_name}} </b></h6>
+			</div>
+			<div class="col-md-12 p-md-0 mt-md-3">
+				<table class="table table-striped">
+					<thead>
+						<th>Product</th>
+						<th>Quantity</th>
+					</thead>
+					<tbody>
+						{% for last_foc_request_detail in last_foc_request_details %}
+						<tr>
+							<td>{{last_foc_request_detail.product_variant_name}}</td>
+							<td>{{last_foc_request_detail.quantity}}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		
+			
+		</div>
+	</div>
+
+{% else %}
+	<div class="col-md-12 p-md-0">
+		<h6><b>No Details found. </b></h6>
+	</div>
+	
+	{% endif %}

@@ -1,0 +1,573 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} <span id="notification_count">({{notifications.count}})</span> &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 text-right">
+
+                        <button type="button" class="btn iconBox iconAddNewNotification" onclick="sendNotification()"></button>
+                        
+                        <div class="dropdown" style="display: inline-block;">
+                            <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            
+                            <input type="hidden" name="show_columns" id="show_columns" value="" >
+                            <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                            </div>
+                        </div>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="user_name" id="user_name" data-id="1" onclick="showHideColumns(this,'user_name',1)" />
+                                    <label class="mb-0" for="user_name">Username</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="notification_heading" id="notification_heading" data-id="2" onclick="showHideColumns(this,'notification_heading',2)" />
+                                    <label class="mb-0" for="notification_heading">Heading</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="notification_message" id="notification_message" data-id="3" onclick="showHideColumns(this,'notification_message',3)" />
+                                    <label class="mb-0" for="notification_message">Message</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="notification_type" id="notification_type" data-id="3" onclick="showHideColumns(this,'notification_type',4)" />
+                                    <label class="mb-0" for="notification_type">Notification Type</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colCheck" name="send_at" id="send_at" data-id="3" onclick="showHideColumns(this,'send_at',4)" />
+                                    <label class="mb-0" for="send_at">Send At</label>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_user_name" data-id="1" onclick="toggleFreeze(this.id,'zone_name',1)" />
+                                    <label class="mb-0" for="lock_user_name">Username</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_notification_heading" data-id="1" onclick="toggleFreeze(this.id,'notification_heading',2)" />
+                                    <label class="mb-0" for="lock_notification_heading">Heading</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_notification_message" data-id="1" onclick="toggleFreeze(this.id,'notification_message',3)" />
+                                    <label class="mb-0" for="lock_notification_message">Message</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_notification_type" data-id="1" onclick="toggleFreeze(this.id,'notification_type',4)" />
+                                    <label class="mb-0" for="lock_notification_type">Notification Type</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="" id="lock_send_at" data-id="1" onclick="toggleFreeze(this.id,'notification_type',4)" />
+                                    <label class="mb-0" for="lock_send_at">Send At</label>
+                                </a>
+                            </div>
+                        </div>
+
+                </div>   
+                <div class="col-md-12 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <select name="filter_notification_type" id="filter_notification_type" class="selectField" onchange="filterNotification()">
+                            <option value="">Notification Type</option>
+                            <!--<option value="0">SMS Notification</option>-->
+                            <option value="1">Push Notification</option>
+                            <option value="2">Email Notification</option>
+                        </select>
+                        
+                        <select name="filter_role" id="filter_role" class="selectField" style="width: 15% !important;" onchange="filterNotification()">
+                            <option value="">Role</option>
+                            {% for role in roles %}
+                            <option value="{{role.id}}">{{role.role_name}}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <input type="search" style="width: 15% !important;" placeholder="From Date" value="{% now 'd/m/Y' %}" class="searchTable" id="filter_from_date" onchange="filterNotification()" readonly>
+
+                        <input type="search" style="width: 15% !important;" placeholder="To Date" value="{% now 'd/m/Y' %}" class="searchTable" id="filter_to_date" onchange="filterNotification()" readonly>
+
+                        <input class="search searchTable" id="filter_keyword" placeholder="Search" type="search" data-column="all" style="width:25%!important;" onkeyup="filterNotification()">
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                    <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="user_name">
+                                    Username
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                
+                                <th class="notification_heading">
+                                    Heading
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="notification_message">
+                                    Message
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="notification_type">
+                                    Notification Type
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>  
+                                
+                                <th class="notification_type">
+                                    Send At
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th> 
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+                            {% if notifications %}
+                            {% for notification in notifications %}
+                            <tr {% if forloop.first %} class="odd selected" {% endif %}>
+                                <td class="user_name" onclick="getNotificationDetails('{{ notification.id }}')">{{notification.to_user_name}} <br>
+                                    ({{notification.recipient_role}})</td>
+                                    <td class="notification_heading" onclick="getNotificationDetails('{{ notification.id }}')">{{notification.heading}}</td>
+                                    <td class="notification_message" onclick="getNotificationDetails('{{ notification.id }}')">
+                                        {{notification.activity|truncatechars:100}}
+                                        {% if notification.activity_image is not None and notification.activity_image != "" %}
+                                        <a href="{{notification.activity_image}}" download><i class="fa fa-download"></i></a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="notification_type" onclick="getNotificationDetails('{{ notification.id }}')">
+                                        {% if notification.notification_type is not None %} 
+                                        {% if notification.notification_type == 0 %}
+                                        SMS
+                                        {% elif notification.notification_type == 1 %}
+                                        Push
+                                        {% else %} EMAIL {% endif %} {% else %} - {% endif %}
+                                    </td>
+                                    <td class="send_at" onclick="getNotificationDetails('{{ notification.id }}')">
+                                        {{notification.created_at|date:'d/m/Y H:i'}}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center;">
+                                        No Record Found...
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 h-100">
+            <div class="primaryContainerBG h-100" id="detailsBox">
+                {% if last_notification %}
+                <div class="row" id="detailsBoxFirst" style="display: block;">
+                    <div class="col-md-12 p-md-0">
+                        <h6><b>{{ last_notification.heading }} </b></h6>
+                    </div>
+                    <div class="col-md-12 p-md-0 mt-md-3">
+                        <div class="row mb-md-2">
+                            
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Sender</h6>
+                                        <h6 class="largeText">
+                                            {{last_notification.from_user_name}}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        {% if last_notification.notification_type == '0' %}
+                                        <img src="{% static 'img/svg/mobile_no.svg' %}" class="profileIconSize" />
+                                        {% elif last_notification.notification_type == '1' %}
+                                        <img src="{% static 'img/svg/app.svg' %}" class="profileIconSize" />
+                                        {% else %}
+                                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Notification Type</h6>
+                                        <h6 class="largeText">
+                                            {% if last_notification.notification_type == 0 %}
+                                            SMS
+                                            {% elif last_notification.notification_type == 1 %}
+                                            PUSH Notification
+                                            {% else %}
+                                            Email
+                                            {% endif %}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-md-2">
+                            <div class="col-md-12 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Message</h6>
+                                        <h6 class="largeText">
+                                            {{last_notification.activity}}
+                                            <br>
+                                            {% if last_notification.activity_image is not None and last_notification.activity_image != "" %}
+                                            <a href="{{last_notification.activity_image}}" download><i class="fa fa-download"></i></a>
+                                            {% endif %}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No Record Found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- *************************************Modal********************************** -->
+    <div class="overlayModal" id="addProductModal" style="display: none;">
+        
+    </div>
+    <!-- *************************************Modal********************************** -->
+    {% endblock content %}
+    {% block script %}
+    <script>
+        
+        function addMultiSelectPlacehoder(){
+            $('[name="route_id[]"]').select2({
+                placeholder:"Select Routes"
+            })
+            $('[name="town_id[]"]').select2({
+                placeholder:"Select Town"
+            })
+            $('[name="role_id[]"]').select2({
+                placeholder:"Select Role"
+            })
+            $('[name="employee_town_id[]"]').select2({
+                placeholder:"Select Town"
+            })
+            
+        }
+        
+        function getNotificationDetails(notification_id){
+            $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+                
+                var url = "{% url 'src:notification/get-details' 'notification_id' %}"
+                url = url.replace('notification_id',notification_id);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        $('#detailsBox').html(data);
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+                
+            }
+            
+            $(document).ready(function(){
+                
+                $("#filter_from_date").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0",
+                    maxDate: 0,
+                    dateFormat: 'dd/mm/yy',
+                    onSelect: function () {
+                        validateDateRange();
+                    } 
+                });
+
+                $("#filter_to_date").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0",
+                    maxDate: 0,
+                    dateFormat: 'dd/mm/yy',
+                    onSelect: function () {
+                        validateDateRange();
+                    }  
+                });
+                function getDateFormat(date){
+                    var dateTemp = date.split('/');
+                    date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+                    return date
+                }
+                
+                
+                
+                function validateDateRange(){
+                    to_date = new Date(getDateFormat($("#filter_to_date").val()));
+                    from_date = new Date(getDateFormat($("#filter_from_date").val()));
+                    $('.error_msg').text('');
+                    $("#filter_from_date").css("border", "");
+                    $("#filter_to_date").css("border", "");
+                    
+                    if(from_date > to_date ){
+                        $("#filter_from_date").parent().find('.error_msg').text('Start date must be less then or equal to end date');
+                        openToaster("danger", "Start date must be less then or equal to end date");
+                        $("#filter_from_date").css("border", "1px solid #db8305");
+                        $("#filter_from_date").val('')
+                        return false;
+                    }else{
+                        filterNotification()
+                    }
+                }
+                
+                
+                var checkbox_val = ["user_name","notification_heading","notification_message", "notification_type","send_at"];
+                checkbox_str = checkbox_val.join(',');
+                $('#show_columns').val(checkbox_str);
+                
+                $(".colCheck").change(function() {
+                    if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                        //do something
+                        $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                    } else {
+                        $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                    }
+                });
+                
+                $(".colFreezeCheck").change(function() {
+                    if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                        //do something
+                        $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                    } else {
+                        $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                    }
+                });
+                
+                
+                //    update tablesorter
+                updateTableSorter();
+                
+                $("#addOrgTable tbody tr").click(function() {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function() {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                
+            });
+            
+            function filterNotification(){
+                filter_from_date = $('#filter_from_date').val();
+                filter_to_date = $('#filter_to_date').val();
+                filter_role = $('#filter_role').val();
+                filter_notification_type = $('#filter_notification_type').val();
+                filter_keyword = $('#filter_keyword').val();
+
+                $.ajax({
+                    url: "{% url 'src:ajax-notification-report' %}",
+                    method: 'POST',
+                    data: { 
+                        filter_from_date:filter_from_date,
+                        filter_to_date:filter_to_date,
+                        filter_role:filter_role,
+                        filter_notification_type:filter_notification_type,
+                        filter_keyword:filter_keyword,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        $('#tablebody').html(data);
+                        $('#addOrgTable').trigger('update');
+                        updateTableSorter();
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            
+            
+            function updateTableSorter(){
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["20%", "20%", "20%", "20%","20%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.report_search',
+                        filter_columnFilters: false,
+                    }
+                });
+            }
+            
+            function freezeColumn(id, colNo) {
+                $('#' + id).addClass("frezedIcon frezedCell");
+                $("#addOrgTable tbody tr").each(function(index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+                });
+                $('#' + id + ' #freeze').show();
+                $('#' + id + ' #unfreeze').hide();
+            }
+            
+            function unfreezeColumn(id, colNo) {
+                $('#' + id).removeClass("frezedIcon frezedCell");
+                $("#addOrgTable tbody tr").each(function(index) {
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                    $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+                });
+                $('#' + id + ' #unfreeze').show();
+                $('#' + id + ' #freeze').hide();
+            }
+            
+            function toggleFreeze(inputid, colid, colNo) {
+                var checkbox = document.getElementById(inputid);
+                
+                if (checkbox.checked == true) {
+                    $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+                    $("#addOrgTable tbody tr").each(function(index) {
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+                    });
+                    $('.' + colid + ' #freeze').show();
+                    $('.' + colid + ' #unfreeze').hide();
+                } else {
+                    $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+                    $("#addOrgTable tbody tr").each(function(index) {
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+                    });
+                    $('.' + colid + ' #unfreeze').show();
+                    $('.' + colid + ' #freeze').hide();
+                }
+            }
+            
+            function showHideColumns(element, el_class, colNo) {
+                var checkbox_val = [];
+                var checkbox = $(element);
+                if ($(element).is(':checked')) {
+                    $('.' + el_class).hide();
+                } else {
+                    $('.' + el_class).show();
+                }
+                $("input:checkbox[class=colCheck]").each(function() {
+                    if (!$(this).is(':checked')) {
+                        checkbox_val.push($(this).attr("id"))
+                    }
+                });
+                checkbox_str = checkbox_val.join(',');
+                $('#show_columns').val(checkbox_str);
+            }
+            
+            function exports(type){
+                var columns = $('#show_columns').val();
+                
+                role = $('#filter_role').val();
+                if(role == ""){
+                    role = "-1"
+                }
+
+                filter_notification_type = $('#filter_notification_type').val();
+                if(filter_notification_type == ""){
+                    filter_notification_type = "4"
+                }
+                keyword = $('#filter_keyword').val();
+                if(keyword == ""){
+                    keyword = "keyword"
+                }
+
+                from_date = $('#filter_from_date').val();
+                from_date = from_date.split('/');
+                from_date = from_date[2]+'-'+from_date[1]+'-'+from_date[0];
+
+                to_date = $('#filter_to_date').val();
+                to_date = to_date.split('/');
+                to_date = to_date[2]+'-'+to_date[1]+'-'+to_date[0];
+                
+                if(columns == ''){
+                    openToaster("danger", "Please select at-least one column");
+                } else {
+                    if(type == 'excel'){
+                        var url = "{% url 'src:export-notification-report-to-xlsx' 'columns' 'filter_notification_type' 'role' 'from_date' 'to_date' 'keyword' %}";
+                        url = url.replace('columns',columns).replace('filter_notification_type',filter_notification_type).replace('role',role).replace('from_date',from_date).replace('to_date',to_date).replace('keyword',keyword);
+                        window.location.href = url;
+                    } else {
+                        
+                    }
+                }
+                
+            }
+            
+            function sendNotification(){
+                $('#addProductModal').html('');
+                showLoader();
+                $.ajax({
+                    url: "{% url 'src:send-notification' %}",
+                    method: 'GET',
+                    data: {},
+                    success: function (data) {
+                        if(typeof data.flag !== "undefined" && !data.flag){
+                            hideLoader();
+                            openToaster("danger", data.message);
+                        }else{
+                            hideLoader();
+                            $("#addProductModal").show();
+                            $('#addProductModal').html(data);
+                            $('.selectField').select2();
+                            
+                            addMultiSelectPlacehoder();
+                            
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+        </script>
+        
+        {% endblock %}
+        

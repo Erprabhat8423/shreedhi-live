@@ -1,0 +1,82 @@
+{% load static %}
+
+<table id="flatIncentiveSchemeUserTable" class="table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                <th class="flat_distributor_name" id="flat_distributor_name">
+                    Distributor Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="flat_town" id="flat_town">Town<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="flat_state" id="flat_state">State<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+               
+                <th class="flat_incentive" id="flat_applied_on_vriant">Applied on variant<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+               <th class="flat_incentive" id="flat_incentive">Discount<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+
+                <th class="flat_created_date" id="flat_created_date">Created Date<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="bonus_scheme_tablebody">
+            {% if users %}
+            {% for user in users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+                <td class="flat_distributor_name">
+                    {{user.store_name}}({{user.first_name}}{% if user.middle_name %} {{user.middle_name}}{%endif%} {{user.last_name}}/{{user.emp_sap_id}})
+                <br>
+                <b>{% if user.is_route == 0 %}{{user.main_route_name}}{% else %}{% if user.route_name %}{{user.route_name}} {% else %}  {{user.town_name}} {% endif %}{% endif %}</b>
+                </td>
+                <td class="flat_town">{{user.town_name}}</td>
+                <td class="flat_state">{{user.state_name}}</td>
+                <td class="flat_applied_on_vriant">{{user.applied_on_variant_name}} </td>
+                <td class="flat_incentive">{{user.incentive_amount}}</td>
+                <td class="flat_created_date">{% if user.scheme_start_date %}{{user.scheme_start_date | date:'d/m/Y'}}{% endif %}</td>
+                <td>
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                            <div class="labelContainerOP">
+                                <label class="switch">
+                                    <input type="hidden" id="user_flat_incentive_is_active_{{ user.user_id }}" value="{{ user.status }}">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if user.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateUserSchemeStatus('{{ user.id }}', this, 'flat_incentive')">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="nonoperational_loading" style="display: none;">
+                <td class="text-center" colspan="9"></td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>

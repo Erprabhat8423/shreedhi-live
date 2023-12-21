@@ -1,0 +1,124 @@
+{% load static %}
+{% if orders %}
+{% for order in orders %}
+<tr class="odd" role="row">
+    <td class="sorter-false checked_class" >{% if role_id == 0 and order.order_status != 3 and order.order_status != 4 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% else %} {% if order.status == 0 %}{% if order.order_status == 1 and order.level_id == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% elif order.order_status == 2 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% elif order.order_status == 3 %} <input type="checkbox" class="checkbox" id="new_module_1" name="order_id[]" value="{{ order.id }}"> {% else %}  {% endif %} {% else %} <input type="checkbox" disabled checked> {% endif %}{% endif %}</td>
+    <td class="order_id" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_code }}</td>
+    <td class="distributor_ss" onclick="getOrderDetails('{{ order.id }}')">{{ order.store_name }}({{ order.user_name }}/{{order.user_sap_id}})</td>
+    <td class="shift" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_shift_name }}</td>
+    <td class="route" onclick="getOrderDetails('{{ order.id }}')">{% if order.route_name %} {{ order.route_name }} {% else %} - {% endif %}</td>
+    <td class="amount" onclick="getOrderDetails('{{ order.id }}')">{{ order.order_total_amount }}</td>
+    <td class="status" ><a href="javascript:void()" onclick="getOrderStatus('{{ order.id }}')">{% if role_id == 0 %} {% if order.order_status == 1 %} Initiated {% elif order.order_status == 2 %} Forwarded {% elif order.order_status == 3 %} Approved {% elif order.order_status == 4 %} Delivered  {% endif %} {% else %} 
+        {% if order.order_status == 4 %} Delivered {% elif order.order_status == 3 %}Approved {% elif order.status == 0 %}{% if order.order_status == 1 and order.level_id == 2 %} Initiated {% elif order.order_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}</a></td>
+    <td class="order_date" onclick="getOrderDetails('{{ order.id }}')">{% if order.order_date %} {{ order.order_date  | date:"d/m/Y h:i A" }} {% else %} - {% endif %}</td>
+    <td>
+        <div class="row">
+            <div class="col-md-3"> 
+                {% if order.order_status == 1 %}
+                <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" onclick="editOrder('{{ order.id }}')"/>
+                {% else %}
+                {% if role_id == 0 %} <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" onclick="editOrder('{{ order.id }}')"/> {% endif %}
+                {% endif %}
+            </div> 
+            <div class="col-md-3">
+            {% if  order.order_status == 1 or order.order_status == 2 or order.order_status == 3 or order.order_status == 4  %}
+            <label class="switch">
+                <input type="checkbox" class="checkbox" name="is_active"
+                id="is_order_active_{{ order.id }}"
+                {% if order.block_unblock == 1 %} checked="" {% else %}
+                {% endif %}
+                onclick="updateUserOrderStatus('{{ order.id }}')">
+                <span class="slider round"></span>
+            </label> 
+            {% else %}
+            {% endif %} 
+
+        </div> 
+        </div>
+    </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td colspan="9" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+<script>
+    getOrderDetails('{{first_order_id}}');
+    $('#forward').hide();
+    $('.iconApproved').hide();
+    $('.iconForward').hide();
+    $(".checked_all").attr("checked", false);
+
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked")); 
+        checked_all();           
+    });
+
+    function checked_all(){
+        $('.iconForward').hide();
+        $('.iconApproved').hide();
+        $('#forward').hide();
+        if($('.checkbox:checked').length == $('.checkbox').length){
+            $('.checked_all').prop('checked',true);
+        }else{
+            $('.checked_all').prop('checked',false);
+        }
+        if($('.checkbox:checked').length > 0){
+            {% if role_id == 0 %}
+            {% if order_status == '1' %}
+            $('.iconForward').show();
+            {% else %} 
+            $('.iconApproved').show();
+            {% endif %}
+            {% else %}
+            $('#forward').show();
+            {% endif %}
+    
+        }else{
+            $('.iconForward').hide();
+            $('.iconApproved').hide();
+            $('#forward').hide();
+        }
+    }
+    
+    $('.checkbox').change(function(){ 
+        checked_all();
+    });
+    
+    
+    {% if role_id == 0 %}
+    {% if order_status != '' %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% else %} 
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% if order_status == '3' %}
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% else %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% endif %}
+
+    
+    {% if orders %}
+    $(".checked_all").attr("disabled", false);
+    {% else %}    
+    $(".checked_all").attr("disabled", true);
+    {% endif %}
+    
+   
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    html = `Order Count: {{orders|length}}/<a href="javascript:void(0)" onclick="getDefaulterUserList('{{user_id}}')">{{total_user_count}}</a>`;
+    $('#order_count').html(html);
+    $('#product_count').html('{% for product in product_class %} {{ product.product_class }} : {{ product.product_count }} {% if forloop.counter < product_class.count %},&nbsp;&nbsp; {% endif %} {% endfor %}');
+</script>
+
+
+

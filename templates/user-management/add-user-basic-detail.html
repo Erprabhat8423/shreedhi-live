@@ -1,0 +1,1247 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="1" />
+        <input type="hidden" name="last_user_id" id="last_user_id" value="{% if last_user_id %} {{ last_user_id }} {% endif %}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Basic Information &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-9 p-0">
+                                    <div class="row">
+                                        <div class="col-md-12 p-0">
+                                            <div class="col-md-6 p-0" style="float: left;">
+                                                <img src="{% static 'img/svg/storeName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                    Store Name*
+                                                </h6>
+                                            </div>
+                                            <div class="col-md-6 p-0" style="float: right; margin-top:10px;">
+                                                <small style="float: right;margin-left:7px">Self</small>
+                                                <label class="switch" style="float: right;">
+                                                    
+                                                    <input type="checkbox" class="checkbox self_owned_val" name="self_owned_val" id="self_owned_val"  {% if user_details.self_owned == 1 %} checked="" {% else %}
+                                                    {% endif %}>
+                                                    
+                                                    <span class="slider round"></span>
+                                                    
+                                                </label>
+                                                <input type="hidden" name="self_owned" id="self_owned" value="{% if user_details.self_owned == 1 %}1{% else %}0
+                                                {% endif %}">
+                                                <small style="float: right;margin-right:7px">Distributor Owned</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 p-0 mt-2">
+                                            <input class="inputField alpha store_name_class" type="text" placeholder="Enter Store Name" name="store_name"
+                                            id="store_name" maxlength="50" value="{% if user_details.store_name %}{{ user_details.store_name }}{% endif %}">
+                                            <label class="error_msg float-right" id="store_name_error"></label>
+                                        </div>
+                                        <div class="col-md-12 p-0 mt-2">
+                                            <div class="row">
+                                                <div class="col-md-2 p-0">
+                                                    <div class="user_ProfileImg" onclick="openImageSelector('file-upload_Store')">
+                                                        {% if user_details.profile_image %}
+                                                        <img id="previewStore" src="{{ user_details.profile_image }}" class="imgStyleRound">
+                                                        {% else %}
+                                                        <img id="previewStore" src="{% static 'img/svg/uploadProfile.svg' %}" class="imgStyleRound">
+                                                        {% endif %}
+                                                        
+                                                        <input type="hidden" name="previous_profile_image" id="previous_profile_image" value="{% if user_details.profile_image %}{{ user_details.profile_image }} {% endif %}" > 
+                                                    </div>
+                                                    <input id="file-upload_Store" name="profile_image" type="file" accept="image/*"
+                                                    style="display: none;" onchange="fileUploader(this.id,'previewStore', 'Profile Image');" />
+                                                    <label class="error_msg float-right" id="profile_image_error" style="text-align:left"></label>
+                                                </div>
+                                                <div class="col-md-10 p-0">
+                                                    <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                        Contact Person Name*
+                                                    </h6>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-2 p-0">
+                                                            <select class="inputField selectField" style="width: 100% !important;" name="salutation" id="salutation">
+                                                                <option value="Mr" {% if user_details.salutation == 'Mr' %}{{ user_details.salutation }}{% endif %}>Mr</option>
+                                                                <option value="Mrs" {% if user_details.salutation == 'Mrs' %}{{ user_details.salutation }}{% endif %}>Mrs</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-5 pr-0">
+                                                            <input class="inputField alpha" type="text" placeholder="Enter First Name"
+                                                            name="first_name" id="first_name" maxlength="30" value="{% if user_details.first_name %}{{ user_details.first_name }}{% endif %}">
+                                                            <label class="error_msg float-right" id="first_name_error"></label>
+                                                        </div>
+                                                        <div class="col-md-5 pr-0">
+                                                            <input class="inputField alpha" type="text" placeholder="Enter Middle Name"
+                                                            name="middle_name" id="middle_name" maxlength="30" value="{% if user_details.middle_name %}{{ user_details.middle_name }}{% endif %}">
+                                                            <label class="error_msg float-right" id="middle_name_error"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 p-0">
+                                    <div class="row">
+                                        <div class="col-md-12 p-0">
+                                            <div class="store_ProfileImg" onclick="openImageSelector('file-upload_StoreUser')">
+                                                {% if user_details.store_image and user_details.store_image != 'None' %}
+                                                <img id="previewStoreUser" src="{{ user_details.store_image }}" class="imgStyle">
+                                                {% else %}
+                                                <img id="previewStoreUser" src="{% static 'img/png/storePic.png' %}" class="imgStyle">
+                                                {% endif %}
+                                                <input type="hidden" name="previous_store_image" id="previous_store_image" value="{{ user_details.store_image }}" >  
+                                                
+                                            </div>
+                                            <input id="file-upload_StoreUser" name="store_image" type="file" accept="image/*"
+                                            style="display: none;" onchange="fileUploader(this.id,'previewStoreUser', 'Store Image')" />
+                                            <label class="error_msg float-right" id="store_image_error"></label>
+                                        </div>
+                                        <div class="col-md-12 mt-2 pr-0">
+                                            <input class="inputField alpha" type="text" placeholder="Enter Last Name" name="last_name"
+                                            id="last_name" maxlength="30" value="{% if user_details.last_name %}{{ user_details.last_name }}{% endif %}">
+                                            <label class="error_msg float-right" id="last_name_error"></label>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                            <input type="hidden" id="contact_number_error" val="0">
+                            {% if not user_contact_details %}
+                            <div class="row mt-3 wrapper">
+                                
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Contact Number*
+                                    </h6>
+                                </div>
+                                <div class="col-md-2 mt-3 p-0">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                                        {% for country_code in country_codes %}
+                                        <option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mt-3">
+                                    <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+                                    id="contact_no_0" maxlength="10" />
+                                    <label class="error_msg float-right contact_no_err_class" id="contact_no_0_error"></label>
+                                </div>
+                                <div class="col-md-3 mt-3 pl-0">
+                                    <select class="inputField contact_type_class" style="width: 100% !important;" name="contact_type[]" id="contact_type_0">
+                                        {% for contact_type in contact_types %}
+                                        <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right contact_type_err_class" id="contact_type_0_error"></label>
+                                </div>
+                                <div class="col-md-3 mt-3 p-0">
+                                    <div class="inputfield">
+                                        <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" checked="">
+                                        <input type="hidden" name="primary_contact[]" value="1">
+                                        <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 mt-3 p-0">
+                                    <button class="iconCover float-right add_user_contact" style="padding: 0.75rem;" type="button">
+                                        <img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+                                    </button>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row">
+                                <div class="col-md-12 p-0" id="contactNumberCont">
+                                    {% if user_contact_details %}
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Contact Number*
+                                        </h6>
+                                    </div>
+                                    
+                                    {% for user_contact in user_contact_details %}
+                                    <div class="row wrapper">
+                                        <div class="col-md-2 mt-3 p-0">
+                                            <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                                                {% for country_code in country_codes %}
+                                                <option value="{{country_code.country_code}}" {% if user_contact.country_code == country_code.country_code %} selected {% endif %}>{{country_code.country_code}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mt-3">
+                                            <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+                                            id="contact_no_{{ forloop.counter0 }}" maxlength="10" value="{% if user_contact.contact_number %}{{ user_contact.contact_number }}{% endif %}"/>
+                                            <label class="error_msg float-right contact_no_err_class" id="contact_no_{{ forloop.counter0 }}_error"></label>
+                                        </div>
+                                        <div class="col-md-3 mt-3 pl-0">
+                                            <select class="inputField contact_type" style="width: 100% !important;" name="contact_type[]" id="contact_type_{{ forloop.counter0 }}">
+                                                {% for contact_type in contact_types %}
+                                                <option value="{{ contact_type.id }}"  {% if user_contact.contact_type ==  contact_type.id %} selected {%  endif %} > {{contact_type.contact_type}}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label class="error_msg float-right contact_type_err_class" id="contact_type_{{ forloop.counter0 }}_error"></label>
+                                        </div>
+                                        <div class="col-md-3 mt-3 p-0">
+                                            <div class="inputfield">
+                                                <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" {% if user_contact.is_primary == 1 %} checked="" {% endif %}>
+                                                <input type="hidden" name="primary_contact[]" value="{% if user_contact.is_primary == 1 %}1{% else %}0{% endif %}">
+                                                <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+                                            </div>
+                                        </div>
+                                        {% if forloop.counter0 == 0 %}
+                                        <div class="col-md-1 mt-3 p-0">
+                                            <button class="iconCover float-right add_user_contact" style="padding: 0.75rem;" type="button">
+                                                <img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+                                            </button>
+                                        </div>
+                                        {% else %}
+                                        <div class="col-md-1 mt-3 p-0">
+                                            <button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row mt-3">
+                                <div class="col-md-6 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Father Name*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Enter Father Name" name="father_name"
+                                        id="father_name" maxlength="50" value="{% if user_basic_details.father_name %}{{ user_basic_details.father_name }}{% endif %}">
+                                        <label class="error_msg float-right" id="father_name_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Mother Name*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Enter Mother Name" name="mother_name"
+                                        id="mother_name" maxlength="50" value="{% if user_basic_details.mother_name %}{{ user_basic_details.mother_name }}{% endif %}">
+                                        <label class="error_msg float-right" id="mother_name_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Email ID
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Enter Email Id" name="official_email"
+                                        id="official_email" maxlength="50" value="{% if user_details.official_email %}{{ user_details.official_email }}{% endif %}">
+                                        <label class="error_msg float-right" id="official_email_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Date Of Birth*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField"
+                                        placeholder="Enter Date of Birth" name="date_of_birth" id="date_of_birth" value="{% if user_basic_details.date_of_birth %}{{ user_basic_details.date_of_birth  | date:'d/m/Y' }}{% endif %}" readonly>
+                                        <label class="error_msg float-right" id="date_of_birth_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class=" mb-0" style="display: inline-block;">
+                                        Marriage Anniversary Date*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField"
+                                        placeholder="Marriage Anniversary Date" name="marriage_date" id="marriage_date" value="{% if user_basic_details.marriage_date %}{{ user_basic_details.marriage_date  | date:'d/m/Y' }}{% endif %}" readonly>
+                                        <label class="error_msg float-right" id="marriage_date_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-8 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Gender*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <div class="row">
+                                            <div class="col-md-4 pl-0">
+                                                <div class="col-md-12 inputField cursurorclass">
+                                                    <label class="checkBoxContainer mb-0 cursurorclass">
+                                                        <img src="{% if user_basic_details.gender %}{% if user_basic_details.gender == 'male' %} {% static 'img/svg/male.svg' %} {% else %} {% static 'img/svg/malegrey.svg' %} {% endif %}{% else %}{% static 'img/svg/male.svg' %}{% endif %}" class="genderImg" id="user_gender_male">
+                                                        <input type="radio" name="user_gender" id="user_male_gender" value="male"{% if user_basic_details.gender %}{% if user_basic_details.gender == 'male' %}checked=""{% endif %}{% else %}checked=""{% endif %} style="display: none;" />
+                                                        MALE
+                                                    </label>
+                                                    
+                                                </div>
+                                                <label class="error_msg float-right" id="user_gender_error"></label>
+                                            </div>
+                                            <div class="col-md-4 p-0">
+                                                <div class="col-md-12 inputField cursurorclass">
+                                                    <label class="checkBoxContainer mb-0 cursurorclass">
+                                                        <img src="{% if user_basic_details.gender == 'female' %} {% static 'img/svg/female.svg' %} {% else %} {% static 'img/svg/femalegrey.svg' %} {% endif %}" class="genderImg" id="user_gender_female">
+                                                        <input type="radio" name="user_gender" id="user_female_gender" value="female" {% if user_basic_details.gender == 'female' %} checked="" {% endif %} style="display: none;" />
+                                                        Female
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 pr-0">
+                                                <div class="col-md-12 inputField cursurorclass">
+                                                    <img src="{% if user_basic_details.gender == 'other' %} {% static 'img/svg/other.svg' %} {% else %} {% static 'img/svg/othergrey.svg' %} {% endif %}" class="genderImg" id="user_gender_other">
+                                                    <label class="checkBoxContainer mb-0 cursurorclass">
+                                                        <input type="radio" name="user_gender" id="user_other_gender"  value="other" {% if user_basic_details.gender == 'other' %} checked="" {% endif %} style="display: none;" />
+                                                        Other
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-md-4 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Blood group
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="blood_group" id="blood_group">
+                                            <option value="">Select blood Group type</option>
+                                            <option value="O−" {% if user_basic_details.blood_group == 'O−' %} selected="" {% endif %}>O−</option>
+                                            <option value="O+" {% if user_basic_details.blood_group == 'O+' %} selected="" {% endif %}>O+</option>
+                                            <option value="A−" {% if user_basic_details.blood_group == 'A−' %} selected="" {% endif %}>A−</option>
+                                            <option value="A+" {% if user_basic_details.blood_group == 'A+' %} selected="" {% endif %}>A+</option>
+                                            <option value="B−" {% if user_basic_details.blood_group == 'B−' %} selected="" {% endif %}>B−</option>
+                                            <option value="B+" {% if user_basic_details.blood_group == 'B+' %} selected="" {% endif %}>B+</option>
+                                            <option value="AB−" {% if user_basic_details.blood_group == 'AB−' %} selected="" {% endif %}>AB−</option>
+                                            <option value="AB+" {% if user_basic_details.blood_group == 'AB+' %} selected="" {% endif %}>AB+</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Store Address
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <input class="inputField" type="text" placeholder="Address Line 1" name="store_address_line_1"
+                                    id="store_address_line_1" maxlength="50" value="{% if user_store_address.address_line_1 %}{{ user_store_address.address_line_1 }}{% endif %}" />
+                                    <label class="error_msg float-right" id="store_address_line_1_error"></label>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <input class="inputField" type="text" placeholder="Address Line 2" name="store_address_line_2"
+                                    id="store_address_line_2" maxlength="50" value="{% if user_store_address.address_line_2 %}{{ user_store_address.address_line_2 }}{% endif %}" />
+                                    <label class="error_msg float-right" id="addressLine2_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="store_country_id" id="store_country_id" onchange="getState(this.value, 'store_state_id', '', '', 'store_city_id')">
+                                        <option value="">Select Country</option>
+                                        {% for countrie in countries %}
+                                        <option value="{{countrie.id}}" {% if user_store_address.country_id == countrie.id %} selected="" {% endif %}>{{countrie.country}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right" id="store_country_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3 pl-0">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="store_state_id" id="store_state_id" onchange="getCity(this.value, 'store_city_id', '')">
+                                        <option value="">Select State</option>
+                                        {% if store_states %}
+                                        {% for state in store_states %}
+                                        <option value="{{state.id}}" {% if user_store_address.state_id == state.id %} selected="" {% endif %}>{{state.state}}</option>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <label class="error_msg float-right" id="store_state_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="store_city_id" id="store_city_id" >
+                                        <option value="">Select City</option>
+                                        {% if store_cities %}
+                                        {% for city in store_cities %}
+                                        <option value="{{city.id}}" {% if user_store_address.city_id == city.id %} selected="" {% endif %}>{{city.city}}</option>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <label class="error_msg float-right" id="store_city_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3 pl-0">
+                                    <input class="inputField numeric" type="text" placeholder="Pin Code*" name="store_pincode"
+                                    id="store_pincode" maxlength="6" value="{% if user_store_address.pincode %}{{ user_store_address.pincode }}{% endif %}"/>
+                                    <label class="error_msg float-right" id="store_pincode_error"></label>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-7">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Permanent Address
+                                    </h6>
+                                </div>
+                                <div class="col-md-5">
+                                    <button type="button" class="btn btn-addDept" onclick="sameAbove('user')">
+                                        Same as above
+                                        <img src="{% static 'img/svg/depart_no.svg' %}" class="btnDeptIcon" />
+                                    </button>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <input class="inputField" type="text" placeholder="Address Line 1"
+                                    name="permanent_address_line_1" id="permanent_address_line_1" maxlength="50" value="{% if user_permanent_address.address_line_1 %}{{ user_permanent_address.address_line_1 }}{% endif %}"/>
+                                    <label class="error_msg float-right" id="permanent_address_line_1_error"></label>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <input class="inputField" type="text" placeholder="Address Line 2"
+                                    name="permanent_address_line_2" id="permanent_address_line_2" maxlength="50" value="{% if user_permanent_address.address_line_2 %}{{ user_permanent_address.address_line_2 }}{% endif %}" />
+                                    <label class="error_msg float-right" id="perm_addressLine2_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="permanent_country_id" id="permanent_country_id" onchange="getState(this.value, 'permanent_state_id', '', '', 'permanent_city_id')">
+                                        <option value="">Select Country</option>
+                                        {% for countrie in countries %}
+                                        <option value="{{countrie.id}}" {% if user_permanent_address.country_id == countrie.id %} selected="" {% endif %}>{{countrie.country}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right" id="permanent_country_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3 pl-0">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="permanent_state_id" id="permanent_state_id" onchange="getCity(this.value, 'permanent_city_id', '')">
+                                        <option value="">Select State</option>
+                                        {% if permanent_states %}
+                                        {% for state in permanent_states %}
+                                        <option value="{{state.id}}" {% if user_permanent_address.state_id == state.id %} selected="" {% endif %}>{{state.state}}</option>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <label class="error_msg float-right" id="permanent_state_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="permanent_city_id" id="permanent_city_id" >
+                                        <option value="">Select City</option>
+                                        {% if permanent_cities %}
+                                        {% for city in permanent_cities %}
+                                        <option value="{{city.id}}" {% if user_permanent_address.city_id == city.id %} selected="" {% endif %}>{{city.city}}</option>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <label class="error_msg float-right" id="permanent_city_id_error"></label>
+                                </div>
+                                <div class="col-md-6 mt-3 pl-0">
+                                    <input class="inputField numeric" type="text" placeholder="Pin Code*" name="permanent_pincode"
+                                    id="permanent_pincode" maxlength="6" value="{% if user_permanent_address.pincode %}{{ user_permanent_address.pincode }}{% endif %}"/>
+                                    <label class="error_msg float-right" id="permanent_pincode_error"></label>
+                                </div>
+                            </div>
+                            {% if user_contact_person is None %}
+                            <div class="row mt-3 wrappers">
+                                <div class="col-md-12">
+                                    <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Other Contact Person
+                                    </h6>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+                                    id="contact_person_name" maxlength="50" />
+                                    <label class="error_msg float-right" id="otherName_error"></label>
+                                </div>
+                                <div class="col-md-3 mt-3 pl-0">
+                                    <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+                                    id="designation" maxlength="50" />
+                                    <label class="error_msg float-right" id="otherDesignation_error"></label>
+                                </div>
+                                <div class="col-md-4 mt-3 pl-0">
+                                    <input class="inputField numeric" type="text" placeholder="Contact no." name="contact_number[]"
+                                    id="contact_number" maxlength="10" />
+                                    <label class="error_msg float-right" id="otherContact_error"></label>
+                                </div>
+                                <div class="col-md-1 mt-3 pl-0">
+                                    <button class="iconCover float-right add_user_contact_person" style="padding: 0.75rem;" type="button">
+                                        <img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-12 p-0" id="otherContactCont">
+                                    {% if user_contact_person %}
+                                    <div class="col-md-12">
+                                        <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Other Contact Person
+                                        </h6>
+                                    </div>
+                                    {% for contact_person in user_contact_person %}
+                                    <div class="row wrappers"><div class="col-md-4 mt-3">
+                                        <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+                                        id="contact_person_name" maxlength="50" value="{{ contact_person.contact_person_name }}" />
+                                        <label class="error_msg float-right" id="otherName_error"></label>
+                                    </div>
+                                    <div class="col-md-3 mt-3 pl-0">
+                                        <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+                                        id="designation" maxlength="50" value="{{ contact_person.designation }}" />
+                                        <label class="error_msg float-right" id="otherDesignation_error"></label>
+                                    </div>
+                                    <div class="col-md-4 mt-3 pl-0">
+                                        <input class="inputField numeric" type="text" placeholder="Contact no.*" name="contact_number[]"
+                                        id="contact_number" maxlength="10" value="{{ contact_person.contact_number }}" />
+                                        <label class="error_msg float-right" id="otherContact_error"></label>
+                                    </div>
+                                    {% if forloop.counter0 == 0 %}
+                                    <div class="col-md-1 mt-3 pl-0">
+                                        <button class="iconCover float-right add_user_contact_person" style="padding: 0.75rem;" type="button">
+                                            <img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-md-1 mt-3 pl-0">
+                                        <button class="iconCover float-right fa fa-trash removeContactPerson" style="padding: 0.75rem;" type="button" 
+                                        onclick="removeTableRow('otherContactCont')">
+                                    </button>
+                                </div>
+                                {% endif %}
+                                
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <br clear="all">
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<nav class="navbar fixed-bottom" id="modalFooter">
+    <div class="dropdown-divider w-100"></div>
+    <div class="col-3 offset-9 p-0">
+        <ul id="stepFooter">
+            <li id="li1" class="selectedstep">
+                <button class="btn btn-step activeStep" id="stepBtn1">
+                    &#10004;
+                </button>
+            </li>
+            <li id="li2">
+                <button class="btn btn-step" id="stepBtn2">
+                    &#10004;
+                </button>
+            </li>
+            <li id="li3">
+                <button class="btn btn-step" id="stepBtn3">
+                    &#10004;
+                </button>
+            </li>
+            <li id="li4">
+                <button class="btn btn-step" id="stepBtn4">
+                    &#10004;
+                </button>
+            </li>
+        </ul>
+    </div>
+</nav>
+</div>
+
+<script>
+    $('#addBasicDetailsForms').submit(function(e){
+        var error = 0;
+        var a = document.forms["addBasicDetailsForms"]["store_name"].value;
+        document.getElementById('store_name_error').innerHTML = '';
+        $('.store_name_class').css("border", "");
+        $('#last_name').css("margin-top", "0");
+        if (a == null || a == "") {
+            var error = 1;
+            document.getElementById('store_name_error').innerHTML = 'Please enter store name*';
+            $('.store_name_class').css("border", "1px solid #db8305");
+            $('#last_name').css("margin-top", "12px");
+        }
+        
+        var b = document.forms["addBasicDetailsForms"]["first_name"].value;
+        document.getElementById('first_name_error').innerHTML = '';
+        $('#first_name').css("border", "");
+        if (b == null || b == "") {
+            var error = 1;
+            document.getElementById('first_name_error').innerHTML = 'Please enter first name*';
+            $('#first_name').css("border", "1px solid #db8305");
+        }
+        
+        var c = document.forms["addBasicDetailsForms"]["last_name"].value;
+        document.getElementById('last_name_error').innerHTML = '';
+        $('#last_name').css("border", "");
+        if (c == null || c == "") {
+            var error = 1;
+            document.getElementById('last_name_error').innerHTML = 'Please enter last name*';
+            $('#last_name').css("border", "1px solid #db8305");
+        }
+        
+        var img = document.forms["addBasicDetailsForms"]["store_image"].value;
+        document.getElementById('store_image_error').innerHTML = '';
+        $('#last_name').css("margin-top", "0");
+        $('#store_image').css("border", "");
+        
+        var previous_store_image = $('#previous_store_image').val();
+        
+        // if ((img == null || img == "") && previous_store_image == '') {
+        //     var error = 1;
+        //     document.getElementById('store_image_error').innerHTML = 'Please select store image*';
+        //     $('#store_image').css("border", "1px solid #db8305");
+        // }
+        
+        var d = document.forms["addBasicDetailsForms"]["father_name"].value;
+        document.getElementById('father_name_error').innerHTML = '';
+        $('#father_name').css("border", "");
+        if (d == null || d == "") {
+            var error = 1;
+            document.getElementById('father_name_error').innerHTML = 'Please enter father name*';
+            $('#father_name').css("border", "1px solid #db8305");
+        }
+        
+        var e1 = document.forms["addBasicDetailsForms"]["mother_name"].value;
+        document.getElementById('mother_name_error').innerHTML = '';
+        $('#mother_name').css("border", "");
+        if (e1 == null || e1 == "") {
+            var error = 1;
+            document.getElementById('mother_name_error').innerHTML = 'Please enter mother name*';
+            $('#mother_name').css("border", "1px solid #db8305");
+        }
+        
+        var f = document.forms["addBasicDetailsForms"]["official_email"].value;
+        document.getElementById('official_email_error').innerHTML = '';
+        $('#official_email').css("border", "");
+        // if (f == null || f == "") {
+        //     var error = 1;
+        //     document.getElementById('official_email_error').innerHTML = 'Please enter email*';
+        //     $('#official_email').css("border", "1px solid #db8305");
+        // } else {
+            var isValidated = validateEmail(f);
+            if (f != "" && !isValidated) {
+                var error = 1;
+                document.getElementById('official_email_error').innerHTML = 'Please enter proper email*';
+                $('#official_email').css("border", "1px solid #db8305");
+            }
+            else {
+                $('#official_email').css("border", "1px solid lightgrey");
+            }
+        //}
+        
+        var g = document.forms["addBasicDetailsForms"]["date_of_birth"].value;
+        document.getElementById('date_of_birth_error').innerHTML = '';
+        $('#date_of_birth').css("border", "");
+        if (g == null || g == "") {
+            var error = 1;
+            document.getElementById('date_of_birth_error').innerHTML = 'Please enter date of birth*';
+            $('#date_of_birth').css("border", "1px solid #db8305");
+        }
+        
+        var h1 = document.getElementById("user_male_gender").checked;
+        var h2 = document.getElementById("user_female_gender").checked;
+        var h3 = document.getElementById("user_other_gender").checked;
+        
+        document.getElementById('user_gender_error').innerHTML = '';
+        $('#user_gender_male').css("border", "");
+        $('#user_gender_female').css("border", "");
+        $('#user_gender_other').css("border", "");
+        if (h1 == false && h2 == false && h3 == false) {
+            var error = 1;
+            document.getElementById('user_gender_error').innerHTML = 'Please select gender*';
+            $('#user_gender_male').css("border", "1px solid #db8305");
+            $('#user_gender_female').css("border", "1px solid #db8305");
+            $('#user_gender_other').css("border", "1px solid #db8305");
+        }
+        
+        var i = document.forms["addBasicDetailsForms"]["store_address_line_1"].value;
+        document.getElementById('store_address_line_1_error').innerHTML = '';
+        $('#store_address_line_1').css("border", "");
+        if (i == null || i == "") {
+            var error = 1;
+            document.getElementById('store_address_line_1_error').innerHTML = 'Please enter address*';
+            $('#store_address_line_1').css("border", "1px solid #db8305");
+        }
+        
+        var j = document.forms["addBasicDetailsForms"]["store_country_id"].value;
+        document.getElementById('store_country_id_error').innerHTML = '';
+        $('#store_country_id').css("border", "");
+        if (j == null || j == "") {
+            var error = 1;
+            document.getElementById('store_country_id_error').innerHTML = 'Please select country*';
+            $('#store_country_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var k = document.forms["addBasicDetailsForms"]["store_state_id"].value;
+        document.getElementById('store_state_id_error').innerHTML = '';
+        $('#store_state_id').css("border", "");
+        if (k == null || k == "") {
+            var error = 1;
+            document.getElementById('store_state_id_error').innerHTML = 'Please select state*';
+            $('#store_state_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var l = document.forms["addBasicDetailsForms"]["store_city_id"].value;
+        document.getElementById('store_city_id_error').innerHTML = '';
+        $('#store_city_id').css("border", "");
+        if (l == null || l == "") {
+            var error = 1;
+            document.getElementById('store_city_id_error').innerHTML = 'Please select city*';
+            $('#store_city_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var m = document.forms["addBasicDetailsForms"]["store_pincode"].value;
+        document.getElementById('store_pincode_error').innerHTML = '';
+        $('#store_pincode').css("border", "");
+        if (m == null || m == "") {
+            var error = 1;
+            document.getElementById('store_pincode_error').innerHTML = 'Please enter pincode*';
+            $('#store_pincode').css("border", "1px solid #db8305");
+        } else {
+            if (m.length < 6) {
+                var error = 1;
+                document.getElementById('store_pincode_error').innerHTML = 'Pincode should be 6 digits*';
+                $('#store_pincode').css("border", "1px solid #db8305");
+            } else {
+                $('#store_pincode').css("border", "1px solid lightgrey");
+            }
+        }
+        
+        var n = document.forms["addBasicDetailsForms"]["permanent_address_line_1"].value;
+        document.getElementById('permanent_address_line_1_error').innerHTML = '';
+        $('#permanent_address_line_1').css("border", "");
+        if (n == null || n == "") {
+            var error = 1;
+            document.getElementById('permanent_address_line_1_error').innerHTML = 'Please enter address*';
+            $('#permanent_address_line_1').css("border", "1px solid #db8305");
+        }
+        
+        var o = document.forms["addBasicDetailsForms"]["permanent_country_id"].value;
+        document.getElementById('permanent_country_id_error').innerHTML = '';
+        $('#permanent_country_id').css("border", "");
+        if (o == null || o == "") {
+            var error = 1;
+            document.getElementById('permanent_country_id_error').innerHTML = 'Please select country*';
+            $('#permanent_country_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var p = document.forms["addBasicDetailsForms"]["permanent_state_id"].value;
+        document.getElementById('permanent_state_id_error').innerHTML = '';
+        $('#permanent_state_id').css("border", "");
+        if (p == null || p == "") {
+            var error = 1;
+            document.getElementById('permanent_state_id_error').innerHTML = 'Please select state*';
+            $('#permanent_state_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var marriage_date = document.forms["addBasicDetailsForms"]["marriage_date"].value;
+        var q = document.forms["addBasicDetailsForms"]["permanent_city_id"].value;
+        document.getElementById('permanent_city_id_error').innerHTML = '';
+        $('#permanent_city_id').css("border", "");
+        if (q == null || q == "") {
+            var error = 1;
+            document.getElementById('permanent_city_id_error').innerHTML = 'Please select city*';
+            $('#permanent_city_id').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        var r = document.forms["addBasicDetailsForms"]["permanent_pincode"].value;
+        document.getElementById('permanent_pincode_error').innerHTML = '';
+        $('#permanent_pincode').css("border", "");
+        if (r == null || r == "") {
+            var error = 1;
+            document.getElementById('permanent_pincode_error').innerHTML = 'Please enter pincode*';
+            $('#permanent_pincode').css("border", "1px solid #db8305");
+        } else {
+            if (r.length < 6) {
+                var error = 1;
+                document.getElementById('permanent_pincode_error').innerHTML = 'Pincode should be 6 digits*';
+                $('#permanent_pincode').css("border", "1px solid #db8305");
+            } else {
+                $('#permanent_pincode').css("border", "1px solid lightgrey");
+            }
+        }
+        
+        obj = $('#addUserModalBody').find('.contact_no_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#contact_number_error').val('0')
+            $('#contact_no_'+sum).css("border", "");
+            document.getElementById('contact_no_'+sum+'_error').innerHTML = '';
+            if($('#contact_no_'+sum).val() == ''){
+                var error = 1;
+                $('#contact_number_error').val('1');
+                document.getElementById('contact_no_'+sum+'_error').innerHTML = 'Please enter contact no*';
+                $('#contact_no_'+sum).css("border", "1px solid #db8305");
+            }else {
+                var contact_length = $('#contact_no_'+sum).val();
+                if (contact_length.length < 10) {
+                    var error = 1;
+                    $('#contact_number_error').val('1');
+                    document.getElementById('contact_no_'+sum+'_error').innerHTML = 'Contact No. should be 10 digits*';
+                    $('#contact_no_'+sum).css("border", "1px solid #db8305");
+                } else {
+                    $('#contact_number_error').val('0');
+                    $('#contact_no_'+sum).css("border", "1px solid lightgrey");
+                }
+            }
+            
+            $('#contact_type_'+sum).css("border", "");
+            document.getElementById('contact_type_'+sum+'_error').innerHTML = '';
+            if($('#contact_type_'+sum).val() == ''){
+                var error = 1;
+                $('#contact_number_error').val('1');
+                document.getElementById('contact_type_'+sum+'_error').innerHTML = 'Please select contact type*';
+                $('#contact_type_'+sum).css("border", "1px solid #db8305");
+            }
+            
+        });
+        
+        $('.error_msg').css("margin-bottom", "0rem");
+        var contact_number_error = $('#contact_number_error').val();    
+        if (error == 0 && contact_number_error == 0) {
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: "{% url 'src:add-user-basic-detail' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.error == true) {
+                        hideLoader();
+                        $(".text-danger").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            console.log(index);
+                            console.log(value);
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        $('#addUserModal').html('');
+                        hideLoader();
+                        $('#addUserModal').html(response);
+                        
+                        var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                        $("#addUserModalBody").height(mch);
+                        $(".selectField").select2();    
+                        
+                        $(".datepicker").datepicker({
+                            weekStart: 1,
+                            changeMonth: true,
+                            changeYear: true,  
+                            yearRange: "-100:+0",
+                            daysOfWeekHighlighted: "6,0",
+                            autoclose: true,
+                            todayHighlight: true,
+                            dateFormat: 'dd/mm/yy',
+                        });
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        } else {
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            return false;
+            
+        }
+    });
+    
+    
+    
+    function getState(country_id, id, store_state_id, store_city_id, permanent_city_id){
+        if(country_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-state-options' 1 %}";
+            url = url.replace(1,country_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_state_id!=''){
+                        $('#permanent_state_id').val(store_state_id).trigger('change');
+                        getCity(store_state_id, 'permanent_city_id', store_city_id); 
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+            $('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    
+    function getCity(state_id, id, store_city_id){
+        if(state_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-city-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_city_id!=''){
+                        $('#permanent_city_id').val(store_city_id).trigger('change');
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function fileUploader(id, previewId, fileType) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            if(fileType == 'Store Image'){
+                document.getElementById('store_image_error').innerHTML = '';
+            }else{
+                document.getElementById('profile_image_error').innerHTML = '';
+            }
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    if(fileType == 'Store Image'){
+                        document.getElementById('store_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }else{
+                        document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }
+                    if(fileType == 'Store Image'){
+                        $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                    }else{
+                        $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                    }
+                    
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            if(fileType == 'Store Image'){
+                                document.getElementById('store_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }else{
+                                document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }
+                            
+                            if(fileType == 'Store Image'){
+                                $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                            }else{
+                                $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                            }
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+    function sameAbove(formtype) {
+        var store_address_line_1 = document.getElementById('store_address_line_1')
+        var store_address_line_2 = document.getElementById('store_address_line_2')
+        var store_country_id = document.getElementById('store_country_id').value
+        var store_state_id = document.getElementById('store_state_id').value
+        var store_city_id = document.getElementById('store_city_id').value
+        var store_pincode = document.getElementById('store_pincode')
+        var permanent_address_line_1 = document.getElementById('permanent_address_line_1');
+        var permanent_address_line_2 = document.getElementById('permanent_address_line_2');
+        var permanent_country_id = document.getElementById('permanent_country_id');
+        var permanent_state_id = document.getElementById('permanent_state_id');
+        var permanent_city_id = document.getElementById('permanent_city_id');
+        var permanent_pincode = document.getElementById('permanent_pincode');
+        
+        permanent_address_line_1.value = store_address_line_1.value
+        permanent_address_line_2.value = store_address_line_2.value
+        permanent_pincode.value = store_pincode.value
+        
+        $('#permanent_country_id').val(store_country_id).trigger('change');
+        
+        if(store_country_id != ''){
+            getState(store_country_id, 'permanent_state_id', store_state_id, store_city_id, 'permanent_city_id');
+        }    
+    }
+    
+    $(".add_user_contact_person").click(function(){
+        var contactNumber = `<div class="row wrappers"><div class="col-md-4 mt-3">
+            <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+            id="contact_person_name" maxlength="50" />
+            <label class="error_msg float-right" id="otherName_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+            id="designation" maxlength="50" />
+            <label class="error_msg float-right" id="otherDesignation_error"></label>
+        </div>
+        <div class="col-md-4 mt-3 pl-0">
+            <input class="inputField numeric" type="text" placeholder="Contact no.*" name="contact_number[]"
+            id="contact_number" maxlength="10" />
+            <label class="error_msg float-right" id="otherContact_error"></label>
+        </div>
+        <div class="col-md-1 mt-3 pl-0">
+            <button class="iconCover float-right fa fa-trash removeContactPerson" style="padding: 0.75rem;" type="button" 
+            onclick="removeTableRow("otherContactCont")">
+        </button>
+    </div></div>`;
+    
+    $("#otherContactCont").append(contactNumber);
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+});
+
+$(".add_user_contact").click(function(){
+    var length = $('.contact_no_class').length;
+    console.log(length);
+    var contactPerson = `<div class="row wrapper">
+        <div class="col-md-2 mt-3 p-0">
+            <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                {% for country_code in country_codes %}
+                <option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mt-3">
+            <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+            id="contact_no_` + length + `" maxlength="10" />
+            <label class="error_msg float-right contact_no_err_class" id="contact_no_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <select class="inputField contact_type" style="width: 100% !important;" name="contact_type[]" id="contact_type_` + length + `">
+                {% for contact_type in contact_types %}
+                <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                {% endfor %}
+            </select>
+            <label class="error_msg float-right contact_type_err_class" id="contact_type_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 p-0">
+            <div class="inputfield">
+                <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" >
+                <input type="hidden" name="primary_contact[]" value="0">
+                <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+            </div>
+        </div>
+        <div class="col-md-1 mt-3 p-0">
+            <button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+            </button>
+        </div></div>`;
+        
+        $("#contactNumberCont").append(contactPerson);
+        $(".selectField").select2();
+        $('.removeContactNumber').click(function() {
+            $(this).closest('.wrapper').remove();
+            resetRowIndex();
+        });
+    });
+    
+    $('.removeContactNumber').click(function() {
+        $(this).closest('.wrapper').remove();
+        resetRowIndex();
+    });
+    
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+    $(document).on('click','.is_primary',function(){
+        
+        if($(this).prop('checked')){
+            $('.is_primary').prop('checked',false);
+            $('input[name="primary_contact[]"]').val(0);
+            $(this).prop('checked',true);
+            $(this).next().val(1);
+        }
+    });
+    
+    $(document).on('click','.self_owned_val',function(){
+        if ($(this).is(':checked')) {
+            $('#self_owned').val('1');
+        } else {
+            $('#self_owned').val('0');
+        }
+    });
+    
+    $(document).ready(function () {    
+        $("input[type='radio']").click(function () {
+            if ($("input[name='user_gender']:checked")) {
+                var radioValue = $("input[name='user_gender']:checked").val();
+                $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                if (radioValue == 'male') {
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else if (radioValue == 'female') {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                }
+            }
+        });
+    });
+    
+    function resetRowIndex(){
+        obj = $('#addUserModalBody').find('.contact_no_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum);
+        });
+        
+        obj = $('#addUserModalBody').find('.contact_no_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum+'_error');
+        });
+
+        obj = $('#addUserModalBody').find('.contact_type_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_type_'+sum+'_error');
+        });
+
+        $(document).ready(function () { 
+            
+            $("#marriage_date").datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0"
+				,maxDate: 0,
+				dateFormat: 'dd/mm/yy' 
+				});
+
+            $("#date_of_birth").datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0"
+				,maxDate: 0,
+				dateFormat: 'dd/mm/yy' 
+				});
+				
+            
+                
+            $("input[type='radio']").click(function () {
+                if ($("input[name='user_gender']:checked")) {
+                    var radioValue = $("input[name='user_gender']:checked").val();
+                    $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                    if (radioValue == 'male') {
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else if (radioValue == 'female') {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    }
+                }
+            });
+        });
+        
+        
+    }
+</script>
+

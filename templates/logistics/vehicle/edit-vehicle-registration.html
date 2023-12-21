@@ -1,0 +1,332 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="vehicle_id" id="vehicle_id" value="{{vehicle.id}}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        
+                        <button class="iconCover" onclick="editVehicleBasic('{{ vehicle.id }}', '1')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        
+                        <h5 class="mt-md-2">Registration Information &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mt-md-2">Registration Details &nbsp;&nbsp;</h5>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Owner Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Owner Name" name="owner_name" id="owner_name" maxlength="50" value="{% if vehicle_registration.owner_name is not None %}{{vehicle_registration.owner_name}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            RTO
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="RTO" name="rto" id="rto" maxlength="50" value="{% if vehicle_registration.rto is not None %}{{vehicle_registration.rto}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Registration Fees Amount
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Registration Fees Amount" name="registration_fees_amount" id="registration_fees_amount" maxlength="50" value="{% if vehicle_registration.registration_fees_amount is not None %}{{vehicle_registration.registration_fees_amount}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Registration Date
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker" type="text" placeholder="Registration Date" name="registration_date" id="registration_date" maxlength="50" value="{% if vehicle_registration.registration_date %}{{vehicle_registration.registration_date | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Valid Till
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField reg_valid_till" type="text" placeholder="Valid Till" name="registration_valid_till" id="registration_valid_till" maxlength="50" value="{% if vehicle_registration.registration_valid_till %}{{vehicle_registration.registration_valid_till | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Upload Registration Copy
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="file" name="registration_copy">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        <div class="col-md-6">
+                            
+                            
+                            <div class="row">
+                                
+                                <div class="col-md-12">
+                                    <h5 class="mt-md-2">Insurance Details &nbsp;&nbsp;</h5>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Name of Insurer
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="name_of_insurer" id="name_of_insurer">
+                                            <option value="">Select</option>
+                                            {% for vehicle_insurer in vehicle_insurers %}
+                                            <option value="{{vehicle_insurer.name_of_insurer}}"  {% if vehicle_insurer.name_of_insurer == vehicle_insurance.name_of_insurer %}selected{% endif %}>{{vehicle_insurer.name_of_insurer}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Date of Insurance
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker" type="text" placeholder="Date of Insurance" name="date_of_insurance" id="date_of_insurance" maxlength="50" value="{% if vehicle_insurance.date_of_insurance %}{{vehicle_insurance.date_of_insurance | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Valid Till
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField reg_valid_till" type="text" placeholder="Valid Till" name="valid_till" id="valid_till" maxlength="50" value="{% if vehicle_insurance.valid_till %}{{vehicle_insurance.valid_till | date:'d/m/Y'}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Premium Amount
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Premium Amount" name="premium_amount" id="premium_amount" maxlength="50" value="{% if vehicle_insurance.premium_amount is not None %}{{vehicle_insurance.premium_amount}}{% endif %}">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Insurance copy
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="file" name="insurance_copy">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                            </div>                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        
+        $(document).ready(function(){
+            $(".reg_valid_till").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                dateFormat: 'dd/mm/yy' 
+            });
+            $(".datepicker").datepicker({
+                weekStart: 1,
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'dd/mm/yy',
+            });
+        });
+        
+        var vehicle_id = "{{vehicle.id}}";
+        
+        $('#addBasicDetailsForms').submit(function(e){
+            showLoader();
+            if(validateZoneForm()){
+                hideLoader();
+                return false;
+            }else{
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                url = "{% url 'src:edit-vehicle-registration' '1' %}";
+                url = url.replace('1',vehicle_id)
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.error == true) {
+                            hideLoader();
+                            $(".text-danger").html('');
+                            var data = response.message;
+                            $.each(data, function (index, value) {
+                                $('#' + index).html(value);
+                            });
+                        } else {
+                            hideLoader();
+                            editVehicleOther(response.vehicle_id)  
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                
+                
+            }
+            
+        });
+
+        function validateZoneForm(){
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+    
+            if($('#registered_address').val() == ""){
+                $('#registered_address').parent().find('.error_msg').text('Please Fill Your Address');
+                $('#registered_address').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+    
+    
+            if($('#registration_number').val() == ""){
+                $('#registration_number').parent().find('.error_msg').text('Please Give Registration Number');
+                $('#registration_number').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+    
+    
+    
+    
+    
+    
+            
+           
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        
+       
+    </script>
+    
+    

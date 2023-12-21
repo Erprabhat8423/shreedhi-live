@@ -1,0 +1,155 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 60%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/new_Variant.png' %}" class="w-30" style="width: 25% !important;" />
+                    <h4 class="modalColHead">Add Incentive Slab</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addIncentiveSlabForm" method="POST" autocomplete="off" action="" aria-label="Product">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Incentive Slab details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveIncentiveSlab()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Product Class</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="product_class_id" id="product_class_id" >
+                            <option value="">Select</option>
+                            {% for product_class in product_class_list %}
+                            <option value="{{product_class.id}}" {% if incentive_slab.product_class_id == product_class.id %}selected{% endif %}>{{product_class.product_class}}</option>
+                            {%endfor%}
+                        </select>
+                        <label class="error_msg float-right" id="route_error"></label>
+                    </div>
+                </div>
+
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>More Than Quantity</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField numeric" type="text" placeholder="More Than Quantity*"  value="{{incentive_slab.more_than_quantity}}" name="more_than_quantity" maxlength="10" />
+                        <label class="error_msg float-right" id="more_than_quantity_error"></label>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Upto Quantity</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField numeric" type="text" placeholder="Upto Quantity*"  value="{{incentive_slab.upto_quantity}}" name="upto_quantity" maxlength="10" />
+                        <label class="error_msg float-right" id="upto_quantity_error"></label>
+                    </div>
+                </div>
+                
+                
+               
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    function saveIncentiveSlab() {
+            showLoader();
+            if(validateRouteForm()){
+                hideLoader();
+                return false;
+            }else{
+                $.ajax({
+                    url: "{% url 'src:add-incentive-slab' %}",
+                    method: 'POST',
+                    data: $('#addIncentiveSlabForm').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            $("#addProductModal").html('');
+                            $("#addProductModal").hide();
+                            getList('incentive_slab')
+                            openToaster("success", data.message);
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    // hideLoader();
+                });
+            } 
+        }
+        
+        
+        function validateRouteForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        if($.trim($('[name="product_class_id"]').val()) == ""){
+            $('[name="product_class_id"]').parent().find('.error_msg').text('Please Select Product Class');
+            $('[name="product_class_id"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="more_than_quantity"]').val() == ""){
+            $('[name="more_than_quantity"]').parent().find('.error_msg').text('Please Defined More Than Quantity');
+            $('[name="more_than_quantity"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+            
+        if(parseFloat($('[name="more_than_quantity"]').val()) >= parseFloat($('[name="upto_quantity"]').val())){
+            $('[name="upto_quantity"]').parent().find('.error_msg').text('Upto Quantity must greater than More Than Quantity');
+            $('[name="upto_quantity"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+        
+        
+        
+    </script>

@@ -1,0 +1,175 @@
+{% load static %}
+<input type="hidden" name="page" id="page" value="2" />
+<input type="hidden" name="page_status" id="page_status" value="0" />
+<input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+<table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+style="width: 100%;">
+<thead>
+    <tr>
+        <th class="org_name" id="org_name">
+            Organisation Name
+            <i class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze"
+            onclick="freezeColumn('org_name',1)">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"
+            onclick="unfreezeColumn('org_name',1)">
+        </th>
+        <th class="landline_no" id="landline_no">Landline no<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze"
+            onclick="freezeColumn('landline_no',2)">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"
+            onclick="unfreezeColumn('landline_no',2)">
+        </th>
+        <th class="mobile_no" id="mobile_no">Mobile no<i
+            class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze"
+            onclick="freezeColumn('mobile_no',3)">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"
+            onclick="unfreezeColumn('mobile_no',3)">
+        </th>
+        <th class="email_id" id="email_id">Email id<i class="fa fa-fw fa-sort float-right"></i>
+            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze"
+            onclick="freezeColumn('email_id',4)">
+            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"
+            onclick="unfreezeColumn('email_id',4)">
+        </th>
+        <th>Action</th>
+    </tr>
+</thead>
+<tbody id="tablebody">
+    {% if organizations %}
+    {% for organization in organizations %}
+    <tr onclick="getOrganizationRecord({{ organization.id }})" {% if forloop.first %}
+    class="odd selected" {% endif %}>
+    <td class="org_name">{{ organization.organization_name }}</td>
+    <td class="landline_no">
+        {% if organization.land_line_code %}{{ organization.land_line_code }}{% endif %}
+        {% if organization.phone_code %}{{ organization.phone_code }}{% endif %}
+        {% if organization.landline_no %}{{ organization.landline_no }}
+        {% else %} - {% endif %}</td>
+        <td class="mobile_no">
+            {% if organization.mobile_code %}{{ organization.mobile_code }}{% endif %}
+            {% if organization.mobile_no %}{{ organization.mobile_no }}
+            {% else %} - {% endif %}</td>
+            <td class="email_id">{% if organization.email_id %}{{ organization.email_id }}
+                {% else %} - {% endif %}</td>
+                <td>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="javascript:void(0)"
+                            onclick="editOrganization({{ organization.id }})" data-toggle="modal"
+                            data-target="#addOrganisationModal"><img
+                            src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ organization.id }}"
+                                    {% if organization.is_active == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateOrganizationStatus({{ organization.id }}, {{ organization.is_active }})">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="12"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                    </td>
+                </tr>
+                <!-- <tr>
+                    <td colspan="3" style="text-align: center;">
+                        {% include 'layout/paginator.html' with page=organizations %}
+                    </td>
+                </tr> -->
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var prevTop = 0;
+                
+                $('.commonTableBg').on('scroll', function () {
+                    var page = $('#page').val();
+                    var totalPages = $('#total_pages').val();
+                    console.log(totalPages);
+                    console.log(page);
+                    
+                    var currentTop = $(this).scrollTop();
+                    if (prevTop !== currentTop) {
+                        prevTop = currentTop;
+                        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                            
+                            if($('#page_status').val() == 0 && page  <= totalPages){
+                                $('#loading').show(); 
+                                $('#page_status').val('1');
+                                $.ajax({
+                                    url: "{% url 'src:ajax-organization-lists' %}",
+                                    method: 'GET',
+                                    data: { page:page },
+                                    success: function (data) {
+                                        setTimeout(() => {
+                                            $('#tablebody').find('tr:last').prev().after(data);
+                                            $('#page').val(parseInt(page)+1);
+                                            $('#loading').hide();
+                                            $('#page_status').val('0');
+                                        }, 2000);
+                                        $("#addOrgTable").tablesorter({
+                                            widgets: ["zebra", "resizable", "stickyHeaders"],
+                                            widgetOptions: {
+                                                resizable_addLastColumn: true,
+                                                resizable: false,
+                                                resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                            },
+                                        });
+                                        $("#addOrgTable tbody tr").click(function () {
+                                            $(this).addClass("selected").siblings().removeClass("selected");
+                                        });
+                                        $(".deptRow").click(function () {
+                                            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                                        });
+                                        
+                                        
+                                        $(".primaryContainerBG").scroll(function () {
+                                            var divTable = $(".primaryContainerBG");
+                                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                                        });
+                                        
+                                    },
+                                    error: function (err) {
+                                        alert(err.message);
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                })
+                
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                $(".fixed-column input:checkbox:checked").each(function () {
+                    var name = $(this).attr("name");
+                    var id = $(this).attr("id");
+                    var dataId = $(this).attr("data-id")
+                    toggleFreeze(id, name, dataId);
+                }); 
+                
+                $(".show-hide input:checkbox:checked").each(function () {
+                    var id = $(this).attr("id");
+                    var dataId = $(this).attr("data-id")
+                    showHideColumns(id, dataId);
+                });
+                
+                getOrganizationRecord({{ organization_details.id }});
+            });
+        </script>

@@ -1,0 +1,1088 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/roles&permission.css' %}" />
+<link rel="stylesheet" href="{% static 'css/mediaQuery.css' %}" />
+<style>
+	.subtext{
+		text-decoration: none;
+	}
+</style>
+{% endblock %}
+
+
+<div class="row" id="containerHeight">
+	<div class="col-md-8 pr-md-0 h-100">
+		<div class="primaryContainer h-100" id="mainbox">
+			<div class="row mb-2" id="topRow">
+				<div class="col-md-5 p-md-0"> 
+					<h6 class="mt-md-3 mb-md-0"><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+				</div>
+				<div class="col-md-7 p-md-0">
+					<div class="row mb-2 mt-2 manageBlock" id="topRow">
+						<div class="col-md-12 p-md-0 text-right">
+							<input class="search searchTable search" placeholder="Search" type="search" data-column="all">
+							
+							<button class="btn iconBox iconAddRoles" onclick="addRole()"></button>
+							
+							<div class="dropdown" style="display: inline-block;" id="hideColumn">
+								<button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false"></button>
+								<div class="dropdown-menu dropdown-menu-right logoutContainer"
+								aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colCheck" name="roles_name" id="roles_name" />
+									<label class="mb-0" for="roles_name">Role Name</label>
+								</a>
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colCheck" name="org_name" id="org_name" />
+									<label class="mb-0" for="org_name">Organization Name</label>
+								</a>
+								<a class="dropdown-item columnHideItem" href="#">
+									<input type="checkbox" class="colCheck" name="department" id="department" />
+									<label class="mb-0" for="department">Department</label>
+								</a>
+							</div>
+						</div>
+						<div class="dropdown" style="display: inline-block;" id="lockColumn">
+							<button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+							<div class="dropdown-menu dropdown-menu-right logoutContainer"
+							aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item columnHideItem" href="#">
+								<input type="checkbox" class="colFreezeCheck" name="roles_name" id="lock_roles_name"
+								onclick="toggleFreeze(this.id,'roles_name',1)" />
+								<label class="mb-0" for="lock_roles_name">Role Name</label>
+							</a>
+							<a class="dropdown-item columnHideItem" href="#">
+								<input type="checkbox" class="colFreezeCheck" name="landline_no" id="lock_org_name"
+								onclick="toggleFreeze(this.id,'org_name',2)" />
+								<label class="mb-0" for="lock_org_name">Organisation</label>
+							</a>
+							<a class="dropdown-item columnHideItem" href="#">
+								<input type="checkbox" class="colFreezeCheck" name="department" id="lock_department"
+								onclick="toggleFreeze(this.id,'department',3)" />
+								<label class="mb-0" for="lock_department">Department</label>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" id="tableBox">
+		<div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg">
+			<table id="rolesTable" class="table table-borderless table-striped table-hover mt-0"
+			style="width: 100%;">
+			<thead>
+				<tr>
+					<th class="roles_name" id="roles_name">
+						Role Name
+						<i class="fa fa-fw fa-sort float-right"></i>
+						<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+						<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+					</th>
+					<th class="org_name" id="org_name">Organisation<i class="fa fa-fw fa-sort float-right"></i>
+						<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+						<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+					</th>
+					<th class="department" id="department">Department<i class="fa fa-fw fa-sort float-right"></i>
+						<img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+						<img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+					</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody id="tablebody">
+				{% if roles %}
+				{% for role in roles %}
+				<tr  {% if forloop.first %} class="odd selected" {% endif %}>
+					<td class="roles_name" onclick="roleDetails('{{role.id}}')">{{role.role_name}}</td>
+					<td class="org_name" onclick="roleDetails('{{role.id}}')">{{role.organization_name}}</td>
+					<td class="department" onclick="roleDetails('{{role.id}}')">{{role.department_name}}</td>
+					<td>
+						<div class="row">
+							<div class="col-md-3" onclick="editRole('{{role.id}}')">
+								<img src="{% static 'img/svg/editcopy.svg' %}" />
+							</div>
+							<div class="col-md-5">
+								<label class="switch">
+									<input type="checkbox" class="checkbox" name="is_active"
+									id="is_active_{{ role.id }}"
+									{% if role.status == 1 %} checked="" {% else %}
+									{% endif %}
+									onclick="updateRoleStatus('{{ role.id }}', '{{ role.status }}')">
+									<span class="slider round"></span>
+								</label>
+							</div>
+						</div>
+					</td>
+				</tr>
+				
+				{% endfor %}
+				<tr id="loading" style="display: none;">
+					<td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+					</td>
+				</tr>
+				{% else %}
+				<tr>
+					<td colspan="4" style="text-align: center;">No Record Found...</td>
+				</tr>
+				{% endif %}
+				
+				
+			</tbody>
+		</table>
+	</div>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 h-100" id="ajax-role-detail">
+	
+	<div class="primaryContainerBG h-100 manageBlock" id="detailsBox">
+		<div class="row" id="detailsBoxFirst" style="display: block !important;">
+			
+			
+			{% if role_details %}
+			<div class="col-md-12 p-md-0">
+				<h6><b>{{role_details.role_name}} </b></h6>
+			</div>
+			<div class="col-md-12 p-md-0 mt-md-3">
+				<div class="row mb-md-2">
+					<div class="col-md-6 p-md-0">
+						<div class="row">
+							<div class="col-md-2 p-md-0">
+								<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+							</div>
+							<div class="col-md-10 p-md-0">
+								<h6 class="smallText">Department</h6>
+								<h6 class="largeText">{{role_details.department_name}}</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 p-md-0">
+						<div class="row">
+							<div class="col-2 p-0">
+								<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+							</div>
+							<div class="col-md-10 p-md-0">
+								<h6 class="smallText">Organisation</h6>
+								<h6 class="largeText">{{role_details.organization_name}}</h6>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="dropdown-divider w-100"></div>
+			<div class="col-md-12 p-md-0">
+				<div class="row mb-2">
+					<div class="col-md-6 p-md-0">
+						<h6 class="m-md-0 mt-md-2"><b>Permissions</b></h6>
+					</div>
+					<div class="col-md-6 p-md-0">
+						<!-- <button type="button" class="btn btn-addDept"
+						onclick="editRole('{{role_details.id}}')">
+						Edit Permissions &nbsp;&nbsp;
+						<img src="{% static 'img/svg/depart_no.svg' %}" class="btnDeptIcon" />
+					</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" id="detailsBoxSecond" >
+		<div id="table-scroll" class="table-scroll" style="width: 100%;">
+			<div class="table-wrap">
+				<table class="table table-borderless table-striped" >
+					<thead>
+						<tr>
+							<th>Modules</th>
+							<th>Permission</th>
+							<th>Workflow</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if role_permission_workflows %}
+						{% for role_permission in role_permission_workflows %}
+						<tr>
+							<td style="text-align: left;">{{ role_permission.sub_module_name}}</td>
+							<td style="text-align: left;">{{ role_permission.permission_slug|title}}</td>
+							<td style="text-align: left;">{{ role_permission.level}}</td>
+						</tr>
+						{% endfor %}
+						{% else %}
+						<td colspan="3">No Record Found...</td>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	{% else %}
+	<div class="col-md-12 p-md-0">
+		<h6><b>No Details found. </b></h6>
+	</div>
+	
+	{% endif %}
+</div>
+</div>
+
+
+</div>
+<!-- ***************************************************************************** -->
+
+
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addPermissionModal">
+	
+</div>
+
+
+<div class="overlayModal" id="openWorkFlowHistory">
+	<div class="modal-WorkModal centered">
+		<div class="modal-body p-0">
+			<div class="row">
+				<div class="col-md-3 p-md-0 modalWFBG">
+					<div class="transformImageWF">
+						<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+						<h3 class="modalColHead">Workflow&nbsp;&nbsp;<span class="fa fa-star add_to_fav"></span></h3>
+					</div>
+				</div>
+				<div class="col-md-9 p-md-4">
+					
+					<form>
+						<div class="row">
+							<div class="col-md-6">
+								<h5><b>Workflow </b></h5>
+							</div>
+							<div class="col-md-6 p-md-0">
+								<button class="btn btn-close float-right" type="button"
+								onclick="manipulateModal('openWorkFlowHistory','close')">
+								Close
+							</button>
+						</div>
+					</div>
+					<div class="row mt-5 mb-5">
+						<div class="col-md-12">
+							<ul class="dots mb-0">
+								<!-- Experience -->
+								<li class="green">
+									<div class="row verticalList">
+										<div class="col-md-3">
+											<label class="mt-2">Initiate</label>
+										</div>
+										<div class="col-md-4 p-md-0">
+											<input class="inputField" type="text" placeholder="Enter Details" disabled />
+										</div>
+										<div class="col-md-4">
+											<select class="inputField selectField" style="width: 100%;" disabled>
+												<option>HR</option>
+											</select>
+										</div>
+									</div>
+								</li>
+								<li class="green">
+									<div class="row verticalList">
+										<div class="col-md-3">
+											<label class="mt-2">Forward</label>
+										</div>
+										<div class="col-md-4 p-md-0">
+											<input class="inputField" type="text" placeholder="Enter Details" disabled />
+										</div>
+										<div class="col-md-4">
+											<select class="inputField selectField" style="width: 100%;" disabled>
+												<option>Accounts</option>
+											</select>
+										</div>
+										<div class="col-md-1 ">
+											<label class="switch">
+												<input type="checkbox" />
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</div>
+								</li>
+								<li class="green">
+									<div class="row verticalList">
+										<div class="col-md-3">
+											<label class="mt-2">Approve</label>
+										</div>
+										<div class="col-md-4 p-md-0">
+											<input class="inputField" type="text" placeholder="Enter Details" disabled />
+										</div>
+										<div class="col-md-4">
+											<select class="inputField selectField" style="width: 100%;" disabled>
+												<option>Accounts</option>
+											</select>
+										</div>
+									</div>
+								</li>
+								
+							</ul>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="overlayModal" id="workflowModal" style="display: none;">
+	
+</div>
+
+<div class="overlayModal" id="viewWorkflowModal" style="display: none;">
+	
+</div>
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+
+{% endblock content %}
+
+
+
+{% block script %}
+
+<script>
+	
+	
+	
+	
+	
+	function closePreview(){
+		$('#workflowModal').html('');
+		$('#workflowModal').hide();
+	}
+	
+	function new_viewWorkfLow(sub_module_id, permission_id, id) {
+		workflows = $('#' + id).val();
+		if(workflows != ""){
+			workflows = JSON.parse(workflows);
+			workflows_length = workflows.length;
+			
+			if(workflows.length == 1){
+				html=`<li class="green">
+					<div class="row">
+						<div class="col-md-3">
+							<label class="mt-2">Super User</label>
+						</div>
+						<div class="col-md-5 p-md-0">
+							<textarea class="inputField timeline-input" id="first_desc"  placeholder="Enter Details">`+workflows[0].description+`</textarea>
+							<label class="error_msg float-right"></label>
+						</div>
+						<div class="col-md-4 pr-md-0">
+							<select class="inputField selectField" id="first_level_role" style="width: 100%;">
+								<option value="{{role_details.id}}" selected>{{role_details.role_name}}</option>
+							</select>
+						</div>
+					</div>
+				</li>`;
+			}else if(workflows.length == 2){
+				html=`<li class="green">
+					<div class="row">
+						<div class="col-md-3">
+							<label class="mt-2">Initiate</label>
+						</div>
+						<div class="col-md-4 p-md-0">
+							<textarea class="inputField timeline-input" id="first_desc"   placeholder="Enter Details">`+workflows[0].description+`</textarea>
+							<label class="error_msg float-right"></label>
+						</div>
+						<div class="col-md-4 pr-md-0">
+							<select class="inputField selectField" id="first_level_role" style="width: 100%;">
+								<option value="{{role_details.id}}" selected>{{role_details.role_name}}</option>
+							</select>
+						</div>
+					</div>
+				</li>
+				<li class="green">
+					<div class="row verticalList">
+						<div class="col-md-3">
+							<label class="mt-2">Approve</label>
+						</div>
+						<div class="col-md-4 p-md-0">
+							<textarea class="inputField timeline-input" id="last_level_desc"  placeholder="Enter Details">`+workflows[1].description+`</textarea>
+							<label class="error_msg float-right"></label>
+						</div>
+						<div class="col-md-4 pr-md-0">
+							<select class="inputField selectField" id="last_level_role" style="width: 100%;">`;
+								var super_admin_selected = "";
+								if(workflows[workflows_length-1].role_id == 0){
+									super_admin_selected ="selected";
+								}
+								html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+								{% for other_department in other_departments %}
+								html+=`<optgroup label="{{other_department.department_name}}">`;
+									{% for other_role in other_department.other_roles %}
+									if({{other_role.id}} == workflows[1].role_id){
+										selected = 'selected';
+									}else{
+										selected = '';
+									}
+									html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+									{% endfor %}
+									html+=`</optgroup>`;
+									{% endfor %}
+									html+=`</select>
+								</div>
+							</div>
+						</li>`;
+					}else if(workflows_length > 2){
+						html=`
+						<li class="green">
+							<div class="row">
+								<div class="col-md-3">
+									<label class="mt-2">Initiate</label>
+								</div>
+								<div class="col-md-4 p-md-0">
+									<textarea class="inputField timeline-input" id="first_desc"   placeholder="Enter Details">`+workflows[0].description+`</textarea>
+									<label class="error_msg float-right"></label>
+								</div>
+								<div class="col-md-4 pr-md-0">
+									<select class="inputField selectField" id="first_level_role" style="width: 100%;">
+										<option value="{{role_details.id}}" selected>{{role_details.role_name}}</option>
+									</select>
+								</div>
+							</div>
+						</li>`;
+						j = 1;
+						$.each(workflows, function (key, workflow) {
+							if(key > 0 && key < (workflows_length-1)){
+								html += `<li class="green">
+									<div class="row">
+										<div class="col-md-3">
+											<label id="labelLevel' + i + '" class="mt-2" onclick="showInput(' + i + ')">Forward</label>
+											<input type="text" id="level_`+(key)+`" class="inputField hide" onblur="showLabel(' + i + ')">
+										</div>
+										<div class="col-md-4 p-md-0">
+											<textarea class="inputField timeline-input" id="level_description_`+(key)+`"  placeholder="Enter Details">`+workflows[key].description+`</textarea>
+											<label class="error_msg float-right"></label>
+										</div>
+										<div class="col-md-4 pr-md-0">
+											<select class="inputField selectField" id="level_role_`+(key)+`" style="width: 100%;">`;
+												var super_admin_selected = "";
+												if(workflows[key].role_id == 0){
+													super_admin_selected ="selected";
+												}
+												html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+												{% for other_department in other_departments %}
+												html+=`<optgroup label="{{other_department.department_name}}">`;
+													{% for other_role in other_department.other_roles %}
+													if({{other_role.id}} == workflows[key].role_id){
+														selected = 'selected';
+													}else{
+														selected = '';
+													}
+													html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+													{% endfor %}
+													html+=`</optgroup>`;
+													{% endfor %}
+													html+=`</select>
+												</div>`
+												var checked = '';
+												var checked_value = 0;
+												if(typeof workflows[key].status != "undefined"){
+													if(workflows[key].status == 1){
+														checked = "checked";
+														checked_value = 1
+													}
+												}
+												html += `<div class="col-md-1 p-md-0">
+													<label class="switch" style="float: right; margin-top:10px !important;">
+														<input type="checkbox" class="checkbox switch_checkbox" `+checked+`>
+														<span class="slider round"></span></label>
+														<input type="hidden" class="switch_checkbox_value"  id="level_status_`+key+`" value="`+checked_value+`">
+													</div>
+													
+												</div>
+											</li>`;
+										}
+										j++;
+									});
+									
+									html +=`<li class="green">
+										<div class="row verticalList">
+											<div class="col-md-3">
+												<label class="mt-2">Approve</label>
+											</div>
+											<div class="col-md-4 p-md-0">
+												<textarea class="inputField timeline-input" id="last_level_desc"   placeholder="Enter Details">`+workflows[workflows_length-1].description+`</textarea>
+												<label class="error_msg float-right"></label>
+											</div>
+											<div class="col-md-4 pr-md-0">
+												<select class="inputField selectField" id="last_level_role" style="width: 100%;">`;
+													var super_admin_selected = "";
+													if(workflows[workflows_length-1].role_id == 0){
+														super_admin_selected ="selected";
+													}
+													html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+													
+													{% for other_department in other_departments %}
+													html+=`<optgroup label="{{other_department.department_name}}">`;
+														{% for other_role in other_department.other_roles %}
+														if({{other_role.id}} == workflows[workflows_length-1].role_id){
+															selected = 'selected';
+														}else{
+															selected = '';
+														}
+														html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+														{% endfor %}
+														html+=`</optgroup>`;
+														{% endfor %}
+														html+=`</select>
+													</div>
+												</div>
+											</li>
+											`;
+										}
+										
+										
+										var body = `<div class="modal-WorkModal centered">
+											<div class="modal-body p-0">
+												<div class="row">
+													<div class="col-md-3 p-md-0 modalWFBG">
+														<div class="transformImageWF">
+															<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+															<h3 class="modalColHead">Workflow &nbsp;&nbsp;</h3>
+														</div>
+													</div>
+													<div class="col-md-9 p-md-4">
+														<form>
+															<div class="row mb-3">
+																<div class="col-md-6">
+																	<h5><b>Workflows </b></h5>
+																</div>
+																<div class="col-md-6 p-md-0">
+																	
+																	<button class="btn btn-close float-right" type="button" onclick="closePreview()">
+																		Close
+																	</button>
+																</div>
+															</div>
+															<div class="row mb-3">
+																<div class="col-md-3">
+																	No. of Level
+																</div>
+																<div class="col-md-5 p-md-0">
+																	<input class="inputField" id="total_work_flows" type="text" value="`+workflows_length+`" placeholder="No. of Level"  readonly/>
+																</div>
+															</div>
+															
+															<div class="row">
+																<div class="col-md-12" id="noOfLevels">
+																	<ul class="dots m-0">
+																		`+html+`
+																	</ul>
+																	
+																</div>
+															</div>
+														</form>
+													</div>
+												</div>
+											</div>`;
+											$('#workflowModal').html(body);
+											$('#workflowModal').show();
+											
+										}
+									}
+									
+									
+									$(document).ready(function(){
+										checkMainCheckbox();
+									})
+									
+									function checkMainCheckbox(){
+										{% for module in modules %}
+										{% for sub_module in module.sub_modules %}
+										total_checkbox = $('.module_checkbox_{{sub_module.id}}').length
+										total_checked = $('.module_checkbox_{{sub_module.id}}:checked').length
+										if(total_checkbox == total_checked){
+											$('#new_module_{{sub_module.id}}').prop('checked',true);
+										}
+										{% endfor %}
+										{% endfor %}
+										
+										{% for permission in permissions %}
+										total_checkbox = $('.permission_checkbox_{{permission.id}}').length
+										total_checked = $('.permission_checkbox_{{permission.id}}:checked').length
+										if(total_checkbox == total_checked){
+											$('#new_permission_{{permission.id}}').prop('checked',true);
+										}
+										{% endfor %}
+									}
+									
+									function roleDetails(id) {
+										showLoader();
+										var url = "{% url 'src:role-details' 1 %}";
+										url = url.replace(1,id);
+										$.ajax({
+											url: url,
+											method: 'GET',
+											success: function (data) {
+												hideLoader();
+												$('#ajax-role-detail').html(data);
+												checkMainCheckbox();
+											},
+											error: function (err) {
+												hideLoader();
+												console.log(err)
+											}
+										});
+									}
+									
+									function editRole(id) {
+										showLoader();
+										var url = "{% url 'src:edit-role' 1 %}";
+										url = url.replace(1,id);
+										$.ajax({
+											url: url,
+											method: 'GET',
+											success: function (data) {
+												hideLoader();
+												
+												
+												$("#addPermissionModal").show();
+												$('#addPermissionModal').html(data);
+												
+												var mch = $(".modal-AddPermission").height() - $(".modal-header").outerHeight();
+												$("#addPermissionModalBody").height(mch);
+												$(".selectField").select2();
+												
+											},
+											error: function (err) {
+												hideLoader();
+												console.log(err)
+											}
+										});
+									}
+									
+									function addRole(id) {
+										showLoader();
+										var url = "{% url 'src:add-role' %}";
+										$.ajax({
+											url: url,
+											method: 'GET',
+											success: function (data) {
+												if(typeof data.flag !== "undefined" && !data.flag){
+													hideLoader();
+													openToaster("danger", data.message);
+												}else{
+													hideLoader();
+													$("#addPermissionModal").show();
+													$('#addPermissionModal').html(data);
+													var mch = $(".modal-AddPermission").height() - $(".modal-header").outerHeight();
+													$("#addPermissionModalBody").height(mch);
+													$(".selectField").select2();
+												}
+												
+											},
+											error: function (err) {
+												hideLoader();
+												console.log(err)
+											}
+										});
+									}
+									
+									
+									
+									function getDepartments(organization_id){
+										if(organization_id != ""){
+											
+											showLoader();
+											var url = "{% url 'src:get-org-department-options' 1 %}";
+											url = url.replace(1,organization_id)
+											$.ajax({
+												url: url,
+												method: 'GET',
+												success: function (data) {
+													hideLoader();
+													$('[name="department_id"]').html(data.options)
+													$(".selectField").select2();
+													
+												},
+												error: function (err) {
+													hideLoader();
+													console.log(err)
+												}
+											});
+										}
+										
+									}
+									
+									function getOrgRoles(organization_id){
+										if(organization_id != ""){
+											
+											showLoader();
+											var url = "{% url 'src:get-org-role-options' 1 %}";
+											url = url.replace(1,organization_id)
+											$.ajax({
+												url: url,
+												method: 'GET',
+												success: function (data) {
+													hideLoader();
+													$('[name="reporting_role_id"]').html(data.options)
+													
+												},
+												error: function (err) {
+													hideLoader();
+													console.log(err)
+												}
+											});
+										}
+										
+									}
+									
+									function getAddRolePermissionView(role_id){
+										var url = "{% url 'src:get-add-role-permission' 1 %}";
+										url = url.replace(1,role_id)
+										$.ajax({
+											url: url,
+											method: 'GET',
+											success: function (data) {
+												hideLoader();
+												$('#permissionSaveSection').show();
+												$('#saveRoleSection').hide();
+												$('#ajaxPermissionTable').html(data)
+												
+											},
+											error: function (err) {
+												hideLoader();
+												console.log(err)
+											}
+										});
+										
+										
+									}
+									function saveRole(){
+										showLoader();
+										if(validateRoleForm()){
+											hideLoader();
+											return false;
+										}else{
+											$.ajax({
+												url: "{% url 'src:add-role' %}",
+												method: 'POST',
+												data: $('#addRoleForm').serialize(),
+												success: function (data) {
+													if(typeof data.flag !== "undefined" && !data.flag){
+														hideLoader();
+														openToaster("danger", data.message);
+													}else{
+														if(data.flag){
+															window.location.href="/roles";
+														}else{
+															openToaster("danger", data.message);
+														}
+													}
+												},
+												error: function (err) {
+													//hideLoader();
+													console.log(err)
+												}
+											}).always(function() {
+												//hideLoader();
+											});
+										}
+									}
+									
+									function saveRolePermission(){
+										showLoader();
+										if($('#role_id').val() == ""){
+											hideLoader();
+											openToaster("danger", "Role not found");
+											return false;
+										}else{
+											$.ajax({
+												url: "{% url 'src:add-role-permission' %}",
+												method: 'POST',
+												data: $('#addRolePermissionForm').serialize(),
+												success: function (data) {
+													if(data.flag){
+														$('#addPermissionModal').hide()
+														openToaster("success", data.message);
+														setTimeout(function(){ window.location.reload(); }, 1000);
+													}else{
+														openToaster("danger", "Server error");
+													}
+												},
+												error: function (err) {
+													hideLoader();
+													console.log(err)
+												}
+											}).always(function() {
+												// hideLoader();
+											});
+										}
+									}
+									
+									
+									function validateRoleForm(){
+										error = 0;
+										$('.error_msg ').text('');
+										$('.inputField').css("border", "");
+										var role_name = $('[name="role_name"]').val();
+										if(role_name.trim() == null || role_name.trim() == ''){
+											$('[name="role_name"]').parent().find('.error_msg').text('Please enter role name');
+											$('[name="role_name"]').css("border", "1px solid #db8305");
+											error = error + 1;
+										}
+										
+										var responsibilities = $('[name="responsibilities"]').val();
+										if(responsibilities.trim() == '' && responsibilities != ''){
+											$('[name="responsibilities"]').parent().find('.error_msg').text('Only Space not allowed in responsibilities');
+											$('[name="responsibilities"]').css("border", "1px solid #db8305");
+											error = error + 1;
+										}
+										if($('[name="organization_id"]').val() == ""){
+											$('[name="organization_id"]').parent().find('.error_msg').text('Please select organization');
+											$('[name="organization_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+											error = error + 1;
+										}
+										if($('[name="department_id"]').val() == ""){
+											$('[name="department_id"]').parent().find('.error_msg').text('Please select department');
+											$('[name="department_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+											error = error + 1;
+										}
+										if($('[name="reporting_role_id"]').val() == ""){
+											$('[name="reporting_role_id"]').parent().find('.error_msg').text('Please select reporting role');
+											$('[name="reporting_role_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+											error = error + 1;
+										}
+										if(error > 0){
+											return true;
+										}else{
+											return false;
+										}
+									}
+									
+									function updateRole(id){
+										if(validateRoleForm()){
+											hideLoader();
+										}else{
+											showLoader();
+											var url = "{% url 'src:edit-role' 1 %}";
+											url = url.replace(1,id);
+											$.ajax({
+												url: url,
+												method: 'POST',
+												data: $('#editRoleForm').serialize(),
+												success: function (data) {
+													if(typeof data.flag !== "undefined" && !data.flag){
+														hideLoader();
+														$('#addPermissionModal').hide()
+														openToaster("danger", data.message);
+													}else{
+														
+														if(data.flag){
+															$('#addPermissionModal').hide()
+															openToaster("success", data.message);
+															setTimeout(function(){ window.location.reload(); }, 500);
+														}else{
+															hideLoader();
+															openToaster("warning", data.message);
+														}
+													}
+												},
+												error: function (err) {
+													// hideLoader();
+													console.log(err)
+												}
+											}).always(function() {
+												// hideLoader();
+											});
+										}
+									}
+									
+									function updateRoleStatus(id, active_status) {
+										if ($('#is_active_' + id).prop("checked") == true) {
+											is_active = 1;
+											status = 'Unblock';
+										} else {
+											is_active = 0;  
+											status = 'Block';
+										}
+										
+										showLoader();
+										$.ajax({
+											url: "{% url 'src:update-role-status' %}",
+											method: 'POST',
+											data: {
+												id: id,
+												is_active: is_active,
+												csrfmiddlewaretoken: '{{ csrf_token }}'
+											},
+											success: function (data) {
+												if(typeof data.flag !== "undefined" && !data.flag){
+													hideLoader();
+													openToaster("danger", data.message);
+													if ($('#is_active_' + id).prop("checked") == true) {
+														$('#is_active_' + id).prop("checked",false);
+													}else{
+														$('#is_active_' + id).prop("checked",true); 
+													}
+												}else{
+													if (data.error == false) {
+														$('#addPermissionModal').hide()
+														openToaster("success", data.message);
+														hideLoader();
+														// setTimeout(function(){ window.location.reload(); }, 500);
+													}
+												}
+											},
+											error: function (err) {
+												console.log(err)
+												hideLoader();
+											}
+										});
+									}
+									
+									function gettost() {
+										toastr.warning("Error", "Error Title");
+									}
+									
+									function toggleOrganization(activetype, inactiveType) {
+										$('#' + activetype).addClass("activeTab");
+										$('#' + inactiveType).removeClass("activeTab");
+										$('.' + inactiveType + 'Block').hide();
+										$('.' + activetype + 'Block').show();
+									}
+									
+									function toggleFreeze(inputid, colid, colNo) {
+										var checkbox = document.getElementById(inputid);
+										if (checkbox.checked == true) {
+											$("#rolesTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+											$("#rolesTable tbody tr").each(function (index) {
+												$("#rolesTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+												$("#rolesTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+											});
+											$('#' + colid + ' #freeze').show();
+											$('#' + colid + ' #unfreeze').hide();
+										} else {
+											$("#rolesTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+											$("#rolesTable tbody tr").each(function (index) {
+												$("#rolesTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+												$("#rolesTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+											});
+											$('#' + colid + ' #unfreeze').show();
+											$('#' + colid + ' #freeze').hide();
+										}
+									}
+									
+									function toggleSelectCol(inputid, colid, colNo) {
+										var checkbox = document.getElementById(inputid);
+										if (checkbox.checked == true) {
+											$("#addPermissionModule thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+											$("#addPermissionModule tbody tr").each(function (index) {
+												$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+												$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+											});
+											$('#' + colid + ' #freeze').show();
+											$('#' + colid + ' #unfreeze').hide();
+										} else {
+											$("#addPermissionModule thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+											$("#addPermissionModule tbody tr").each(function (index) {
+												$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+												$("#addPermissionModule tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+											});
+											$('#' + colid + ' #unfreeze').show();
+											$('#' + colid + ' #freeze').hide();
+										}
+									}
+									
+									$(document).ready(function () {
+										setHeightWidth();
+										showLoader();
+										setTimeout(() => {
+											hideLoader();
+										}, 2000);
+										$('#rolesTable').tablesorter({
+											widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+											widgetOptions: {
+												resizable_addLastColumn: true,
+												resizable: false,
+												resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+												stickyHeaders_attachTo: ".primaryContainerBG",
+												filter_external: '.search',
+												filter_columnFilters: false,
+											}
+										});
+										
+										$("#rolesTable tbody tr").click(function () {
+											$(this).addClass("selected").siblings().removeClass("selected");
+										});
+										
+										$(".primaryContainerBG").scroll(function () {
+											var divTable = $(".primaryContainerBG");
+											$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+										});
+										
+										$(".checkBoxContainer").scroll(function () {
+											var divTable = $(".checkBoxContainer");
+											$(".frezedCell").css("left", 0 + divTable.scrollLeft());
+										});
+										
+										$("#hideColumn input:checkbox:checked").each(function () {
+											var column = "table ." + $(this).attr("name");
+											$(column).hide();
+											//$("#hideColumn").hide();
+										});
+										$("#hideColumn input:checkbox").click(function () {
+											var column = "table ." + $(this).attr("name");
+											$(column).toggle();
+										});
+										
+										$(".colCheck").change(function () {
+											if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+												//do something
+												$(".iconHide").css("background-image", "url({% static 'img/png/hide.png' %})");
+											} else {
+												$(".iconHide").css("background-image", "url({% static 'img/svg/hideblue.svg' %})");
+											}
+										});
+										
+										$(".colFreezeCheck").change(function () {
+											if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+												//do something
+												$(".iconUnfreeze").css("background-image", "url({% static 'img/svg/unfreeze.svg' %})");
+											} else {
+												$(".iconUnfreeze").css("background-image", "url({% static 'img/svg/freeze.svg' %})");
+											}
+										});
+										jQuery(".main-table").clone(true).appendTo('#table-scroll').addClass('clone');
+										jQuery(".main-tableModal").clone(true).appendTo('#table-scrollModal').addClass('clone');
+										
+									});
+									
+									$(window).resize(function () {
+										setHeightWidth();
+									});
+								</script>
+								<script type="text/javascript">
+									$(document).ready(function () {
+										var prevTop = 0;
+										// $('.commonTableBg').on('scroll', function () {
+											// 	var currentTop = $(this).scrollTop();
+											// 	if (prevTop !== currentTop) {
+												// 		prevTop = currentTop;
+												// 		if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+													// 			$('#loading').show();
+													// 			setTimeout(() => {
+														// 				$('#tablebody').find('tr:last').prev().after('<tr><td class="roles_name">PSM</td><td class="org_name">Saahaj Milk Prodcuts</td><td class="department">Finance</td><td><div class="row"><div class="col-md-3"><img src="dist/img/svg/editcopy.svg" /></div><div class="col-md-5"><label class="switch"><input type="checkbox" /><span class="slider round"></span></label></div></div></td></tr>');
+														// 				$('#loading').hide();
+														// 			}, 2000);
+														// 		}
+														// 	}
+														// })
+													});
+												</script>
+												
+												{% endblock %}

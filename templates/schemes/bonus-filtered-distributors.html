@@ -1,0 +1,77 @@
+{% load helper_tags %}
+
+<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Dis./SS name</th>
+            <th>On Order of</th>
+            <th>Free Product variant</th>
+            <th colspan="2" style="text-align:center;">Free Product quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td style="width: 25%;">
+                <input type="hidden" name="is_disabled[]" value="{{user.is_scheme_applied}}">
+                <input type="hidden" name="user_id[]" value="{{user.user_id}}">
+                {{user.store_name}}({{user.first_name}} {{user.middle_name}} {{user.last_name}}/{{user.emp_sap_id}}) <br>
+                <b>{{user.route_name}}, {{user.town_name}}</b>
+            </td>
+            
+            <td style="width: 30%;">
+                {% for order_container in order_containers %}
+                <div class="row" style="margin-top:5px;">
+                    <div class="col-md-4">
+                        <input class="inputField incentive_field numeric" type="text" placeholder="Qty" name="user_minimim_order_quantity_{{user.user_id}}" value="{{minimum_order_quantities|index:forloop.counter0}}"/>
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    <div class="col-md-6 padding_0">
+                        <select class="inputField selectField" data-placeholder="Container" name="user_order_container_id_{{user.user_id}}" style="width: 100% !important;">
+                            {% for container in containers %}
+                            {% if container.id == order_containers|index:forloop.parentloop.counter0|add:"0" %}
+                            <option value="{{container.id}}">{{container.container}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endfor %}
+            </td>
+            
+            <td style="width: 20%;">
+                <select class="inputField selectField"  name="user_free_variant_id[]" style="width: 100% !important;">
+                    <option value="">Select Product</option>
+                    {% for product in products %}
+                    <optgroup label="{{product.product_name}} ({{product.product_class_name}}) - {{product.container_name}}">
+                        {% for product_variant in product.product_variants %}
+                        <option value="{{product_variant.id}}" {% if product_variant.id == free_variant_id %}selected{% endif %} >{{product_variant.variant_name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </td>
+            <td style="width: 15%;">
+                <div>
+                    <span><input type="checkbox" onclick="toggleQty(this)" style="display: inline-block;" {% if container_qty %}checked{% endif %}> </span>
+                    <input class="container_qty numeric" value="{{container_qty}}" style="display: inline-block;" type="text" placeholder="Qty" name="user_container_qty[]" size="3"  />
+                    <label for="" id="free_product_unit" style="display: inline-block;">{{container}} </label>
+                </div>
+            </td>
+            <td style="width: 15%;">
+                <div>
+                    <span><input type="checkbox" onclick="toggleQty(this)" style="display: inline-block;" {% if pouch_qty %}checked{% endif %}> </span>
+                    <input class="container_qty numeric" value="{{pouch_qty}}" style="display: inline-block;" type="text" placeholder="Qty" name="user_pouch_qty[]" size="3"  />
+                    <label for="" style="display: inline-block;">Pouch </label>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function(){
+        $('.selectField').select2();
+    })
+</script>

@@ -1,0 +1,316 @@
+{% load helper_tags %}
+<style>
+    .header-title h2,
+    .header-title h3 {
+        display: inline-block;
+    }
+    h3 {
+        font-size: 18px;
+        text-align: center;
+        padding: 15px 0px 0px 0px;
+        margin: 0px;
+    }
+    
+    table {
+        width: 750px;
+        border-collapse: collapse;
+        margin: 0px auto;
+    }
+    
+    /* Zebra striping */
+    tr:nth-of-type(odd) {
+        background: #eee;
+    }
+    
+    th {
+        background: #3498db;
+        color: #000000;
+        font-weight: bold;
+    }
+    
+    th {
+        padding: 2px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 9px;
+    }
+    
+    td {
+        padding: 2px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 9px;
+    }
+    
+    @page {
+        size: letter portrait;
+        margin: 1cm 1cm 1cm 1cm;
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 200pt; width: 512pt; top: 772pt; height: 20pt;
+            
+        }
+    }
+    .header tr th{
+        border: none;
+    }
+    .header tr td{
+        border: none;
+    }
+</style>
+
+{% if user_list %}
+{% for user in user_list %}
+<div class="col-md-12" style="padding: 10px; margin-top:55px ">
+    
+    <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+        <thead>
+            <tr><td colspan="2" style="border:none;"><img src="{{ url }}/static/img/png/pawanshree.jpg" style="width:100px;height:50px;margin-left:40px;" class="dashboardLogo" /></td>
+            <th colspan="8" style="border:none;font-size:14px; text-decoration: underline; margin-left:170px;">{% if taxable_values %} Tax Invoice {% else %} Bill of Supply {% endif %}</th></tr>
+            <tr>
+                <th colspan="5" style="vertical-align: top;">
+                    <table style="float: left; border: none;" class="header">
+                        <tr><th style="vertical-align: top;" colspan="2">{{ organization.organization_name }} </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">{{ organization.address }} </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">FSSAI NO. {{ co_fssai }}</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">GSTIN/UIN: {{ co_gstin }}</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">State Name: {{ co_state_name }}, Code : {{ co_state_code }}</th></tr>
+                    </table>
+                </th>
+                <th colspan="5" style="vertical-align: top;">
+                    <table style="float: right; border: none;" class="header">
+                        <tr><th style="vertical-align: top;">Invoice No. <br/>{{invoice_no}} </th><th>Dated <br/>{{ today_date }}</th></tr>
+                        <tr><th style="vertical-align: top;">Delivery Note <br/>&nbsp; </th><th>Mode/Terms of Payment <br/>&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top;">Suppliers Ref. <br/>&nbsp; </th><th>Other Reference(s) <br/>&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top;">Buyers Order No. <br/>&nbsp; </th><th>Dated: <br/>&nbsp;</th></tr>
+                    </table>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="5" style="vertical-align: top;">
+                    <table style="float: left; border: none; margin-top: 5px;;" class="header">
+                        <tr><th style="vertical-align: top;" colspan="2">Buyer </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2"> {{ user.store_name }} ({{user.sap_code}})</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">{{ user.address }} </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">MO.NO.: {{ user.contact_no }}</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">GSTIN/UIN: {{ user.gstin }}</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">State Name: {{ user.state_name }}, Code : {{ user.state_code }}</th></tr>
+                    </table>
+                </th>
+                <th colspan="5" style="vertical-align: top;">
+                    <table style="float: right; border: none;" class="header">
+                        <tr><th style="vertical-align: top;">Despatch Document No.<br/>&nbsp; </th><th> Delivery Note Date <br/>&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top;">Despatched through <br/>&nbsp; </th><th>Destination <br/>&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">Terms of Delivery <br/>&nbsp; </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">&nbsp; </th></tr>
+                        <tr><th style="vertical-align: top;" colspan="2">&nbsp; </th></tr>
+                    </table>
+                </th>
+            </tr>
+             </thead>
+            </table>
+            <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+        <thead>
+            <tr>
+                <th align="center">Sr. No. </th>
+                <th align="center" colspan="2" >Description of Goods </th>
+                <th align="center" >HSN/SAC</th>
+                <th align="center" >QTY(CRT/<br>OTHERS)</th>
+                <th align="center">QTY(POUCHES/<br>OTHERS)</th>
+                <th align="center">Rate</th>
+                <th align="center" >Per</th>
+                <th align="right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in user.orders %}
+            <tr>
+                <td align="center" >{{ forloop.counter }}.</td>
+                <td align="center" colspan="2">{{ order.product_variant_name }} </td>
+                <td align="center">{{ order.hsn_code }}</td>
+                {% comment %} <td align="center" >{{ order.quantity_in_ltr }} {{ order.unit_name }} ({{ order.quantity }} {% if order.packaging_type == '0' %} {{ order.product_container_type }} {% else %} {{ order.product_packaging_type_name }} {% endif %})</td> {% endcomment %}
+                <td align="center" >{{ order.quantity }}({% if order.packaging_type == '0' %} {{ order.product_container_type }} {% else %} {{ order.product_packaging_type_name }} {% endif %})</td>
+                <td align="center" > {{ order.no_of_pouches }}( {{ order.product_packaging_type_name}})</td>
+                <td align="center" >{{ order.rate_per_pouch }}  </td>
+                <td align="center">{{ order.product_packaging_type_name }}</td>
+                <td align="right">{{ order.net_amount }}</td>
+            </tr>
+            {% comment %} {% if order.free_scheme > 0 %}
+            <tr>
+                <td align="center"> </td>
+                <th colspan="2">{{order.free_scheme_text}}</th>
+                <td>{{ order.free_scheme }} {{ order.free_scheme_packaging_type }}</td>
+                <td>{{ order.free_scheme_in_ltr }} {{ order.free_scheme_container_size }}</td>
+                <td> </td>
+                <td> </td>
+                
+            </tr>
+            {% endif %} {% endcomment %}
+            {% endfor %}
+        </tbody>
+        <tfoot>
+           
+            <tr>
+                <th colspan="7" style="float: right;"> </th>
+                <th style="text-align: right;">Total</th>
+                <th >{{net_amount}}</th>
+            </tr>
+            {% if user.inter_state == 0 and taxable_value_total > 0 %}
+            <tr>
+                <th colspan="6"> </th>
+                <th>Add : </th>
+                <th> CGST </th>
+                <th align="right">&nbsp;{{ cgst }}</th>
+            </tr>
+            <tr>
+                <th colspan="7"> </th>
+                <th > SGST </th>
+                <th align="right">&nbsp;{{ sgst}}</th>
+            </tr>
+            {% elif user.inter_state == 1 and taxable_value_total > 0 %}
+            <tr>
+                <th colspan="6"> </th>
+                <th>Add : </th>
+                <th> IGST </th>
+                <th align="right">&nbsp;{{igst}}</th>
+            </tr>
+            {% endif %}
+            {% if tcs_amount > 0 %}
+            <tr>
+                <th colspan="4" style="float: right;"> </th>
+                <th colspan="4" style="text-align: right;">TCS U/S 206(C) 1H of Income Tax</th>
+                <th >{{tcs_amount}}</th>
+            </tr>
+            
+            <tr>
+                <th colspan="4" style="float: right;"> </th>
+                <th colspan="4" style="text-align: right;">Grand Total value</th>
+                <th >{{grand_total}}</th>
+            </tr>
+            
+            {% endif %}
+            <tr>
+                <th colspan="4" style="float: right;"> </th>
+                <th colspan="4" style="text-align: right;">Round off&nbsp;</th>
+                <th >{% subtract grand_total final_amount %}</th>
+            </tr>
+            <tr>
+                <th colspan="4" style="float: right;"> </th>
+                <th colspan="4" style="text-align: right;">Total Bill Amount&nbsp;</th>
+                <th >{{ final_amount|floatformat:0 }}</th>
+            </tr>
+            
+            <tr>
+                <th colspan="9" style="line-height: 15px; float: left; vertical-align: middle;"> 
+                    Amount Chargeable (in Words): INR &nbsp; &nbsp; &nbsp; &nbsp; {{billing_amount|title }} Only
+                </th>
+            </tr>
+            {% if taxable_values %}
+            <tr>
+                <th colspan="9">
+                    <table class="table table-bordered mt-0">
+                    <thead>
+                        <tr>
+                            <th align="center" rowspan="2" colspan="2"> HSN/SAC   </th>
+                            <th align="center" rowspan="2" colspan="2"> Taxable Value </th>
+                            {% if user.inter_state == 0 and taxable_value_total > 0 %}
+                            <th colspan="2" align="center"> Central Tax </th>
+                            <th colspan="2" align="center"> State Tax </th>
+                            {% elif user.inter_state == 1 and taxable_value_total > 0 %}
+                            <th colspan="2" align="center"> Integrated Tax </th>
+                            {% endif %}
+                            <th align="center" rowspan="2"> Total Tax Amount </th>
+                        </tr>
+                        <tr>
+                            {% if user.inter_state == 0 and taxable_value_total > 0 %}
+                            <th align="center"> Rate </th>
+                            <th align="center"> Amount </th>
+                            <th align="center"> Rate </th>
+                            <th align="center"> Amount </th>
+                            {% elif user.inter_state == 1 and taxable_value_total > 0 %}
+                            <th align="center"> Rate </th>
+                            <th align="center"> Amount </th>
+                            {% endif %}
+                           
+                        </tr>
+                    </thead>
+                    <tbody style="font-weight: 100;">
+                        {% for taxable in taxable_values %}
+                        <tr>
+                            <td align="center" colspan="2"> {{ taxable }} </td>
+                            <td align="center"colspan="2"> {{ taxable_values|index:taxable }} </td>
+                            {% if user.inter_state == 0 and taxable_value_total > 0 %}
+                            <td align="center"> {{ rate_values|index:taxable }}% </td>
+                            <td align="center"> {{ cgst_values|index:taxable }} </td>
+                            <td align="center"> {{ rate_values|index:taxable }}% </td>
+                            <td align="center"> {{ sgst_values|index:taxable }} </td>
+                            {% elif user.inter_state == 1 and taxable_value_total > 0 %}
+                            <td align="center"> {{ rate_values|index:taxable }} </td>
+                            <td align="center"> {% sum sgst_values|index:taxable cgst_values|index:taxable %} </td>
+                            {% endif %}
+                            <td align="center"> {% sum sgst_values|index:taxable cgst_values|index:taxable %} </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tr>
+                            <th align="center" colspan="2"> Total </th>
+                            <th align="center" colspan="2"> {{ taxable_value_total }} </th>
+                            {% if user.inter_state == 0 and taxable_value_total > 0 %}
+                            <th align="center"> &nbsp; </th>
+                            <th align="center"> {{ cgst_value_total }} </th>
+                            <th align="center"> &nbsp; </th>
+                            <th align="center"> {{ sgst_value_total }} </th>
+                            {% elif user.inter_state == 1 and taxable_value_total > 0 %}
+                            <th align="center"> &nbsp; </th>
+                            <th align="center"> {% sum cgst_value_total sgst_value_total %} </th>
+                            {% endif %}
+                            <th align="center"> {% sum cgst_value_total sgst_value_total %} </th>
+                        </tr>
+                    </table>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="9" style="line-height: 15px; float: left; vertical-align: middle;"> 
+                    Tax Amount (in Words): INR &nbsp; &nbsp; &nbsp; &nbsp; {{gst_amount_in_words|title }} {% if total_gst_value == '1' %} And {{total_gst_value_in_words|title }} Paise {% endif %} Only
+                </th>
+            </tr>
+            {% endif %}
+            </tfoot>
+            </table>
+            <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+            <tfoot>
+            <tr>
+                <th colspan="5" style="vertical-align: top;">
+                    <table style="float: left; border: none;" class="header">
+                        <tr><th>Company PAN</th><th>ADSPJ6516D</th></tr>
+                        <tr><th colspan="2" style="vertical-align: top;"><h4>Declaration</h4> </th></tr>
+                        <tr><td colspan="2">We declare that this invoice shows the actual price of
+                            the goods described and that all particulars are true and
+                            correct.
+                        </td></tr>
+                    </table>
+                </th>
+                <th colspan="5">
+                    <table style="float: right; border: none;" class="header">
+                        <tr><th style="vertical-align: top;" colspan="2">Company Bank Details </th></tr>
+                        <tr><td style="vertical-align: top;">Bank A/c No. </td><th style="vertical-align: top;">{{organization.org_bank_account_no}}  </th>
+                            <td style="vertical-align: top;">Bank Name </td><th style="vertical-align: top;"> {{organization.org_bank_name}}   </th></tr>
+                        <tr><td style="vertical-align: top;">Branch Name </td><th style="vertical-align: top;">{{organization.org_bank_branch_name}}  </th>
+                            <td style="vertical-align: top;">IFSC Code </td><th style="vertical-align: top;"> {{organization.org_bank_ifsc}}   </th></tr>
+                            
+                        <tr><th style="vertical-align: top; text-align: center;" colspan="4">For : {{ organization.organization_name }}</th></tr>
+                        <tr><th style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top; text-align: center;" colspan="4">&nbsp;</th></tr>
+                        <tr><th style="vertical-align: top; text-align: center;" colspan="4">Authorised Signatory</th></tr>
+                    </table>
+                </th>
+            </tr>
+            
+        </tfoot>
+    </table>
+    
+</div>
+
+{% endfor %}
+{% endif %}

@@ -1,0 +1,1122 @@
+{% load helper_tags %}
+
+{% load static %}
+<style>
+	.modal-AddPermission{
+		width: 40%;
+	}	
+</style>
+<div class="modal-AddPermission centered">
+	<div class="modal-header">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-6">
+					<h5 class="mt-md-2">Role Details&nbsp;&nbsp;</h5>
+				</div>
+				<div class="col-md-6">
+					<button class="btn btn-save float-right" type="button" onclick="updateRole('{{role.id}}')">
+						Save
+					</button>
+					<button class="btn btn-close float-right" type="button"
+					onclick="manipulateModal('addPermissionModal','close')">
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+	
+</div>
+<form method="POST" id="editRoleForm" autocomplete="off" aria-label="Edit Role">
+	{% csrf_token %}
+	<div class="modal-body p-0" id="addPermissionModalBody">
+		<div class="row h-100">
+			<div class="col-md-12 p-md-0 modalAddPermissionBG">
+				
+				<textarea id="organization_role_options" style="display: none;"></textarea>
+				
+				<div class="row mt-md-2">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-1 pr-md-0">
+								<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+							</div>
+							<div class="col-md-11">
+								<h6 style="display: inline-block;">
+									<b>Organisation Name</b>
+								</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-11 offset-md-1">
+						<div class="row">
+							<div class="col-md-12 p-md-0">
+								<select class="inputField selectField" name="organization_id" style="width: 100% !important;" onchange="getDepartments(this.value);">
+									<option value="">Select Organization Name</option>
+									{% for organization in organizations %}
+									<option value="{{organization.id}}" {% if role.organization_id == organization.id %} selected {% endif %}>{{organization.organization_name}}</option>
+									{% endfor %}
+								</select>
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-md-2">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-1 pr-md-0">
+								<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+							</div>
+							<div class="col-md-11">
+								<h6 style="display: inline-block;">
+									<b>Department Name</b>
+								</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-11 offset-md-1 p-md-0">
+								<select class="inputField selectField" name="department_id" style="width: 100%;" >
+									<option value="">Select Department Name</option>
+									{% for department in departments %}
+									<option value="{{department.id}}" {% if role.department_id == department.id %} selected {% endif %}>{{department.department_name}}</option>
+									{% endfor %}
+								</select>
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row mt-md-2">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-1 pr-md-0">
+								<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+							</div>
+							<div class="col-md-11">
+								<h6 style="display: inline-block;">
+									<b>Role Name</b>
+								</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-12">
+								<input class="inputField widthSetter" type="text" placeholder="Enter Role Name"
+								name="role_name" id="dept_role_name" maxlength="50" value="{{role.role_name}}" />
+								<label class="error_msg float-right" id="dept_role_error"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row mt-md-2">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-1 pr-md-0">
+								<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+							</div>
+							<div class="col-md-11">
+								<h6 style="display: inline-block;">
+									<b>Responsibilities</b>
+								</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-12">
+								<textarea name="responsibilities" class="inputField widthSetter" id="responsibilities" cols="10" rows="3" placeholder="Enter role responsibilities">{{role.responsibilities}}</textarea>
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-md-2">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-1 pr-md-0">
+								<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+							</div>
+							<div class="col-md-11">
+								<h6 style="display: inline-block;">
+									<b>Report to</b>
+								</h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="row">
+							<div class="col-md-11 offset-md-1 p-md-0">
+								<select class="inputField selectField" name="reporting_role_id" style="width: 100%;">
+									<option value="0">Super Admin </option>
+									{% for reporting_department in reporting_departments %}
+									<optgroup label="{{reporting_department.department_name}}">
+										{% for current_role in reporting_department.roles %}
+										<option value="{{current_role.id}}" {% if role.reporting_role_id == current_role.id %} selected {% endif %}>{{current_role.role_name}}</option>
+										{% endfor %}
+									</optgroup>
+									
+									{% endfor %}
+									
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<br clear="all"><br clear="all"><br clear="all"><br clear="all">
+				</div>
+				
+			</div>
+			
+		</div>
+	</div>
+</form>
+</div>
+
+<script>
+	
+	$(document).ready(function(){
+		checkMainCheckbox()
+		
+		
+	})
+	
+	function checkMainCheckbox(){
+		{% for module in modules %}
+		{% for sub_module in module.sub_modules %}
+		total_checkbox = $('.module_checkbox_{{sub_module.id}}').length
+		total_checked = $('.module_checkbox_{{sub_module.id}}:checked').length
+		if(total_checkbox == total_checked){
+			$('#module_{{sub_module.id}}').prop('checked',true);
+		}
+		{% endfor %}
+		{% endfor %}
+		
+		{% for permission in permissions %}
+		total_checkbox = $('.permission_checkbox_{{permission.id}}').length
+		total_checked = $('.permission_checkbox_{{permission.id}}:checked').length
+		if(total_checkbox == total_checked){
+			$('#permission_{{permission.id}}').prop('checked',true);
+		}
+		{% endfor %}
+	}
+	
+	function toggleVerticalPermissions(element,id) {
+		if($(element).is(':checked')){
+			$('.permission_checkbox_'+id).each(function(){
+				$(this).prop('checked',true);
+			})
+			var body = `<div class="modal-WorkModal centered">
+				<div class="modal-body p-0">
+					<div class="row">
+						<div class="col-md-3 p-md-0 modalWFBG">
+							<div class="transformImageWF">
+								<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+								<h3 class="modalColHead">Workflow &nbsp;&nbsp;</h3>
+							</div>
+						</div>
+						<div class="col-md-9 p-md-4">
+							<form>
+								<div class="row mb-3">
+									<div class="col-md-6">
+										<h5><b>Workflows </b></h5>
+									</div>
+									<div class="col-md-6 p-md-0">
+										<button class="btn btn-save float-right" type="button" onclick="applyWorkflowToAll('vertical',`+id+`)">
+											Save
+										</button>
+										<button class="btn btn-close float-right" type="button" onclick="uncheckAll('vertical',`+id+`)" >
+											Close
+										</button>
+									</div>
+								</div>
+								<div class="row mb-3">
+									<div class="col-md-3">
+										No. of Level
+									</div>
+									<div class="col-md-5 p-md-0">
+										<input class="inputField" type="text" id="total_work_flows" placeholder="No. of Level" />
+										<label class="error_msg float-right"></label>
+									</div>
+								</div>
+								
+								
+								<div class="row">
+									<div class="col-md-12" id="noOfLevels">
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>`;
+				$('#workflowModal').html(body);
+				$('#workflowModal').show();
+			}else{
+				$(element).prop('checked',false);
+				$('.permission_checkbox_'+id).prop('checked',false);
+				$('.permission_checkbox_'+id).each(function(){
+					$(this).parent().find('label').text('');
+					$(this).parent().find('label').next().val();
+				})
+				
+			}
+		}
+		
+		function toggleHorizontalPermissions(element,id) {
+			if($(element).is(':checked')){
+				$('.module_checkbox_'+id).prop('checked',true);
+				var body = `<div class="modal-WorkModal centered">
+					<div class="modal-body p-0">
+						<div class="row">
+							<div class="col-md-3 p-md-0 modalWFBG">
+								<div class="transformImageWF">
+									<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+									<h3 class="modalColHead">Workflow &nbsp;&nbsp;</h3>
+								</div>
+							</div>
+							<div class="col-md-9 p-md-4">
+								<form>
+									<div class="row mb-3">
+										<div class="col-md-6">
+											<h5><b>Workflows </b></h5>
+										</div>
+										<div class="col-md-6 p-md-0">
+											<button class="btn btn-save float-right" type="button" onclick="applyWorkflowToAll('horizontal',`+id+`)">
+												Save
+											</button>
+											<button class="btn btn-close float-right" type="button" onclick="uncheckAll('horizontal',`+id+`)" >
+												Close
+											</button>
+										</div>
+									</div>
+									<div class="row mb-3">
+										<div class="col-md-3">
+											No. of Level
+										</div>
+										<div class="col-md-5 p-md-0">
+											<input class="inputField" type="text" id="total_work_flows" placeholder="No. of Level" />
+											<label class="error_msg float-right"></label>
+										</div>
+									</div>
+									
+									
+									<div class="row">
+										<div class="col-md-12" id="noOfLevels">
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>`;
+					$('#workflowModal').html(body);
+					$('#workflowModal').show();
+				}else{
+					$('.module_checkbox_'+id).prop('checked',false);
+					$('.module_checkbox_'+id).parent().find('.subtext').text('');
+					$('.module_checkbox_'+id).parent().find('input').val('');
+					$(element).prop('checked',false);
+				}
+			}
+			
+			function uncheckAll(type, id) {
+				if(type == "vertical"){
+					$('#permission_'+id).prop('checked',false);
+					$('.permission_checkbox_'+id).each(function(){
+						if($(this).parent().find('label').text().trim() == ""){
+							$(this).parent().find('label').text('');
+							$(this).prop('checked',false);
+						}
+						if($(this).parent().find('label').next().val() == ""){
+							$(this).parent().find('label').next().val('');
+							$(this).prop('checked',false);
+						}
+					})
+				}else{
+					$('#module_'+id).prop('checked',false);
+					$('.module_checkbox_'+id).each(function(){
+						if($(this).parent().find('label').text().trim() == ""){
+							$(this).parent().find('label').text('');
+							$(this).prop('checked',false);
+						}
+						if($(this).parent().find('label').next().val() == ""){
+							$(this).parent().find('label').next().val('');
+							$(this).prop('checked',false);
+						}
+					})
+					
+				}
+				$('#workflowModal').html('');
+				$('#workflowModal').hide();
+			}
+			
+			
+			function applyWorkflowToAll(type, id) {
+				total_work_flows = $('#total_work_flows').val();
+				if (total_work_flows == 0) {
+					$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+					return false
+				}else if(total_work_flows > 10){
+					$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+					return false
+				}
+				else {
+					name_error_count = 0;
+					role_error_count = 0;
+					$('.error_msg').text('');
+					$('.timeline-input').each(function () {
+						if ($(this).val() == '') {
+							name_error_count = name_error_count + 1;
+							$(this).parent().find('.error_msg').text('Description required*');
+						}
+					})
+					$('.authorize_role').each(function () {
+						if ($(this).val() == '') {
+							role_error_count = role_error_count + 1;
+							$(this).parent().find('.error_msg').text('Role required*');
+						}
+					})
+					if (name_error_count > 0) {
+						return false;
+					} else if (role_error_count > 0) {
+						return false
+					}  else {
+						var workflows = [];
+						if (total_work_flows == 1) {
+							var workflow = {};
+							workflow.level_id = "{{first_workflow_level.id}}";
+							workflow.role_id = $('#first_level_role option:selected').val();
+							workflow.description = $('#first_desc').val();
+							workflows.push(workflow);
+						} else if (total_work_flows == 2) {
+							var workflow = {};
+							workflow.level_id = "{{first_workflow_level.id}}";
+							workflow.role_id = $('#first_level_role option:selected').val();
+							workflow.description = $('#first_desc').val();
+							workflows.push(workflow);
+							var workflow = {};
+							workflow.level_id = "{{last_workflow_level.id}}";
+							workflow.role_id = $('#last_level_role option:selected').val();
+							workflow.description = $('#last_level_desc').val();
+							workflows.push(workflow);
+						} else if (total_work_flows > 2) {
+							var workflow = {};
+							workflow.level_id = "{{first_workflow_level.id}}";
+							workflow.role_id = $('#first_level_role option:selected').val();
+							workflow.description = $('#first_desc').val();
+							workflows.push(workflow);
+							for (var i = 1; i < parseInt(total_work_flows) - 1; i++) {
+								var workflow = {};
+								workflow.level_id = "{{middle_workflow_level.id}}";
+								workflow.role_id = $('#level_role_' + i + ' option:selected').val();
+								workflow.description = $('#level_description_' + i).val();
+								workflows.push(workflow);
+							}
+							var workflow = {};
+							workflow.level_id = "{{last_workflow_level.id}}";
+							workflow.role_id = $('#last_level_role option:selected').val();
+							workflow.description = $('#last_level_desc').val();
+							workflows.push(workflow);
+						}
+						
+						if(type == 'vertical'){
+							$('.permission_checkbox_'+id).each(function(){
+								if($(this).parent().find('label').text().trim() == ""){
+									$(this).parent().find('label').text('Workflow Added ('+total_work_flows+')');
+								}
+								if($(this).parent().find('label').next().val() == ""){
+									$(this).parent().find('label').next().val(JSON.stringify(workflows));
+								}
+							})
+						}else{
+							$('.module_checkbox_'+id).each(function(){
+								if($(this).parent().find('label').text().trim() == ""){
+									$(this).parent().find('label').text('Workflow Added ('+total_work_flows+')');
+								}
+								if($(this).parent().find('label').next().val() == ""){
+									$(this).parent().find('label').next().val(JSON.stringify(workflows));
+								}
+							})
+						}
+						$('#workflowModal').html('');
+						$('#workflowModal').hide();
+					}
+				}
+			}
+			
+			
+			function viewWorkfLow(sub_module_id, permission_id) {
+				
+				role_name = $('[name="role_name"]').val();
+				organization_id = $('[name="organization_id"]').val();
+				department_id = $('[name="department_id"]').val();
+				reporting_role_id = $('[name="reporting_role_id"]').val();
+				if ($('#permission_' + sub_module_id + '_' + permission_id).is(":checked")) {
+					
+					if(role_name == "" || organization_id == "" || department_id == ""){
+						$('#permission_' + sub_module_id + '_' + permission_id).prop('checked',false);
+						return false;
+					}
+					
+					if ($('#workflow_' + sub_module_id + '_' + permission_id).val() != ""){
+						$('#permission_' + sub_module_id + '_' + permission_id).prop('checked',true);
+					}else{
+						
+						var body = `<div class="modal-WorkModal centered">
+							<div class="modal-body p-0">
+								<div class="row">
+									<div class="col-md-3 p-md-0 modalWFBG">
+										<div class="transformImageWF">
+											<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+											<h3 class="modalColHead">Workflow &nbsp;&nbsp;</h3>
+										</div>
+									</div>
+									<div class="col-md-9 p-md-4">
+										<form>
+											<div class="row mb-3">
+												<div class="col-md-6">
+													<h5><b>Workflows </b></h5>
+												</div>
+												<div class="col-md-6 p-md-0">
+													<button class="btn btn-save float-right" type="button"
+													onclick="applyWorkflow(` + sub_module_id + `,` + permission_id + `)">
+													Save
+												</button>
+												<button class="btn btn-close float-right" type="button" onclick="uncheckPermission(` + sub_module_id + `,` + permission_id + `)">
+													Close
+												</button>
+											</div>
+										</div>
+										<div class="row mb-3">
+											<div class="col-md-3">
+												No. of Level
+											</div>
+											<div class="col-md-5 p-md-0">
+												<input class="inputField" type="text" id="total_work_flows" placeholder="No. of Level" />
+												<label class="error_msg float-right"></label>
+											</div>
+										</div>
+										
+										
+										<div class="row">
+											<div class="col-md-12" id="noOfLevels">
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>`;
+						$('#workflowModal').html(body);
+						$('#workflowModal').show();
+					}
+					
+				} else {
+					
+					$('#permission_' + sub_module_id + '_' + permission_id).prop('checked',false);
+					
+					$('#workflow_text_' + sub_module_id + '_' + permission_id).text('');
+					$('#workflow_' + sub_module_id + '_' + permission_id).val('');
+					
+					classes_h = $('#permission_' + sub_module_id + '_' + permission_id).attr('class');
+					tempClasses_h = classes_h.split(' ');
+					
+					module_class = tempClasses_h[2]
+					
+					total_h = $('.'+module_class).length;
+					total_h_checked = $('.'+module_class+ ':checked').length;
+					
+					tempArr_h = module_class.split('_');
+					module_id = tempArr_h[2];
+					if(total_h_checked < total_h){
+						$('#module_'+module_id).prop('checked',false);
+					}
+					
+					
+					classes_p = $('#permission_' + sub_module_id + '_' + permission_id).attr('class');
+					tempClasses_p = classes_p.split(' ');
+					permission_class = tempClasses_p[2]
+					total_p = $('.'+permission_class).length;
+					total_p_checked = $('.'+permission_class+ ':checked').length;
+					
+					tempArr = permission_class.split('_');
+					permission_id = tempArr[2];
+					if(total_p_checked < total_p){
+						$('#permission_'+permission_id).prop('checked',false);
+					}
+					
+				}
+			}
+			
+			
+			
+			
+			function previewNewWorkfLow(sub_module_id, permission_id, id) {
+				if ($('#' + id).val() != "") {
+					previewWorkfLow(sub_module_id, permission_id, $('#' + id).val());
+				}
+			}
+			
+			
+			function closePreview(){
+				$('#workflowModal').html('');
+				$('#workflowModal').hide();
+			}
+			
+			function previewWorkfLow(sub_module_id, permission_id, workflows) {
+				workflows = JSON.parse(workflows);
+				workflows_length = workflows.length;
+				
+				if(workflows.length == 1){
+					html=`<li class="green">
+						<div class="row">
+							<div class="col-md-3">
+								<label class="mt-2">Super User</label>
+							</div>
+							<div class="col-md-5 p-md-0">
+								<textarea maxlength='100' class="inputField timeline-input" id="first_desc"  placeholder="Enter Details">`+workflows[0].description+`</textarea>
+								<label class="error_msg float-right"></label>
+							</div>
+							<div class="col-md-4 pr-md-0">
+								<select class="inputField selectField" id="first_level_role" style="width: 100%;">`;
+									var super_admin_selected = "";
+									if(workflows[workflows_length-1].role_id == 0){
+										super_admin_selected ="selected";
+									}
+									html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+									{% for other_department in other_departments %}
+									html+=`<optgroup label="{{other_department.department_name}}">`;
+										{% for other_role in other_department.other_roles %}
+										if({{other_role.id}} == workflows[0].role_id){
+											selected = 'selected';
+										}else{
+											selected = '';
+										}
+										html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+										{% endfor %}
+										html+=`</optgroup>`;
+										{% endfor %}
+										html+=`</select>
+									</div>
+								</div>
+							</li>`;
+						}else if(workflows.length == 2){
+							html=`<li class="green">
+								<div class="row">
+									<div class="col-md-3">
+										<label class="mt-2">Initiate</label>
+									</div>
+									<div class="col-md-4 p-md-0">
+										<textarea maxlength='100' class="inputField timeline-input" id="first_desc"   placeholder="Enter Details">`+workflows[0].description+`</textarea>
+										<label class="error_msg float-right"></label>
+									</div>
+									<div class="col-md-4 pr-md-0">
+										<select class="inputField selectField" id="first_level_role" style="width: 100%;">`;
+											var super_admin_selected = "";
+											if(workflows[workflows_length-1].role_id == 0){
+												super_admin_selected ="selected";
+											}
+											html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+											{% for other_department in other_departments %}
+											html+=`<optgroup label="{{other_department.department_name}}">`;
+												{% for other_role in other_department.other_roles %}
+												if({{other_role.id}} == workflows[0].role_id){
+													selected = 'selected';
+												}else{
+													selected = '';
+												}
+												html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+												{% endfor %}
+												html+=`</optgroup>`;
+												{% endfor %}
+												html+=`</select>
+											</div>
+										</div>
+									</li>
+									<li class="green">
+										<div class="row verticalList">
+											<div class="col-md-3">
+												<label class="mt-2">Approve</label>
+											</div>
+											<div class="col-md-4 p-md-0">
+												<textarea maxlength='100' class="inputField timeline-input" id="last_level_desc"  placeholder="Enter Details">`+workflows[1].description+`</textarea>
+												<label class="error_msg float-right"></label>
+											</div>
+											<div class="col-md-4 pr-md-0">
+												<select class="inputField selectField" id="last_level_role" style="width: 100%;">`;
+													var super_admin_selected = "";
+													if(workflows[workflows_length-1].role_id == 0){
+														super_admin_selected ="selected";
+													}
+													html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+													{% for other_department in other_departments %}
+													html+=`<optgroup label="{{other_department.department_name}}">`;
+														{% for other_role in other_department.other_roles %}
+														if({{other_role.id}} == workflows[1].role_id){
+															selected = 'selected';
+														}else{
+															selected = '';
+														}
+														html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+														{% endfor %}
+														html+=`</optgroup>`;
+														{% endfor %}
+														html+=`</select>
+													</div>
+												</div>
+											</li>`;
+										}else if(workflows_length > 2){
+											html=`
+											<li class="green">
+												<div class="row">
+													<div class="col-md-3">
+														<label class="mt-2">Initiate</label>
+													</div>
+													<div class="col-md-4 p-md-0">
+														<textarea maxlength='100' class="inputField timeline-input" id="first_desc"   placeholder="Enter Details">`+workflows[0].description+`</textarea>
+														<label class="error_msg float-right"></label>
+													</div>
+													<div class="col-md-4 pr-md-0">
+														<select class="inputField selectField" id="first_level_role" style="width: 100%;">`;
+															var super_admin_selected = "";
+															if(workflows[workflows_length-1].role_id == 0){
+																super_admin_selected ="selected";
+															}
+															html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+															{% for other_department in other_departments %}
+															html+=`<optgroup label="{{other_department.department_name}}">`;
+																{% for other_role in other_department.other_roles %}
+																if({{other_role.id}} == workflows[0].role_id){
+																	selected = 'selected';
+																}else{
+																	selected = '';
+																}
+																html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+																{% endfor %}
+																html+=`</optgroup>`;
+																{% endfor %}
+																html+=`</select>
+															</div>
+														</div>
+													</li>`;
+													j = 1;
+													$.each(workflows, function (key, workflow) {
+														if(key > 0 && key < (workflows_length-1)){
+															html += `<li class="green">
+																<div class="row">
+																	<div class="col-md-3">
+																		<label id="labelLevel' + i + '" class="mt-2" onclick="showInput(' + i + ')">Forward</label>
+																		<input type="text" id="level_`+(key)+`" class="inputField hide" onblur="showLabel(' + i + ')">
+																	</div>
+																	<div class="col-md-4 p-md-0">
+																		<textarea maxlength='100' class="inputField timeline-input" id="level_description_`+(key)+`"  placeholder="Enter Details">`+workflows[key].description+`</textarea>
+																		<label class="error_msg float-right"></label>
+																	</div>
+																	<div class="col-md-4 pr-md-0">
+																		<select class="inputField selectField" id="level_role_`+(key)+`" style="width: 100%;">`;
+																			var super_admin_selected = "";
+																			if(workflows[key].role_id == 0){
+																				super_admin_selected ="selected";
+																			}
+																			html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+																			{% for other_department in other_departments %}
+																			html+=`<optgroup label="{{other_department.department_name}}">`;
+																				{% for other_role in other_department.other_roles %}
+																				if({{other_role.id}} == workflows[key].role_id){
+																					selected = 'selected';
+																				}else{
+																					selected = '';
+																				}
+																				html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+																				{% endfor %}
+																				html+=`</optgroup>`;
+																				{% endfor %}
+																				html+=`</select>
+																			</div>`
+																			var checked = '';
+																			var checked_value = 0;
+																			if(typeof workflows[key].status != "undefined"){
+																				if(workflows[key].status == 1){
+																					checked = "checked";
+																					checked_value = 1
+																				}
+																			}
+																			html += `<div class="col-md-1 p-md-0">
+																				<label class="switch" style="float: right; margin-top:10px !important;">
+																					<input type="checkbox" class="checkbox switch_checkbox" `+checked+`>
+																					<span class="slider round"></span></label>
+																					<input type="hidden" class="switch_checkbox_value"  id="level_status_`+key+`" value="`+checked_value+`">
+																				</div>
+																				
+																			</div>
+																		</li>`;
+																	}
+																	j++;
+																});
+																
+																html +=`<li class="green">
+																	<div class="row verticalList">
+																		<div class="col-md-3">
+																			<label class="mt-2">Approve</label>
+																		</div>
+																		<div class="col-md-4 p-md-0">
+																			<textarea maxlength='100' class="inputField timeline-input" id="last_level_desc"   placeholder="Enter Details">`+workflows[workflows_length-1].description+`</textarea>
+																			<label class="error_msg float-right"></label>
+																		</div>
+																		<div class="col-md-4 pr-md-0">
+																			<select class="inputField selectField" id="last_level_role" style="width: 100%;">`;
+																				var super_admin_selected = "";
+																				if(workflows[workflows_length-1].role_id == 0){
+																					super_admin_selected ="selected";
+																				}
+																				html+= `<option value="0" `+super_admin_selected+`>Super Admin</option>`;
+																				
+																				{% for other_department in other_departments %}
+																				html+=`<optgroup label="{{other_department.department_name}}">`;
+																					{% for other_role in other_department.other_roles %}
+																					if({{other_role.id}} == workflows[workflows_length-1].role_id){
+																						selected = 'selected';
+																					}else{
+																						selected = '';
+																					}
+																					html+=`<option value="{{other_role.id}}" `+selected+`>{{other_role.role_name}}</option>`;
+																					{% endfor %}
+																					html+=`</optgroup>`;
+																					{% endfor %}
+																					html+=`</select>
+																				</div>
+																			</div>
+																		</li>
+																		`;
+																	}
+																	
+																	
+																	var body = `<div class="modal-WorkModal centered">
+																		<div class="modal-body p-0">
+																			<div class="row">
+																				<div class="col-md-3 p-md-0 modalWFBG">
+																					<div class="transformImageWF">
+																						<img src="{% static 'img/svg/workflow.svg' %}" class="modalLeftImg" />
+																						<h3 class="modalColHead">Workflow &nbsp;&nbsp;</h3>
+																					</div>
+																				</div>
+																				<div class="col-md-9 p-md-4">
+																					<form>
+																						<div class="row mb-3">
+																							<div class="col-md-6">
+																								<h5><b>Workflows </b></h5>
+																							</div>
+																							<div class="col-md-6 p-md-0">
+																								
+																								<button class="btn btn-save float-right" type="button"
+																								onclick="applyWorkflow(` + sub_module_id + `,` + permission_id + `)">
+																								Save
+																							</button>
+																							
+																							<button class="btn btn-close float-right" type="button" onclick="closePreview()">
+																								Close
+																							</button>
+																						</div>
+																					</div>
+																					<div class="row mb-3">
+																						<div class="col-md-3">
+																							No. of Level
+																						</div>
+																						<div class="col-md-5 p-md-0">
+																							<input class="inputField" id="total_work_flows" type="text" value="`+workflows_length+`" placeholder="No. of Level" />
+																						</div>
+																					</div>
+																					
+																					<div class="row">
+																						<div class="col-md-12" id="noOfLevels">
+																							<ul class="dots m-0">
+																								`+html+`
+																							</ul>
+																							
+																						</div>
+																					</div>
+																				</form>
+																			</div>
+																		</div>
+																	</div>`;
+																	$('#workflowModal').html(body);
+																	$('#workflowModal').show();
+																	
+																}
+																
+																
+																function uncheckPermission(sub_module_id, permission_id) {
+																	$('#permission_'+sub_module_id+'_'+permission_id).prop('checked',false);
+																	$('#workflowModal').hide();
+																}
+																
+																
+																$(document).on('keyup', '#total_work_flows', function () {
+																	$('#noOfLevels').html('');
+																	
+																	var level = $(this).val();
+																	if(level == 0){
+																		$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+																		return false;
+																	}
+																	else if (level == 1) {
+																		leve_html = `<ul class="dots m-0">
+																			<li class="green">
+																				<div class="row">
+																					<div class="col-md-3">
+																						<label class="mt-2">Super User</label>
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="first_desc" placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role"  id="first_level_role" style="width: 100%;">
+																							<option value="{{role.id}}" selected>{{role.role_name}}</option> 
+																						</select>
+																					</div>
+																				</div>
+																			</li>
+																		</ul>`;
+																		$('#noOfLevels').append(leve_html);
+																		$('.error_msg').text('');
+																	} else if (level == 2) {
+																		var leve_html = `<ul class="dots m-0">
+																			<li class="green">
+																				<div class="row">
+																					<div class="col-md-3">
+																						<label class="mt-2">Initiate</label>
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="first_desc"  placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role" id="first_level_role" style="width: 100%;">
+																							<option value="{{role.id}}">{{role.role_name}}</option> 
+																						</select>
+																					</div>
+																				</div>
+																			</li>
+																			<li class="green">
+																				<div class="row verticalList">
+																					<div class="col-md-3">
+																						<label class="mt-2">Approve</label>
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="last_level_desc"  placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role" id="last_level_role" style="width: 100%;">
+																							<option value="0">Super Admin</option>
+																							{% for other_department in other_departments %}
+																							<optgroup label="{{other_department.department_name}}">
+																								{% for other_role in other_department.other_roles %}
+																								<option value="{{other_role.id}}">{{other_role.role_name}}</option>
+																								{% endfor %}
+																							</optgroup>
+																							{% endfor %}
+																						</select>
+																					</div>
+																				</div>
+																			</li>
+																		</ul>`;
+																		$('#noOfLevels').append(leve_html);
+																		$('.error_msg').text('');
+																	} else if (level > 2 && level <= 10) {
+																		var level_html = `
+																		<ul class="dots m-0">
+																			<li class="green">
+																				<div class="row">
+																					<div class="col-md-3">
+																						<label class="mt-2">Initiate</label>
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="first_desc" placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role" id="first_level_role" style="width: 100%;">
+																							<option value="{{role.id}}">{{role.role_name}}</option> 
+																						</select>
+																					</div>
+																				</div>
+																			</li>
+																			<li class="green">
+																				<div class="row verticalList">
+																					<div class="col-md-3">
+																						<label class="mt-2">Approve</label>
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="last_level_desc" placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role" id="last_level_role" style="width: 100%;">
+																							<option value="0">Super Admin</option>
+																							{% for other_department in other_departments %}
+																							<optgroup label="{{other_department.department_name}}">
+																								{% for other_role in other_department.other_roles %}
+																								<option value="{{other_role.id}}">{{other_role.role_name}}</option>
+																								{% endfor %}
+																							</optgroup>
+																							{% endfor %}
+																						</select>
+																					</div>
+																				</div>
+																			</li>
+																		</ul>
+																		`;
+																		$('#noOfLevels').append(level_html);
+																		
+																		var midProcess = level - 1;
+																		for (var i = 1; i < midProcess; i++) {
+																			var level_html = `
+																			<li class="green">
+																				<div class="row">
+																					<div class="col-md-3">
+																						<label id="labelLevel' + i + '" class="mt-2" onclick="showInput(' + i + ')">Forward</label>
+																						<input type="text" id="level_`+i+`" class="inputField hide" onblur="showLabel(' + i + ')">
+																					</div>
+																					<div class="col-md-5 p-md-0">
+																						<textarea maxlength='100' class="inputField timeline-input" id="level_description_`+i+`" placeholder="Enter Details"></textarea>
+																						<label class="error_msg float-right"></label>
+																					</div>
+																					<div class="col-md-4 pr-md-0">
+																						<select class="inputField selectField authorize_role" id="level_role_`+i+`" style="width: 100%;">
+																							<option value="0">Super Admin</option>
+																							{% for other_department in other_departments %}
+																							<optgroup label="{{other_department.department_name}}">
+																								{% for other_role in other_department.other_roles %}
+																								<option value="{{other_role.id}}">{{other_role.role_name}}</option>
+																								{% endfor %}
+																							</optgroup>
+																							{% endfor %}
+																						</select>
+																					</div>
+																				</div>
+																			</li>`;
+																			
+																			$('#noOfLevels ul').find('li:last').prev().after(level_html);
+																			
+																		}
+																		$('.error_msg').text('');
+																	} else if (level > 10) {
+																		$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+																	}
+																	
+																	
+																})
+																
+																function applyWorkflow(sub_module_id, permission_id) {
+																	total_work_flows = $('#total_work_flows').val();
+																	if (total_work_flows == 0) {
+																		$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+																		return false
+																	}else if(total_work_flows > 10){
+																		$('#total_work_flows').parent().find('.error_msg').text('Permission level should be between 1 to 10*');
+																		return false
+																	}
+																	else  {
+																		name_error_count = 0;
+																		role_error_count = 0;
+																		$('.error_msg').text('');
+																		$('.timeline-input').each(function () {
+																			if ($(this).val() == '') {
+																				name_error_count = name_error_count + 1;
+																				$(this).parent().find('.error_msg').text('Description required*');
+																			}
+																		})
+																		$('.authorize_role').each(function () {
+																			if ($(this).val() == '') {
+																				role_error_count = role_error_count + 1;
+																				$(this).parent().find('.error_msg').text('Role required*');
+																			}
+																		})
+																		if (name_error_count > 0) {
+																			return false;
+																		} else if (role_error_count > 0) {
+																			return false
+																		}  else {
+																			var workflows = [];
+																			if (total_work_flows == 1) {
+																				var workflow = {};
+																				workflow.level_id = "{{first_workflow_level.id}}";
+																				workflow.role_id = $('#first_level_role option:selected').val();
+																				workflow.description = $('#first_desc').val();
+																				workflows.push(workflow);
+																			} else if (total_work_flows == 2) {
+																				var workflow = {};
+																				workflow.level_id = "{{first_workflow_level.id}}";
+																				workflow.role_id = $('#first_level_role option:selected').val();
+																				workflow.description = $('#first_desc').val();
+																				workflows.push(workflow);
+																				var workflow = {};
+																				workflow.level_id = "{{last_workflow_level.id}}";
+																				workflow.role_id = $('#last_level_role option:selected').val();
+																				workflow.description = $('#last_level_desc').val();
+																				workflows.push(workflow);
+																			} else if (total_work_flows > 2) {
+																				var workflow = {};
+																				workflow.level_id = "{{first_workflow_level.id}}";
+																				workflow.role_id = $('#first_level_role option:selected').val();
+																				workflow.description = $('#first_desc').val();
+																				workflows.push(workflow);
+																				for (var i = 1; i < parseInt(total_work_flows) - 1; i++) {
+																					var workflow = {};
+																					workflow.level_id = "{{middle_workflow_level.id}}";
+																					workflow.role_id = $('#level_role_' + i + ' option:selected').val();
+																					workflow.description = $('#level_description_' + i).val();
+																					workflow.status = $('#level_status_' + i).val();
+																					workflows.push(workflow);
+																				}
+																				var workflow = {};
+																				workflow.level_id = "{{last_workflow_level.id}}";
+																				workflow.role_id = $('#last_level_role option:selected').val();
+																				workflow.description = $('#last_level_desc').val();
+																				workflows.push(workflow);
+																			}
+																			
+																			classes_h = $('#permission_' + sub_module_id + '_' + permission_id).attr('class');
+																			tempClasses_h = classes_h.split(' ');
+																			
+																			module_class = tempClasses_h[2]
+																			total_h = $('.'+module_class).length;
+																			total_h_checked = $('.'+module_class+ ':checked').length;
+																			
+																			tempArr_h = module_class.split('_');
+																			module_id = tempArr_h[2];
+																			if(total_h_checked == total_h){
+																				$('#module_'+module_id).prop('checked',true);
+																			}
+																			
+																			
+																			classes_p = $('#permission_' + sub_module_id + '_' + permission_id).attr('class');
+																			tempClasses_p = classes_p.split(' ');
+																			permission_class = tempClasses_p[2]
+																			total_p = $('.'+permission_class).length;
+																			total_p_checked = $('.'+permission_class+ ':checked').length;
+																			
+																			tempArr = permission_class.split('_');
+																			// permission_id = tempArr[2];
+																			if(total_p_checked == total_p){
+																				$('#permission_'+permission_id).prop('checked',true);
+																			}
+																			$('#workflow_text_' + sub_module_id + '_' + permission_id).text('Workflow Added ('+total_work_flows+')');
+																			$('#workflow_' + sub_module_id + '_' + permission_id).val(JSON.stringify(workflows));
+																			$('#workflowModal').hide();
+																		}
+																	}
+																}
+																
+																$(document).on('click','.switch_checkbox',function(){
+																	if ($(this).is(':checked')) {
+																		$(this).parent().parent().find('.switch_checkbox_value').val(1);
+																	} else {
+																		$(this).parent().parent().find('.switch_checkbox_value').val(0);
+																	}
+																});
+															</script>

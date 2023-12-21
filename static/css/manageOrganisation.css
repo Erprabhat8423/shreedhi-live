@@ -1,0 +1,705 @@
+#containerHeight {
+	overflow: auto;
+}
+.primaryContainerBG, .nonprimaryContainerBG, .employeeprimaryContainerBG {
+	border-radius: 17px;
+	background: rgb(255, 255, 255);
+	box-shadow: 0px 7px 13px 0px rgba(0, 115, 224, 0.08);
+	padding: 1rem;
+	overflow: auto;
+}
+.primaryContainer {
+	background: transparent;
+	padding: 0rem;
+}
+.commonTableBg, .commonNonOperationalTableBg, .commonEmployeeTableBg {
+	border-radius: 0;
+	border-bottom-left-radius: 17px;
+	border-bottom-right-radius: 17px;
+	background: url(/static/img/png/tableBg.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-color: #fff;
+	background-size: 40%;
+}
+.tabBar {
+	list-style-type: none;
+	overflow: hidden;
+	display: inline-block;
+	display: -webkit-inline-box;
+	border: 1px solid #d5d5d5;
+	padding: 0rem;
+	width: 100%;
+	margin: 0;
+	border: 1px solid rgb(223, 223, 223);
+	border-radius: 0.6rem;
+	background-color: rgb(249, 250, 252);
+	box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+}
+
+.customisedTab {
+	padding: 0.4rem;
+	background: #fff;
+	color: #969696;
+	position: relative;
+	font-size: 0.8rem;
+	cursor: pointer;
+	text-align: center;
+	width: 50%;
+	font-weight: 600;
+}
+
+.customisedTab:hover {
+	color: #7e7e7e;
+}
+
+.customisedTab:nth-child(even) {
+	border-left: 1px solid lightgray;
+}
+.customisedTab.activeTab {
+	color: #009cff;
+	font-weight: 700;
+}
+
+.customisedTab3 {
+	padding: 0.4rem;
+	background: #fff;
+	color: #969696;
+	position: relative;
+	font-size: 0.8rem;
+	cursor: pointer;
+	text-align: center;
+	width: 33.3%;
+	font-weight: 600;
+}
+
+.customisedTab3:hover {
+	color: #7e7e7e;
+}
+
+.customisedTab3:nth-child(even) {
+	border-left: 1px solid lightgray;
+	border-right: 1px solid lightgray;
+}
+.customisedTab3.activeTab {
+	color: #009cff;
+	font-weight: 700;
+}
+
+.customisedTab2 {
+	padding: 0.4rem;
+	background: #fff;
+	color: #969696;
+	position: relative;
+	font-size: 0.8rem;
+	cursor: pointer;
+	text-align: center;
+	width: 50%;
+	font-weight: 600;
+}
+
+.customisedTab2:hover {
+	color: #7e7e7e;
+}
+
+.customisedTab2:nth-child(even) {
+	border-left: 1px solid lightgray;
+	border-right: 1px solid lightgray;
+}
+.customisedTab2.activeTab {
+	color: #009cff;
+	font-weight: 700;
+}
+
+/* #topRow,
+#secondRow {
+    flex: 0 1 auto;
+}
+
+#tableBox {
+    flex: 1 1 auto;
+}
+#treeBox {
+    flex: 1 1 auto;
+    } */
+
+    .searchTable {
+    	padding: 0.4rem;
+    	background-image: url(/static/img/svg/search.svg);
+    	background-position: 0.5rem;
+    	background-repeat: no-repeat;
+    	padding-left: 2rem;
+    	background-size: 1rem;
+    	width: 50%;
+    	font-size: 0.8rem;
+    	border: 1px solid rgb(223, 223, 223);
+    	border-radius: 0.6rem;
+    	background-color: rgb(249, 250, 252);
+    	box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+
+    .iconBox {
+    	padding: 0.4rem;
+    	height: 1.9rem;
+    	display: inline-block;
+    	background-position: center;
+    	background-repeat: no-repeat;
+    	margin: 0 0.2rem;
+    	padding-left: 2rem;
+    	background-size: contain;
+    	cursor: pointer;
+    	border: 1px solid rgb(223, 223, 223);
+    	border-radius: 0.5rem;
+    	background-color: rgb(249, 250, 252);
+    	box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+
+    .iconBox:hover {
+    	padding: 0.4rem;
+    	height: 1.9rem;
+    	display: inline-block;
+    	background-position: center;
+    	background-repeat: no-repeat;
+    	margin: 0 0.2rem;
+    	padding-left: 2rem;
+    	background-size: contain;
+    	cursor: pointer;
+    	border: 1px solid rgb(223, 223, 223);
+    	border-radius: 0.5rem;
+    	background-color: #ffffff;
+    	box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0);
+    }
+
+    .iconGenerateIndent {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/generate.svg);
+    	background-position: center;
+    	background-size: 6rem;
+    }
+    .iconGenerateIndent:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/generate.svg);
+    	background-position: center;
+    	background-size: 6rem;
+    }
+
+    .iconReGenerateIndent {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/regenerate.svg);
+    	background-position: center;
+    	background-size: 6rem;
+    }
+    .iconReGenerateIndent:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/regenerate.svg);
+    	background-position: center;
+    	background-size: 6rem;
+    }
+
+    .iconExports {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/export.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconExports:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/export.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+
+    .iconAddScheme {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createScheme.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddScheme:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createScheme.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    
+    .iconAddDiscount {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/creatediscount.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddDiscount:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/creatediscount.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+
+
+
+    .iconAddProduct {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createProduct.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddProduct:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createProduct.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconExportExcel {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/ExportXLS.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconExportExcel:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/ExportXLS.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+
+
+    .iconAddNew {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/addNew.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddNew:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/addNew.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+
+    .iconAddNewNotification {
+    	padding-right: 5rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/send-notification.svg);
+    	background-position: center;
+    	background-size: 8rem;
+    }
+    .iconAddNewNotification:hover {
+    	padding-right: 5rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/send-notification.svg);
+    	background-position: center;
+    	background-size: 8rem;
+    }
+    .iconEditNew {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/edit-button.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconEditNew:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/edit-button.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddVehicle {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/CreateVehicle.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddVehicle:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/CreateVehicle.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+
+    .iconModify {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/modify.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconModify:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/modify.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+
+
+    .iconAddDriver {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/CreateDriver.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddDriver:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/CreateDriver.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+
+    .iconAddVariant {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createVariant.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+    .iconAddVariant:hover {
+    	padding-right: 4rem;
+    	padding-left: 4rem;
+    	background-image: url(/static/img/svg/createVariant.svg);
+    	background-position: center;
+    	background-size: 7rem;
+    }
+
+
+    .iconAddOrg {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/addOrg.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconAddOrg:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/addOrg.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+
+    .iconPlan {
+    	background-image: url(/static/img/svg/iconPlan.svg);
+    	background-position: right center;
+    	background-size: 17px;
+    	font-size: 13px;
+    	font-weight: 600;
+    	text-align: left;
+    	padding: 2.5px 0;
+    	color: #0083ff;
+    }
+    .iconplan:hover {
+    	background-image: url(/static/img/svg/iconPlan.svg);
+    	background-size: 17px;
+    	background-position: right center;
+    	color: #0083ff;
+    	padding: 2.5px 0;
+    }
+
+    .iconSetting {
+    	background-image: url(/static/img/svg/setting.svg);
+    	background-size: 17px;
+    }
+    .iconSetting:hover{
+    	background-size: 17px;
+    }
+
+
+    .iconForward {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/Farward_btn.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+
+    .iconForward:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/Farward_btn.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconApproved {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/Approve.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconApproved:hover {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/order/Approve.svg);
+    	background-position: center;
+    	background-size: 5rem;
+    }
+    .iconHide {
+    	background-image: url(/static/img/png/hide.png);
+    }
+    .iconUnFreeze {
+    	background-image: url(/static/img/svg/unfreeze.svg);
+    	background-size: 1.5rem;
+    }
+    .iconUnFreeze:hover {
+    	background-size: 1.5rem;
+    }
+
+    .iconExport {
+    	background-image: url(/static/img/png/export.png);
+    }
+
+    #addOrgTable thead th {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+
+    #producTable thead th {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+
+    #addNonOperationalTable thead th {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+
+    #addEmployeeTable thead th {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+    #addOrgTable thead th:last-child {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+    #producTable thead th:last-child {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+    #addEmployeeTable thead th:last-child {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+    #addNonOperationalTable thead th:last-child {
+    	border: 0;
+    	border-right: 1px solid #e7e7e7!important;
+    }
+
+    .tablesorter-scroller .tablesorter-scroller-table {
+    	overflow-y: hidden;
+    }
+
+    #mainbox {
+    	display: flex;
+    	flex-flow: column;
+    }
+
+    #topRow,
+    #secondRow {
+    	flex: 0 1 auto;
+    }
+
+    #tableBox {
+    	flex: 1 1 auto;
+    	overflow: auto;
+    }
+
+    #detailsBox {
+    	display: flex;
+    	flex-flow: column;
+    }
+
+    #detailsBoxFirst {
+    	flex: 0 1 auto;
+    }
+
+    #graphBox {
+    	flex: 0 1 auto;
+    }
+
+    #detailsBoxSecond {
+    	flex: 1 1 auto;
+    	overflow: auto;
+    }
+    .profileIconSize {
+    	width: 1.5rem;
+    }
+    .deptRow {
+    	border: 0px solid #dfdfdf;
+    	padding: 1rem;
+    	border-radius: 1rem;
+    	margin-bottom: 0.5rem;
+    	background-color: #f7f7f7;
+    	cursor: pointer;
+    }
+    .deptRow.deptSelected {
+    	background-color: #ffffff;
+    	border: 1px solid #dfdfdf;
+    }
+
+    .deptRow table tr td {
+    	font-size: 0.7rem;
+    }
+
+    #example tr td {
+    	padding: 0.5rem;
+    }
+    thead {
+    	padding: 0.5rem;
+    }
+
+    .btn-addDept {
+    	background-color: #f9fafc;
+    	font-size: 0.8rem;
+    	padding: 0.4rem 1rem;
+    	float: right;
+    	border: 1px solid #dfdfdf;
+    	color: #009cff;
+    	font-weight: 700;
+    	border-radius: 0.5rem;
+    }
+    .btn-addDept:hover {
+    	color: #177ab9;
+    }
+
+    .btnDeptIcon {
+    	width: 1.3rem;
+    }
+
+    .smallText {
+    	font-size: 0.8rem;
+    	color: #969696;
+    	word-break: break-all;
+    }
+    .largeText {
+    	font-size: 0.9rem;
+    	word-break: break-all;
+    }
+
+    .deptRowHead {
+    	font-size: 0.8rem;
+    	color: #333;
+    }
+
+    #addOrganisationModal,
+    #addDeptModal {
+    	display: none;
+    }
+
+    .modalIcon {
+    	width: 1.5rem;
+    	display: inline-block;
+    }
+/* .modalColBG {
+    background-image: url("/static/img/png/modalColBg.png");
+    background-size: cover;
+    text-align: center;
+    background-position: bottom;
+}
+
+.modalColHead {
+    color: rgb(255, 255, 255);
+    font-weight: 700;
+    width: 90%;
+    margin: auto;
+    font-size: 1.5rem;
+}
+
+.widthSetter {
+    width: calc(100% - 3rem);
+    float: right;
+}
+
+.transformImage {
+    transform: translateY(50%);
+}
+
+*/
+
+.modalOrgBG {
+	background-repeat: no-repeat;
+	background-image: url(/static/img/png/ShapeOrgModal.png);
+	text-align: center;
+	background-color: #0073e0;
+	background-position: bottom left;
+	background-size: 80%;
+}
+
+.modalDeptBG {
+	background-repeat: no-repeat;
+	background-image: url(/static/img/png/ShapeDeptModal.png);
+	text-align: center;
+	background-color: #0073e0;
+	background-position: bottom left;
+	background-size: 60%;
+}
+
+.modalColHead {
+	color: #fff;
+	font-weight: 700;
+	width: 90%;
+	margin: auto;
+}
+
+.widthSetter {
+	width: calc(100% - 3rem) !important;
+	float: right;
+}
+
+.transformImage {
+	transform: translateY(30%);
+}
+
+.modalLeftImg {
+	width: 33%;
+}
+
+.iconRecievePayment {
+    	padding-right: 3rem;
+    	padding-left: 3rem;
+    	background-image: url(/static/img/svg/Receive_Payment.svg);
+    	background-position: center;
+    	background-size: 9rem;
+    }
+.iconRecievePayment:hover {
+	padding-right: 3rem;
+	padding-left: 3rem;
+	background-image: url(/static/img/svg/Receive_Payment.svg);
+	background-position: center;
+	background-size: 9rem;
+}
+
+
+.iconRecievePayments {
+	padding-right: 3rem;
+	padding-left: 3rem;
+	background-image: url(/static/img/svg/CRDR_Note.svg);
+	background-position: center;
+	background-size: 9rem;
+}
+.iconRecievePayments:hover {
+padding-right: 3rem;
+padding-left: 3rem;
+background-image: url(/static/img/svg/CRDR_Note.svg);
+background-position: center;
+background-size: 9rem;
+}

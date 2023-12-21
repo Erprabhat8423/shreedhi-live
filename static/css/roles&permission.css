@@ -1,0 +1,267 @@
+.head {
+    color: #333;
+    font-weight: 600;
+}
+
+.permissionHeadText {
+    color: #969696;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.subHead {
+    color: #969696;
+    font-weight: 500;
+}
+
+.permissionHead {
+    border: 0px solid #dfdfdf;
+    padding: 0.5rem 1.5rem !important;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.permissionRow {
+    border: 0px solid #dfdfdf;
+    padding: 2rem 1.5rem 0.5rem 1.5rem !important;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #f7f7f7;
+    cursor: pointer;
+}
+
+.modal-AddPermission {
+    width: 95%;
+    max-height: 90%;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    border-radius: 11px;
+    /* padding: 1rem 0rem; */
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 7px 81px 0px rgba(0, 115, 224, 0.22);
+}
+.modal-WorkModal {
+    width: 60%;
+    max-height: 85%;
+    background-color: #f8f9fa;
+    overflow: auto;
+    border-radius: 11px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 7px 81px 0px rgba(0, 115, 224, 0.22);
+}
+
+#addPermissionModal,
+#openWorkFlowHistory,
+#openEditWorkFlow {
+    display: none;
+}
+
+.iconAddRoles {
+    padding-right: 3rem;
+    padding-left: 3rem;
+    background-image: url(/static/img/svg/addroles.svg);
+    background-position: center;
+    background-size: 5rem;
+}
+.iconAddRoles:hover {
+    padding-right: 3rem;
+    padding-left: 3rem;
+    background-image: url(/static/img/svg/addroles.svg);
+    background-position: center;
+    background-size: 5rem;
+}
+
+.checkBoxColumn {
+    width: 12.5%;
+    display: inline-block;
+}
+
+.checkBoxColumnEdit {
+    width: 3rem;
+    display: inline-block;
+}
+
+.modalAddPermissionBG {
+    background-repeat: no-repeat;
+    background-image: url(/static/img/png/ShapeDeptModalGrey.png);
+    background-color: #ffffff;
+    background-position: bottom left;
+    background-size: 40%;
+}
+
+.modalWFBG {
+    background-repeat: no-repeat;
+    background-image: url(/static/img/png/ShapeWFModal.png);
+    text-align: center;
+    background-color: #0073e0;
+    background-position: bottom left;
+    background-size: 35%;
+}
+
+.table-scroll {
+    position: relative;
+    overflow: hidden;
+    border: 0px solid #000;
+}
+.table-wrap {
+    width: 100%;
+    overflow: auto;
+}
+.table-scroll table {
+    width: 100%;
+    margin: auto;
+    font-size: 0.8rem;
+}
+.table-scroll th {
+    padding: 1rem;
+    border: 0px solid #000;
+    background: #ffffff;
+    white-space: nowrap;
+    vertical-align: top;
+}
+.table-scroll td {
+    padding: 1rem;
+    border: 0px solid #000;
+    background: transparent;
+    vertical-align: top;
+    text-align: center;
+    white-space: pre-line;
+    min-width: 5rem;
+}
+
+.table-scroll thead,
+.table-scroll tfoot {
+    background: #ffffff;
+}
+.clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.clone th,
+.clone td {
+    visibility: hidden;
+}
+.clone td,
+.clone th {
+    border-color: transparent;
+}
+.clone tbody th {
+    visibility: visible;
+}
+.clone .fixed-side {
+    border: 0px solid #000;
+    background: #ffffff;
+    visibility: visible;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.table-scroll tr {
+    background-color: #f7f7f7;
+    border-collapse: separate;
+    border-spacing: 1rem;
+}
+
+ul.dots li {
+    padding-left: 33px;
+    margin-bottom: 2.5em;
+    list-style: none;
+}
+
+ul.dots li {
+    position: relative;
+    margin-bottom: 0;
+    padding-bottom: 1.5em;
+}
+
+ul.dots li:after {
+    position: absolute;
+    left: 0rem;
+    top: 0rem;
+    content: "\25CF";
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: orange;
+}
+ul.dots li:first-of-type:after {
+    position: absolute;
+    left: 0rem;
+    top: 0rem;
+    content: "\25CF";
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: red;
+}
+ul.dots li:last-of-type:after {
+    position: absolute;
+    left: 0rem;
+    top: 0rem;
+    content: "\25CF";
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: green;
+}
+
+ul.dots li:before {
+    content: "";
+    position: absolute;
+    left: 0.4rem;
+    border-left: 2px solid lightgrey;
+    height: 100%;
+    width: 1px;
+}
+
+ul.dots li:first-child:before {
+    top: 1rem;
+}
+
+ul.dots li:last-child:before {
+    height: 1rem;
+}
+
+.class_checkbox {
+    width: 1rem;
+    height: 1rem;
+    background-color: #ffffff;
+    border: 1px solid darkgrey;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: auto;
+}
+.class_checkbox.checked {
+    background-image: url(/static/img/svg/selected.svg);
+    border: 1px solid #0686ff;
+    box-shadow: 0px 0px 18px 0px #0686ff;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: 150%;
+}
+
+.subtext.checked {
+    font-size: x-small;
+    color: #0686ff;
+    margin: -0.5rem 0rem;
+    cursor: pointer;
+    text-decoration: underline;
+    display: block;
+}
+
+.subtext {
+    font-size: x-small;
+    color: #0686ff;
+    margin: -0.5rem 0rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.hide {
+    display: none;
+}
+
+.transformImageWF {
+    transform: translateY(20%);
+}

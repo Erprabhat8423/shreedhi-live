@@ -1,0 +1,469 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+	
+	<div class="modal-header" id="headerStep1">
+		<div class="col-12 p-0">
+			<div class="row">
+				<div class="col-6">
+					<h5 class="mt-md-2">Create Bulkpack Incentive Scheme &nbsp;&nbsp;</h5>
+				</div>
+				<div class="col-6">
+					<button class="btn btn-save float-right" type="button" onclick="saveBulkpackIncentiveScheme()" >
+						Save & Proceed
+					</button>
+					<button class="btn btn-close float-right" type="button" onclick="closeModal()">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal-body" id="addUserModalBody" style="overflow: auto">
+		<div class="row">
+			<div class="col-md-12 p-0 h-100 w-100" >.
+				<form name="addBulkpackSchemeForm" id="addBulkpackSchemeForm" method="POST" enctype="multipart/form-data" >
+					{% csrf_token %}
+					<input type="hidden" name="incentive_scheme_type" value="2" >
+					
+					<div class="row">
+						<div class="col-md-4" style="border-right: 1px solid lightgrey;">
+							
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Scheme Name</label>
+									<input class="inputField" type="text" placeholder="Enter Scheme Name"
+									name="scheme_name" id="scheme_name" maxlength="50"  />
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Unit</label>
+									<select class="inputField selectField" name="unit_id" style="width: 100% !important;" onchange="getProductClass();updateIncentiveText(); getFilteredUsers();">
+										<option value="">Select Unit</option>
+										{% for unit in units %}
+										<option value="{{unit.id}}">{{unit.unit}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Product Class</label>
+									<select class="inputField selectField" data-placeholer="Select Product Class" name="product_class[]" style="width: 100% !important;" multiple>
+										<option value="">Select Product Class</option>
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp; State</label>
+									<select class="inputField selectField" name="state_id" style="width: 100% !important;" onchange="getStateRouteOptions(this.value); getFilteredUsers();">
+										<option value="">Select State</option>
+										{% for state in states %}
+										<option value="{{state.id}}">{{state.state}}</option>
+										{% endfor %}
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/route.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Route</label>
+									<select class="inputField selectField" data-placeholer="Select Route"  name="route_id[]" style="width: 100% !important;" onchange="routeTownOptions(this); getFilteredUsers();" multiple>
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Town</label>
+									<select class="inputField selectField" data-placeholer="Select Town"  name="town_id[]" style="width: 100% !important;" onchange="selectTownAllOption(this);getFilteredUsers();" multiple>
+									</select>
+									<label class="error_msg float-right"></label>
+								</div>
+							</div>
+							
+							
+							
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize" />&nbsp;&nbsp; Incentive Bifurcation <span class="incentive_text"></span></label>
+									<div class="row">
+										<div class="col-md-2 padding_0" style="font-size: 11px;margin-top: 10px;">
+											More than
+										</div>
+										<div class="col-md-4 padding_0">
+											<input class="inputField incentive_field numeric" type="text" placeholder="Above order of" maxlength="4" name="above_order_of[]" onkeyup="getFilteredUsers()" />
+											<label class="error_msg float-right"></label>
+										</div>
+										<div class="col-md-4">
+											<input class="inputField incentive_field" type="text" onkeypress="return validateFloatKeyPress(this,event);"  placeholder="Incentive" name="incentive_amount[]" onkeyup="getFilteredUsers()" />
+											<label class="error_msg float-right"></label>
+										</div>
+									</div>
+									
+									<div id="new_rows">
+										
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12 text-right" >
+									<a href="javascript:;" onclick="addNewIncentiveRow()" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+								</div>
+							</div>
+							
+							
+							<div class="row">
+								<div class="col-md-12">
+									<label for=""><img src="{% static 'img/svg/schemeDate.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Scheme Time Period</label>
+									<div class="row">
+										<div class="col-md-6 padding_0">
+											<input class="inputField" type="text" placeholder="Start Date"
+											name="start_date" id="start_date" readonly  />
+											<label class="error_msg float-right"></label>
+										</div>
+										
+										<div class="col-md-6 padding_0">
+											<input class="inputField" type="text" placeholder="End date"
+											name="end_date" id="end_date" readonly  />
+											<label class="error_msg float-right"></label>
+										</div>
+										
+									</div>
+								</div>
+							</div>
+							
+						</div>
+						
+						
+						<div class="col-md-8" id="ajaxDistributors">
+							
+							<table class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+								<thead>
+									<tr>
+										<th>Dis./SS name</th>
+										<th>Incentive Bifurcations / Unit</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+							
+						</div>
+						
+					</div>
+					
+				</form>	
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	
+</div>
+
+<script>
+	
+	$(document).ready(function(){
+		
+		$("#start_date").datepicker({
+			weekStart: 1,
+			changeMonth: true,
+			changeYear: true,  
+			yearRange: "-100:+10",
+			daysOfWeekHighlighted: "6,0",
+			autoclose: true,
+			todayHighlight: true,
+			dateFormat: 'dd/mm/yy',
+			minDate: 0
+		});
+		
+		$("#end_date").datepicker({
+			weekStart: 1,
+			changeMonth: true,
+			changeYear: true,  
+			yearRange: "-100:+10",
+			daysOfWeekHighlighted: "6,0",
+			autoclose: true,
+			todayHighlight: true,
+			dateFormat: 'dd/mm/yy',
+			minDate: 0
+		});
+		
+	});
+	
+	function addNewIncentiveRow(){
+		new_row = `
+		<div class="row" style="margin-top:5px;">
+			
+			<div class="col-md-2 padding_0" style="font-size: 11px;margin-top: 10px;">
+				More than
+			</div>
+			
+			<div class="col-md-4 padding_0">
+				<input class="inputField incentive_field numeric" type="text" placeholder="Above order of" maxlength="4" name="above_order_of[]" onkeyup="getFilteredUsers();" />
+				<label class="error_msg float-right"></label>
+			</div>
+			<div class="col-md-4">
+				<input class="inputField incentive_field" type="text" onkeypress="return validateFloatKeyPress(this,event);"  placeholder="Incentive" name="incentive_amount[]" onkeyup="getFilteredUsers();" />
+				<label class="error_msg float-right"></label>
+			</div>
+			<div class="col-md-2" style="margin-top:5px;">
+				<a href="javascript:;" onclick="removeNewIncentiveRow(this)" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+			</div>
+		</div>
+		`;
+		$('#new_rows').append(new_row);
+	}
+	function removeNewIncentiveRow(element){
+		$(element).parent().parent().remove();
+		getFilteredUsers();
+	}
+	
+	function saveBulkpackIncentiveScheme(){
+		showLoader();
+		if(validateBulkpackSchemeForm()){
+			hideLoader();
+			return false;
+		}else{
+			console.log($('#addBulkpackSchemeForm, #userAddBulkpackSchemeForm').serialize());
+			
+			
+			$.ajax({
+				url: "{% url 'src:add-bulkpack-incentive-scheme' %}",
+				method: 'POST',
+				data: $('#addBulkpackSchemeForm, #userAddBulkpackSchemeForm').serialize(),
+				success: function (data) {
+					hideLoader();
+					if(data.flag){
+						openToaster("success", data.message);
+						
+						$("#addUserModal").html('');
+						$("#addUserModal").hide();
+						openToaster("success", data.message);
+						setTimeout(function(){ window.location.reload(); }, 500);
+						
+					}else{
+						openToaster("danger", data.message);
+					}
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			}).always(function() {
+				hideLoader();
+			});
+		}
+		
+	}
+	function validateBulkpackSchemeForm(){
+		error = 0;
+		$('.error_msg ').text('');
+		$('.inputField').css("border", "");
+		if($('[name="scheme_name"]').val() == ""){
+			$('[name="scheme_name"]').parent().find('.error_msg').text('Please enter scheme name');
+			$('[name="scheme_name"]').css("border", "1px solid #db8305");
+			error = error + 1;
+		}
+		if($('[name="state_id"]').val() == ""){
+			$('[name="state_id"]').parent().find('.error_msg').text('Please select state');
+			$('[name="state_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="route_id[]"]').val() == "" || $('[name="route_id[]"]').val() == null){
+			$('[name="route_id[]"]').parent().find('.error_msg').text('Please select route/routes');
+			$('[name="route_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="town_id[]"]').val() == "" || $('[name="town_id[]"]').val() == null){
+			$('[name="town_id[]"]').parent().find('.error_msg').text('Please select town/towns');
+			$('[name="town_id[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		
+		
+		if($('[name="start_date"]').val() == ""){
+			$('[name="start_date"]').parent().find('.error_msg').text('Please enter start date');
+			$('[name="start_date"]').css("border", "1px solid #db8305");
+			error = error + 1;
+		}
+		if($('[name="unit_id"]').val() == "" || $('[name="unit_id"]').val() == null){
+			$('[name="unit_id"]').parent().find('.error_msg').text('Please select unit');
+			$('[name="unit_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		
+		$('.incentive_field').each(function(){
+			if($(this).val() == ""){
+				$(this).parent().find('.error_msg').text('Please enter details');
+				$(this).css("border", "1px solid #db8305");
+				error = error + 1;
+			}
+		})
+		
+		if(error > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function getStateRouteOptions(value){
+		if(value == ""){
+			$('[name="route_id[]"]').html('');
+			$('#ajaxDistributors').html('');
+		}else{
+			showLoader();
+			var url = "{% url 'src:get-state-route-options' 1 %}";
+			url = url.replace(1,parseInt(value));
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					hideLoader();
+					$('[name="route_id[]"]').html(data.options);
+					$('[name="route_id[]"]').select2();
+					addMultiSelectPlacehoder();
+					
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			});
+		}
+		
+	}
+	
+	
+	function routeTownOptions(element){
+		if($(element).val() != null){
+			route_ids = $(element).val().join();
+			if(route_ids == "all" || route_ids.includes("all")){
+				$('[name="route_id[]"] > option').prop("selected","selected");
+				var wanted_option = $('[name="route_id[]"] option[value="all"]');
+				wanted_option.prop('selected', false);
+				$('[name="route_id[]"]').trigger('change.select2');
+			}else{
+			url = "{% url 'src:get-route-town-options' %}";
+			$.ajax({
+				url: url,
+				method: 'POST',
+				data:{'route_ids':route_ids,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+				success: function (data) {
+					$('[name="town_id[]"]').html(data)
+					$('[name="town_id[]"]').select2();
+					addMultiSelectPlacehoder();
+				},
+				error: function (err) {
+					console.log(err)
+				}
+			});
+		}
+		}else{
+			$('[name="town_id[]"]').html('')
+		}
+		
+	}
+	
+		
+	function selectTownAllOption(element){
+		if($(element).val() != null){
+			town_ids = $(element).val().join();
+
+			if(town_ids == "all" || town_ids.includes("all")){
+				$('[name="town_id[]"] > optgroup option').prop("selected","selected");
+				var wanted_option = $('[name="town_id[]"] option[value="all"]');
+				wanted_option.prop('selected', false);
+				$('[name="town_id[]"]').trigger('change.select2');
+			}else{
+				getFilteredUsers();
+			}
+		}
+	}
+
+	function updateIncentiveText(){
+		if($('[name="unit_id"] option:selected').val() != ""){
+			$('.incentive_text').text(' / '+$('[name="unit_id"] option:selected').text());
+		}else{
+			$('.incentive_text').text('');
+		}
+	}
+
+	
+	function getProductClass(){
+		largest_unit = $('[name="unit_id"] option:selected').text();
+		console.log(largest_unit)
+		if(largest_unit == "" || largest_unit == "Select Unit"){
+			$('[name="product_class[]"]').html('')
+		}else{
+			url = "{% url 'src:get-product-class' 'unit' %}";
+			url = url.replace('unit',largest_unit)
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					console.log(data)
+					$('[name="product_class[]"]').html(data.options)
+				},
+				error: function (err) {
+					console.log(err)
+				}
+			});
+		}
+	}
+
+	function getFilteredUsers(){
+		state_id = $('[name="state_id"]').val();
+		if($('[name="route_id[]"]').val() == null){
+			route_ids = '';
+		}else{
+			route_ids = $('[name="route_id[]"]').val().join();
+		}
+		
+		if($('[name="town_id[]"]').val() == null){
+			town_ids = '';
+		}else{
+			town_ids = $('[name="town_id[]"]').val().join();
+		}
+		
+		if($('[name="town_id[]"]').val() == null){
+			town_ids = '';
+		}else{
+			town_ids = $('[name="town_id[]"]').val().join();
+		}
+		unit_id = $('[name="unit_id"]').val();
+		
+		
+		
+		url = "{% url 'src:get-incentive-filtered-users' %}";
+		$.ajax({
+			url: url,
+			method: 'POST',
+			data:$('#addBulkpackSchemeForm').serialize(),
+			success: function (data) {
+				$('#ajaxDistributors').html(data);
+				addMultiSelectPlacehoder();
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		});
+	}
+</script>
+

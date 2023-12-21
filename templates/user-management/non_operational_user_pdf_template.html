@@ -1,0 +1,70 @@
+<style>
+  .header-title h2,
+  .header-title h3 {
+    display: inline-block;
+  }
+  h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
+  }
+
+  table {
+    width: 750px;
+    border-collapse: collapse;
+    margin: 0px auto;
+  }
+
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+
+  th {
+    background: #3498db;
+    color: #000000;
+    font-weight: bold;
+  }
+
+  td,
+  th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 12px;
+  }
+</style>
+
+<div class="col-md-12">
+  <div class="col-12" style="margin-bottom: 15px;">
+    <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th colspan="{{ columns_length }}">
+          <h3> Non Operational Users List </h3>
+        </th>
+      </tr>
+      <tr>
+        <th class="store_name" {% if 'non_store_name' not in columns %} style="display: none;" {% endif %}>Store Name</th>
+        <th class="role" {% if 'non_role' not in columns %} style="display: none;" {% endif %}>Role</th>
+        <th class="contact_person" {% if 'non_contact_person' not in columns %} style="display: none;" {% endif %}>Contact Person</th>
+        <th class="contact_no" {% if 'non_contact_no' not in columns %} style="display: none;" {% endif %}>Contact No.</th>
+        <!-- <th class="address">Address</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td class="store_name" {% if 'non_store_name' not in columns %} style="display: none;" {% endif %}>{{ user.store_name }}</td>
+        <td class="role" {% if 'non_role' not in columns %} style="display: none;" {% endif %}>{{ user.role_name }}</td>
+        <td class="contact_person" {% if 'non_contact_person' not in columns %} style="display: none;" {% endif %}> {% if user.first_name %}{{ user.first_name }}{% endif %} {% if user.middle_name %}{{ user.middle_name }} {% else %} - {% endif %} {% if user.last_name %}{{ user.last_name }} {% else %} - {% endif %} </td>
+		   <td class="contact_no" {% if 'non_contact_no' not in columns %} style="display: none;" {% endif %}> {% if user.primary_contact_number %}{{ user.primary_contact_number }} {% else %} - {% endif %} </td>
+		   </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

@@ -1,0 +1,187 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">User Tracking &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-close float-right" type="button" onclick="closeModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="row">
+            <div class="col-md-12 p-0 h-100 w-100 text-right">
+                <input type="text" style="width: 12% !important;" placeholder="Track Date" value="{% now 'd/m/Y' %}" class="inputField" id="track_date" onchange="filterTrack(this.value,'{{user.id}}')" readonly>
+            </div>
+            
+            <div class="col-md-12 p-0 h-100 w-100" id="ajaxDistributors">
+                {% if tracks %}
+                <div id="map" style="height: 650px; margin-top: 20px;"></div>    
+                <script>
+
+                    function initMap() {
+
+                        {% if tracks %}
+
+                        var directionsService = new google.maps.DirectionsService;
+                        var directionsRenderer = new google.maps.DirectionsRenderer({
+                            markerOptions:{
+                                visible:false,
+
+                            },
+                        });
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 12,
+                            suppressMarkers: true,
+                            center: {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} },
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                        directionsRenderer.setMap(map);
+
+                        var startLatLng = {lat: {{first_track.latitude}}, lng: {{first_track.longitude}} };
+                        var marker = new google.maps.Marker({
+                            position: startLatLng,
+                            map,
+                            icon: "{% static '/img/png/start.png' %}",
+                            title: 'Day Started - {{first_track.created_at|date:'H:i:s a'}}'
+                        });
+                        marker.setMap(map);
+
+                        var endLatLng = {lat: {{last_track.latitude}}, lng: {{last_track.longitude}} };
+                        var marker = new google.maps.Marker({
+                            position: endLatLng,
+                            map,
+                            icon: "{% static '/img/png/end.png' %}",
+                            title: 'Last Location - {{last_track.created_at|date:'H:i:s a'}} '
+                        });
+                        marker.setMap(map);
+
+
+                        {% for track in tracks %}
+                        {% if not forloop.first and not forloop.last %}
+                        var middleLatLng = {lat: {{track.latitude}}, lng: {{track.longitude}}};
+                        var marker = new google.maps.Marker({
+                            position: middleLatLng,
+                            map,
+                            icon: "{% static '/img/png/walk.gif' %}",
+                            title: 'Poll Time - {{track.created_at|date:'H:i:s a'}}'
+                        });
+                        marker.setMap(map);
+                        {% endif %}
+                        {% endfor %}
+
+
+                        calculateAndDisplayRoute(directionsService, directionsRenderer);
+
+
+                    }
+
+                    function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+                        var waypts = [];
+                        counter = 0
+                        {% for track in tracks %}
+                        
+                        if(counter < 20)
+                            waypts.push({
+                                location: new google.maps.LatLng({{track.latitude}},{{track.longitude}}),
+                                stopover: true
+                            });
+                        counter = counter+1;
+                        {% endfor %}
+                        
+                        waypts.push({
+                            location: new google.maps.LatLng({{last_track.latitude}},{{last_track.longitude}}),
+                            stopover: true
+                        });
+
+
+                        directionsService.route({
+                            origin: new google.maps.LatLng({{first_track.latitude}},{{first_track.longitude}}),
+                            destination: new google.maps.LatLng({{last_track.latitude}},{{last_track.longitude}}),
+                            waypoints: waypts,
+                            optimizeWaypoints: true,
+                            travelMode: 'DRIVING'
+                        }, function(response, status) {
+                            if (status === 'OK') {
+                                directionsRenderer.setDirections(response);
+                                var route = response.routes[0];
+                            } else {
+                                window.alert('Directions request failed due to ' + status);
+                            }
+                        });
+
+                        {% else %}
+
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 12,
+                            center: new google.maps.LatLng({{org_latitude}}, {{org_longitude}}),
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+
+                        {% endif %}
+
+                    }
+
+
+                    
+                    
+                </script>
+                
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initMap&libraries=&v=weekly">
+                </script>
+                <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5Pmv2She9T2jPiTwiNfcRrrP7Jcf2lCg&callback=initMap&libraries=&v=weekly"> -->
+                    <!-- </script> -->
+                    
+                    
+                    {% else %}
+                    <div class="no_track_section">
+                    </div>
+                    
+                    {% endif %}
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $("#track_date").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+        })
+    </script>
+    
+    <script>
+        function closeModal() {
+            $("#addUserModal").hide();
+        }
+        
+        function filterTrack(track_date,user_id){
+            var url = "{% url 'src:ajax-user-tracking' '1' %}";
+            url = url.replace('1',user_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: { track_date:track_date },
+                success: function (data) {
+                    $('#ajaxDistributors').html(data);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        
+    </script>

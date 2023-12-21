@@ -1,0 +1,713 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+
+<style>
+    .table td, .table th{
+        padding:0.65rem!important;
+    }
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+    
+    #user_wise_order {
+        width: 100%;
+        height: 200px;
+        border-top:1px solid rgb(223, 223, 223);
+        border-left:1px solid rgb(223, 223, 223);
+        border-bottom:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    
+    #product_wise_order {
+        width: 100%;
+        height: 200px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    #weekly {
+        width: 100%;
+        height: 280px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{
+        text-align:left!important;
+    }
+    
+</style>
+
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-3 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12  text-right">
+                            
+                            <select class="inputField selectField" style="width: 25% !important; padding: 0.3rem;" id="user_id" onchange="getleaveRecord()">
+                                <option value="">All</option>
+                                {% for user in users %}
+                                <option value="{{user.id}}">{{user.first_name}} {% if user.middle_name is not None %} {{user.middle_name}} {% endif %}{{user.last_name}} ({{user.emp_sap_id}})</option>
+                                {% endfor %}
+                            </select>
+                            
+                            {% if role_id == 0 %}
+                            <select class="inputField selectField" style="width: 25% !important; padding: 0.3rem;" name="leave_status" id="leave_status" onchange="getleaveRecord()">
+                                <option value="">All Status</option>
+                                <option value="1" {% if leave_status == 1 %} selected {% endif %}>Initiated</option>
+                                <option value="2" {% if leave_status == 2 %} selected {% endif %}>Forwarded</option>
+                                <option value="3" {% if leave_status == 3 %} selected {% endif %}>Approved</option>
+                                <option value="4" {% if leave_status == 4 %} selected {% endif %}>Declined</option>
+                            </select>
+                            {% else %}
+                            {% endif %}
+                            
+                            <input type="hidden" name="leave_status" id="leave_status" value="{{ leave_status }}" />
+                            
+                            <!-- <input class="search searchTable search" style="width: 30%;" id="user_name_search"  name="user_name_search" placeholder="Search By Name" type="text" data-column="all" onkeyup="getleaveRecord()" > -->
+                            <!-- <input class="inputField" placeholder="Leave From Date" name="leave_from_datepicker" id="leave_from_datepicker" value="" style="width: 25%; padding: 0.3rem;" onchange="getLeaveReportRecord()" readonly> -->
+                            <!-- <input class="inputField" placeholder="Leave To Date" name="leave_to_datepicker" id="leave_to_datepicker" value="" style="width: 25%; padding: 0.3rem;" onchange="getLeaveReportRecord()" readonly> -->
+                            
+                            {% if role_id == 0 %}
+                            <button type="button" class="btn iconBox iconForward" id="forward" onclick="updateLeaveRemarks({{level_id}}, '2')" value="2" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconApproved" id="forward" onclick="updateLeaveRemarks({{level_id}}, '3')" value="3" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateLeaveRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% else %}
+                            {% if level_id == 2 %}
+                            <button type="button" class="btn iconBox iconForward" id="forward" onclick="updateLeaveRemarks({{level_id}}, '2')" value="2" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateLeaveRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% else %}
+                            <button type="button" class="btn iconBox iconApproved" id="forward" onclick="updateLeaveRemarks({{level_id}}, '3')" value="3" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateLeaveRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% endif %}
+                            {% endif %}
+                            <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a>
+                                    </div>
+                                </div>
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="user_name" id="user_name" data-id="1"
+                                        onclick="showHideColumns(this.id,1)"
+                                        />
+                                        
+                                        <label class="mb-0" for="user_name">User name</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="leave_from_date" id="leave_from_date" data-id="2"
+                                        onclick="showHideColumns(this.id, 2)"
+                                        />
+                                        <label class="mb-0" for="leave_from_date">Leave Date (From-To)</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="remark" id="remark" data-id="3"
+                                        onclick="showHideColumns(this.id, 3)"
+                                        />
+                                        <label class="mb-0" for="remark">Remark</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="attachment" id="attachment" data-id="4"
+                                        onclick="showHideColumns(this.id, 4)"
+                                        />
+                                        <label class="mb-0" for="attachment">Attachment</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="status" id="status" data-id="4"
+                                        onclick="showHideColumns(this.id, 5)"
+                                        />
+                                        <label class="mb-0" for="status">Status</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="user_name" id="lock_user_name" data-id="1"
+                                    onclick="toggleFreeze(this.id,'user_name',2)" />
+                                    <label class="mb-0" for="lock_user_name">User Name</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_leave_from_date"
+                                    id="lock_leave_from_date" data-id="2" 
+                                    onclick="toggleFreeze(this.id,'leave_from_date',3)" />
+                                    <label class="mb-0" for="lock_leave_from_date">Leave Date (From-To)</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_remark"
+                                    id="lock_remark" data-id="3"  
+                                    onclick="toggleFreeze(this.id,'remark',4)" />
+                                    <label class="mb-0" for="lock_remark">Remark</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_attachment"
+                                    id="lock_attachment" data-id="3"  
+                                    onclick="toggleFreeze(this.id,'attachment',4)" />
+                                    <label class="mb-0" for="lock_attachment">Attachment</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_status" id="lock_status" data-id="4"
+                                    onclick="toggleFreeze(this.id,'status',5)" />
+                                    <label class="mb-0" for="lock_status">Status</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="sorter-false all_checkbox_class" style="border-right:none!important; width:32px!important; min-width: 32px!important;"><input type="checkbox" class="checked_all" id="new_module_1"  > </th> 
+                        <th class="user_name" id="user_name">
+                            User Name
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="leave_from_date" id="leave_from_date">Leave Date (From-To)<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="remark" id="remark">Remark<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="attachment" id="attachment">Attachment<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="status" id="status">Status<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if leaveReport %}
+                    {% for leaveReportRecord in leaveReport %}
+                    <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                        <td class="sorter-false checked_class {{leaveReportRecord.leave_status}}  {{leaveReportRecord.level_id}}" >
+                            {% if role_id == 0 and leaveReportRecord.leave_status != 3 and leaveReportRecord.leave_status != 4 %}
+                            
+                            <input type="checkbox" class="checkbox" id="new_module_1 1" name="order_id[]" value="{{ leaveReportRecord.id }}" onclick="checkBox()"> 
+                            {% else %} 
+                            {% if leaveReportRecord.status == 0 %}
+                            {% if leaveReportRecord.leave_status == 1 and leaveReportRecord.level_id == 2 %} 
+                            <input type="checkbox" class="checkbox " id="new_module_1 2" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+                            {% elif leaveReportRecord.leave_status == 2 %} 
+                            <input type="checkbox" class="checkbox " id="new_module_1 3" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+                            {% elif leaveReportRecord.leave_status == 3 %} 
+                            <input type="checkbox" class="checkbox  4{{leaveReportRecord.status}}" id="new_module_1" name="order_id[]" value="{{leaveReportRecord.id}}"> 
+                            {% else %}  
+                            {% endif %} 
+                            {% else %} 
+                            <input type="checkbox" disabled checked> 
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        
+                        <td class="user_name" >{{ leaveReportRecord.user_name  }}</td>
+                        
+                        <td class="leave_from_date" >
+                            {{ leaveReportRecord.leave_from_date | date:"d/m/Y"}} - {{ leaveReportRecord.leave_to_date | date:"d/m/Y"}}
+                        </td>
+                        <td class="remark" >{% if leaveReportRecord.leave_detail %} {{  leaveReportRecord.leave_detail   }} {% else %} - {% endif %}
+                            
+                        </td>
+                        <td class="attachment" >
+                            {% if leaveReportRecord.attachment is not None and leaveReportRecord.attachment != "" %}
+                            <a href="{{leaveReportRecord.attachment}}" download><i class="fa fa-download"></i></a>
+                            {% else %}
+                            --
+                            {% endif %}
+                        </td>
+                        
+                        <td class="status">  
+                            <a href="javascript:void(0)" onclick="getLeaveStatus('{{ leaveReportRecord.id }}')">
+                                {% if role_id == 0 %} {% if leaveReportRecord.leave_status	 == 1 %} Initiated {% elif leaveReportRecord.leave_status == 2 %} Forwarded {% elif leaveReportRecord.leave_status == 3 %} Approved {% elif leaveReportRecord.leave_status == 4 %} Declined {% else %} {{leaveReportRecord.leave_status}}   {% endif %} {% else %} 
+                                {% if leaveReportRecord.leave_status == 4 %} Declined {% elif leaveReportRecord.leave_status == 3 %}Approved {% elif leaveReportRecord.status == 0 %}{% if leaveReportRecord.leave_status == 1 and leaveReportRecord.level_id == 2 %} Initiated {% elif leaveReportRecord.leave_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}
+                            </a></td>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="5"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>                        
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="leaveModal" data-keyboard="false" data-backdrop="static" style="display: none;"></div>
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+<script>
+    
+    function getLeaveStatus(leave_id){       
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:leave-status-details' %}",
+            method: 'GET',
+            data: { leave_id:leave_id },
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function checkBox(){
+        
+        if ($('.checkbox:checked').length == $('.checkbox').length) {        
+            $('.checked_all').prop('checked', true);
+        }
+        else{        
+            $('.checked_all').prop('checked', false);
+        }
+        
+    }
+    
+    function updateLeaveStatus(level_id, leave_status, remark=''){
+        
+        var leaveID = [];
+       
+        $('.checkbox').each(function (index, obj) {
+            if (this.checked === true) {
+                var id = parseInt($(this).val());
+                leaveID.push(id);
+            }
+        });
+        {% if role_id == 0 %}
+        level_id = parseInt($('#leave_status').val())+1;        
+        {% else %}
+        level_id = level_id
+        {% endif %}
+        if(leaveID.length > 0){
+            showLoader();
+            
+            $.ajax({
+                url: "{% url 'src:update-leave-status' %}",
+                method: 'POST',                
+                data: { level_id:level_id, leave_status:leave_status, remark:remark, leave_id: leaveID, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    if (data.error == false) {
+                        console.log(data.message)
+                        
+                        openToaster("success", data.message);
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    
+    function getleaveRecord(){
+        var user_id    = $('#user_id').val();
+        var leave_status    = $('#leave_status').val();
+        
+        $('#tablebody').html('<tr><td colspan="8"><div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div></td></tr>');
+            $.ajax({
+                url: "{% url 'src:ajax-leave-report-lists' %}",
+                method: 'GET',
+                data: { user_id:user_id,leave_status:leave_status},
+                success: function (data) {
+                    console.log(data)
+                    $('#tablebody').html(data);
+                    $('#addOrgTable').trigger('update');
+                    $('#tablebody > tr').removeAttr('class')
+                },
+                error: function (err) {
+                    alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        
+        function approveLeaveStatus(id) {
+            $('#leaveModal').html('');
+            showLoader();
+            $.ajax({
+                url: "{% url 'src:edit-leave-status' %}",
+                method: 'GET',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    hideLoader();
+                    $("#leaveModal").show();
+                    $('#leaveModal').html(data);
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        function exports(type){
+            var columns     = $('#show_columns').val();    
+            var user_id   = $('#user_id').val();
+            var status_leave = $('#leave_status').val();
+            if(status_leave == ''){
+                status_leave = 0
+                // alert("Select Status From dropdown Box");
+                // return false;
+            }
+            if(user_id){ user_id = user_id; }else{ user_id = '0' }
+            // var leave_from_date  = $('#leave_from_datepicker').val();
+            // if(leave_from_date){ 
+                //     leave_from_date = leave_from_date.split('/');
+                //     leave_from_date = leave_from_date[2]+'-'+leave_from_date[1]+'-'+leave_from_date[0];
+                // }else{ leave_from_date = '0' }
+                
+                // var leave_to_date  = $('#leave_to_datepicker').val();
+                // if(leave_to_date){ 
+                    //     leave_to_date = leave_to_date.split('/');
+                    //     leave_to_date = leave_to_date[2]+'-'+leave_to_date[1]+'-'+leave_to_date[0];
+                    // }else{ leave_to_date = '0' }
+                    
+                    
+                    if(columns == ''){
+                        openToaster("danger", "Please select at-least one column");
+                    } else {
+                        if(type == 'excel'){
+                            var url = "{% url 'src:export-leave-report-to-xlsx' 'columns' 'userId'  'status_leave' %}";
+                            url = url.replace('columns',columns).replace('userId',user_id).replace('status_leave',status_leave);
+                            console.log(url);
+                            window.location.href = url;
+                        } else {
+                            var url = "{% url 'src:export-leave-report-to-pdf'  'columns' 'userId' 'status_leave' %}";
+                            url = url.replace('columns',columns).replace('userId',user_id).replace('status_leave',status_leave);
+                            console.log(url);
+                            window.location.href = url;
+                        }
+                    }
+                    
+                }
+                function freezeColumn(id, colNo) {
+                    $('#' + id).addClass("frezedIcon frezedCell");
+                    $("#addOrgTable tbody tr").each(function (index) {
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+                    });
+                    $('#' + id + ' #freeze').show();
+                    $('#' + id + ' #unfreeze').hide();
+                }
+                
+                function unfreezeColumn(id, colNo) {
+                    $('#' + id).removeClass("frezedIcon frezedCell");
+                    $("#addOrgTable tbody tr").each(function (index) {
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                        $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+                    });
+                    $('#' + id + ' #unfreeze').show();
+                    $('#' + id + ' #freeze').hide();
+                }
+                
+                function toggleFreeze(inputid, colid, colNo) {
+                    var checkbox = document.getElementById(inputid);
+                    
+                    if (checkbox.checked == true) {
+                        $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+                        $("#addOrgTable tbody tr").each(function (index) {
+                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+                        });
+                        $('#' + colid + ' #freeze').show();
+                        $('#' + colid + ' #unfreeze').hide();
+                    } else {
+                        $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+                        $("#addOrgTable tbody tr").each(function (index) {
+                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+                        });
+                        $('#' + colid + ' #unfreeze').show();
+                        $('#' + colid + ' #freeze').hide();
+                    }
+                }
+                
+                function showHideColumns(inputid, colNo) {
+                    var checkbox_val = [];
+                    var checkbox = document.getElementById(inputid);
+                    if (checkbox.checked == true) {
+                        $('.'+inputid).hide();
+                    }else{
+                        $('.'+inputid).show();
+                    }
+                    $("input:checkbox[class=colCheck]").each(function () {
+                        if(!$(this).is(':checked')){
+                            checkbox_val.push($(this).attr("id"))
+                        }
+                    });
+                    checkbox_str = checkbox_val.join(',');
+                    $('#show_columns').val(checkbox_str);
+                }
+                
+                $(document).ready(function () {
+                    setHeightWidth();
+                    
+                    $("#leave_from_datepicker").datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        dateFormat: 'dd/mm/yy' 
+                    });
+                    
+                    $("#leave_to_datepicker").datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        // maxDate: 0,
+                        dateFormat: 'dd/mm/yy' 
+                    });
+                    
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["5%", "21.5%", "21.5%", "21.5%", "20%","20%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                    $(".mobileCode").mask("+00");
+                    $(".phoneCode").mask("000");
+                    $(".landLineNo").mask("00000000");
+                    $(".mobileNo").mask("0000000000");
+                    $(".pincode").mask("000000");
+                });
+                
+                $(document).ready(function () {
+                    var checkbox_val = ["user_name","leave_from_date","remark","status"];
+                    checkbox_str = checkbox_val.join(',');
+                    $('#show_columns').val(checkbox_str);
+                    
+                    $(".colCheck").change(function () {
+                        if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                            //do something
+                            $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+                        } else {
+                            $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+                        }
+                    });
+                    
+                    $(".colFreezeCheck").change(function () {
+                        if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                            //do something
+                            $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+                        } else {
+                            $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+                        }
+                    });
+                    
+                    $('.checked_all').on('change', function() {     
+                        $('.checkbox').prop('checked', $(this).prop("checked")); 
+                        if($('.checkbox:checked').length > 0){
+                            $('#forward').show();
+                        }else{
+                            $('#forward').hide();
+                        }             
+                    });
+                    
+                    $('.checkbox').change(function(){ 
+                        if($('.checkbox:checked').length == $('.checkbox').length){
+                            //alert($('.checkbox').length + $('.checkbox:checked').length);
+                            $('.checked_all').prop('checked',true);
+                        }else{
+                            $('.checked_all').prop('checked',false);
+                        }
+                        if($('.checkbox:checked').length > 0){
+                            $('#forward').show();
+                        }else{
+                            $('#forward').hide();
+                        }
+                    }); 
+                    
+                    {% if leaveReport %}
+                    $(".checked_all").attr("disabled", false);
+                    {% else %}    
+                    $(".checked_all").attr("disabled", true);
+                    {% endif %}
+                    
+                    {% if role_id == 0 %}
+                    $(".all_checkbox_class").css("display", "none");
+                    $(".checked_class").css("display", "none");
+                    {% endif %}
+                    jQuery(".main-table").clone(true).appendTo('#table-scroll').addClass('clone');
+                    jQuery(".main-tableModal").clone(true).appendTo('#table-scrollModal').addClass('clone');
+                });
+                
+                $(window).resize(function () {
+                    setHeightWidth();
+                });
+                
+                $(document).on('click', '.pagination a', function (event) {
+                    event.preventDefault();
+                    var page = $(this).attr('href').split('page=')[1];
+                    
+                    $('li').removeClass('active');
+                    $(this).parent().addClass('active');
+                    ajaxOrganizationList(page);
+                });
+            </script>
+            
+            <script>
+                
+                
+                function getLeaveReportRecord(){
+                    var user_name    = $('#user_name_search').val();
+                    var leave_from_date         = $('#leave_from_datepicker').val();
+                    var leave_to_date         = $('#leave_to_datepicker').val();
+                    
+                    $('#tablebody').html('<tr><td colspan="8"><div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div></td></tr>');
+                        $.ajax({
+                            url: "{% url 'src:ajax-leave-report-lists' %}",
+                            method: 'GET',
+                            data: { user_name:user_name, leave_from_date:leave_from_date, leave_to_date:leave_to_date },
+                            success: function (data) {
+                                $('#tablebody').html(data);
+                                $('#addOrgTable').trigger('update');
+                            },
+                            error: function (err) {
+                                // alert(err.message);
+                                // window.location.reload();
+                            }
+                        });
+                    }
+                    
+                    
+                    
+                </script>
+                <script>
+                    function updateLeaveRemarks(level_id, leave_status) {
+                        $('#addUserModal').html('');
+                        showLoader();
+                        $.ajax({
+                            url: "{% url 'src:update-leave-remark' %}",
+                            method: 'GET',
+                            data: { level_id:level_id, leave_status:leave_status },
+                            success: function (data) {
+                                hideLoader();
+                                $("#addUserModal").show();
+                                $('#addUserModal').html(data);                
+                            },
+                            error: function (err) {
+                                console.log(err)
+                            }
+                        });
+                    };
+                </script>
+                {% endblock %}
